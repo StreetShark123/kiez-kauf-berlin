@@ -13,7 +13,7 @@ type SearchPayload = {
 };
 
 const LOCATION_CACHE_KEY = "kiezkauf:last-location";
-const LOCATION_CACHE_TTL_MS = 1000 * 60 * 60 * 12;
+const LOCATION_CACHE_TTL_MS = 1000 * 60 * 30;
 
 function triggerHaptic(pattern: number | number[] = 10) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -23,6 +23,24 @@ function triggerHaptic(pattern: number | number[] = 10) {
 
 function formatRadiusKm(radiusKm: number) {
   return Number.isInteger(radiusKm) ? `${radiusKm} km` : `${radiusKm.toFixed(1)} km`;
+}
+
+function formatDistance(distanceMeters: number) {
+  if (distanceMeters < 1000) {
+    return `${Math.round(distanceMeters)} m`;
+  }
+  return `${(distanceMeters / 1000).toFixed(1)} km`;
+}
+
+function primaryCategory(result: SearchResult, unknownCategoryLabel: string) {
+  return result.store.appCategories?.[0] ?? result.store.osmCategory ?? unknownCategoryLabel;
+}
+
+function formatValidation(dictionary: Dictionary, status: SearchResult["validationStatus"]) {
+  if (status === "validated") return dictionary.validationValidated;
+  if (status === "likely") return dictionary.validationLikely;
+  if (status === "rejected") return dictionary.validationRejected;
+  return dictionary.validationUnvalidated;
 }
 
 export function SearchExperience({
@@ -59,7 +77,12 @@ export function SearchExperience({
         return;
       }
 
-      const parsed = JSON.parse(cached) as { lat: number; lng: number; timestamp: number };
+      const parsed = JSON.parse(cached) as {
+        lat: number;
+        lng: number;
+        timestamp: number;
+        accuracy?: number;
+      };
       if (
         typeof parsed?.lat !== "number" ||
         typeof parsed?.lng !== "number" ||
@@ -69,6 +92,9 @@ export function SearchExperience({
       }
 
       if (Date.now() - parsed.timestamp > LOCATION_CACHE_TTL_MS) {
+        return;
+      }
+      if (typeof parsed.accuracy === "number" && parsed.accuracy > 300) {
         return;
       }
 
@@ -134,37 +160,46 @@ export function SearchExperience({
       return;
     }
 
+    const applyPosition = (position: GeolocationPosition) => {
+      const nextCenter = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+      setCenter(nextCenter);
+      setLocationMessage(dictionary.geolocationReady);
+      setErrorMessage(null);
+      setIsLocating(false);
+      pulse([10, 22, 10]);
+
+      try {
+        localStorage.setItem(
+          LOCATION_CACHE_KEY,
+          JSON.stringify({
+            ...nextCenter,
+            accuracy: position.coords.accuracy,
+            timestamp: Date.now()
+          })
+        );
+      } catch {
+        // Ignore localStorage write errors.
+      }
+    };
+
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const nextCenter = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude
-        };
-        setCenter(nextCenter);
-        setLocationMessage(dictionary.geolocationReady);
-        setErrorMessage(null);
-        setIsLocating(false);
-        pulse([10, 22, 10]);
-
-        try {
-          localStorage.setItem(
-            LOCATION_CACHE_KEY,
-            JSON.stringify({
-              ...nextCenter,
-              timestamp: Date.now()
-            })
-          );
-        } catch {
-          // Ignore localStorage write errors.
-        }
-      },
+      applyPosition,
       () => {
-        setErrorMessage(dictionary.geolocationError);
-        setIsLocating(false);
-        pulse(26);
+        navigator.geolocation.getCurrentPosition(
+          applyPosition,
+          () => {
+            setErrorMessage(dictionary.geolocationError);
+            setIsLocating(false);
+            pulse(26);
+          },
+          { enableHighAccuracy: false, timeout: 20000, maximumAge: 120000 }
+        );
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   }
 
@@ -172,7 +207,7 @@ export function SearchExperience({
     <section className="space-y-4">
       <section className="tool-block">
         <div className="tool-row hand-divider p-3 md:p-4">
-          <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto_auto]">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-2">
             <label className="sr-only" htmlFor="search-query-input">
               {dictionary.searchPlaceholder}
             </label>
@@ -193,8 +228,8 @@ export function SearchExperience({
               type="button"
               onClick={runSearch}
               disabled={isLoading}
-              className={`btn-primary min-w-[124px] md:min-w-[150px] disabled:cursor-not-allowed ${
-                isLoading ? "is-loading-stroke" : ""
+              className={`btn-primary search-submit min-w-[108px] sm:min-w-[124px] md:min-w-[150px] disabled:cursor-not-allowed ${
+                isLoading ? "is-loading-simple" : ""
               }`}
               aria-busy={isLoading}
             >
@@ -281,11 +316,44 @@ export function SearchExperience({
           validationLikelyLabel={dictionary.validationLikely}
           validationValidatedLabel={dictionary.validationValidated}
           unknownCategoryLabel={dictionary.unknownCategory}
+          radiusMeters={Math.round(radiusKm * 1000)}
           className="h-[58vh] min-h-[300px] border border-neutral-300 md:h-[66vh] md:min-h-[360px]"
         />
 
         {!isLoading && hasSearched && results.length === 0 ? (
           <p className="border border-neutral-300 p-3 text-sm text-neutral-600">{dictionary.noResults}</p>
+        ) : null}
+
+        {results.length > 0 ? (
+          <section className="border-t border-neutral-300 pt-2">
+            <h3 className="mb-2 text-sm font-medium tracking-tight">{dictionary.resultsTitle}</h3>
+            <div className="space-y-1.5">
+              {results.map((result) => (
+                <details key={result.offer.id} className="store-item" onToggle={() => pulse(6)}>
+                  <summary className="store-summary">
+                    <span className="store-summary-name">{result.store.name}</span>
+                    <span className="mono store-summary-distance">{formatDistance(result.distanceMeters)}</span>
+                  </summary>
+                  <div className="store-details">
+                    <p className="store-detail-line">
+                      {dictionary.matchedProductLabel}: {result.product.normalizedName}
+                    </p>
+                    <p className="store-detail-line">
+                      {dictionary.storeCategoryLabel}: {primaryCategory(result, dictionary.unknownCategory)}
+                    </p>
+                    {result.validationStatus ? (
+                      <p className="store-detail-line">
+                        {dictionary.validationLabel}: {formatValidation(dictionary, result.validationStatus)}
+                      </p>
+                    ) : null}
+                    {result.whyThisProductMatches ? (
+                      <p className="store-detail-line">{result.whyThisProductMatches}</p>
+                    ) : null}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </section>
         ) : null}
       </section>
     </section>
