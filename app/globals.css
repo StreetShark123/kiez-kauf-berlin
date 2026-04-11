@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --bg: #fbfbf9;
+  --paper: #ffffff;
+  --ink: #0f0f0f;
+  --ink-soft: #4a4a4a;
+  --line: #d6d6d4;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-display), "Helvetica Neue", sans-serif;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(251, 251, 249, 0.95)),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 27px,
+      rgba(0, 0, 0, 0.015) 27px,
+      rgba(0, 0, 0, 0.015) 28px
+    );
+  color: var(--ink);
+}
+
+a,
+button {
+  cursor: pointer;
+}
+
+.mono {
+  font-family: var(--font-mono), "Courier New", monospace;
+}
+
+.note-card {
+  position: relative;
+  border: 2px solid var(--ink);
+  border-radius: 1.25rem;
+  background: var(--paper);
+  box-shadow: 6px 6px 0 0 rgba(15, 15, 15, 0.08);
+}
+
+.paper-lines {
+  background:
+    linear-gradient(var(--paper), var(--paper)) padding-box,
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 31px,
+      rgba(15, 15, 15, 0.07) 31px,
+      rgba(15, 15, 15, 0.07) 32px
+    ) border-box;
+}
+
+.note-tape {
+  position: relative;
+}
+
+.note-tape::before,
+.note-tape::after {
+  content: "";
+  position: absolute;
+  width: 54px;
+  height: 14px;
+  background: rgba(15, 15, 15, 0.08);
+  border: 1px solid rgba(15, 15, 15, 0.15);
+  border-radius: 6px;
+  top: -8px;
+}
+
+.note-tape::before {
+  left: 20px;
+  transform: rotate(-7deg);
+}
+
+.note-tape::after {
+  right: 20px;
+  transform: rotate(8deg);
+}
+
+.stamp {
+  display: inline-flex;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  letter-spacing: 0.09em;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  font-family: var(--font-mono), "Courier New", monospace;
+}
+
+input,
+button,
+select {
+  font: inherit;
+}
