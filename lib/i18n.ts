@@ -3,24 +3,32 @@ import type { Locale } from "@/lib/types";
 export type Dictionary = {
   appTitle: string;
   appSubtitle: string;
-  noteBadge: string;
-  noteTagline: string;
-  headerLinePrimary: string;
-  headerLineSecondary: string;
   searchPlaceholder: string;
   radiusLabel: string;
   searchButton: string;
   useMyLocation: string;
   addressSectionTitle: string;
-  addressSectionHint: string;
   locationFallbackLabel: string;
   locationFallbackPlaceholder: string;
   resolveLocationButton: string;
   resultsTitle: string;
+  mapTitle: string;
+  goToResults: string;
+  goToMap: string;
   noResults: string;
   openStore: string;
   routeAction: string;
   matchedProductLabel: string;
+  storeCategoryLabel: string;
+  confidenceLabel: string;
+  validationLabel: string;
+  whyMatchLabel: string;
+  validationLikely: string;
+  validationValidated: string;
+  validationUnvalidated: string;
+  validationRejected: string;
+  unknownCategory: string;
+  unknownConfidence: string;
   storeProductsTitle: string;
   priceUnknown: string;
   availabilityInStock: string;
@@ -34,7 +42,6 @@ export type Dictionary = {
   queryRequiredError: string;
   searchRequestError: string;
   mapYouAreHere: string;
-  storeNoteBadge: string;
   itemLabel: string;
   backToSearch: string;
   notFoundTitle: string;
@@ -45,25 +52,33 @@ export type Dictionary = {
 const dictionaries: Record<Locale, Dictionary> = {
   de: {
     appTitle: "KiezKauf Berlin",
-    appSubtitle: "Finde Produkte in Geschaeften in deiner Naehe.",
-    noteBadge: "Einkaufsnotiz",
-    noteTagline: "Notieren, finden, losgehen.",
-    headerLinePrimary: "Bereit fuer exakte Produktsuche in deiner Naehe.",
-    headerLineSecondary: "Kein Login. Schnell. Lokal.",
+    appSubtitle: "Lokale Produktsuche in Berlin.",
     searchPlaceholder: "Produkt exakt suchen (z. B. Hafermilch 1L)",
     radiusLabel: "Suchradius (km)",
     searchButton: "Produkte suchen",
     useMyLocation: "Meinen Standort nutzen",
     addressSectionTitle: "Deine Adresse",
-    addressSectionHint: "Du kannst Strasse + Hausnummer oder Postleitzahl eingeben.",
     locationFallbackLabel: "Fallback ohne GPS",
     locationFallbackPlaceholder: "Adresse oder Postleitzahl in Berlin",
     resolveLocationButton: "Adresse auf Karte finden",
     resultsTitle: "Ergebnisse in deiner Naehe",
+    mapTitle: "Karte",
+    goToResults: "Zu Ergebnissen",
+    goToMap: "Zur Karte",
     noResults: "Keine Treffer im Radius. Probiere einen groesseren Radius oder einen anderen Produktnamen.",
     openStore: "Details zur Filiale",
     routeAction: "Route starten",
     matchedProductLabel: "Produkt",
+    storeCategoryLabel: "Kategorie",
+    confidenceLabel: "Treffer-Sicherheit",
+    validationLabel: "Datenstatus",
+    whyMatchLabel: "Warum dieser Treffer",
+    validationLikely: "Wahrscheinlich",
+    validationValidated: "Validiert",
+    validationUnvalidated: "Ungeprueft",
+    validationRejected: "Verworfen",
+    unknownCategory: "Nicht klassifiziert",
+    unknownConfidence: "Keine Angabe",
     storeProductsTitle: "Produkte in dieser Filiale",
     priceUnknown: "Preis nicht verfuegbar",
     availabilityInStock: "Auf Lager",
@@ -77,7 +92,6 @@ const dictionaries: Record<Locale, Dictionary> = {
     queryRequiredError: "Bitte gib einen Produktnamen ein.",
     searchRequestError: "Die Suche ist fehlgeschlagen.",
     mapYouAreHere: "Dein Standort",
-    storeNoteBadge: "Filialnotiz",
     itemLabel: "Artikel",
     backToSearch: "Zurueck zur Suche",
     notFoundTitle: "Nicht gefunden",
@@ -86,25 +100,33 @@ const dictionaries: Record<Locale, Dictionary> = {
   },
   en: {
     appTitle: "KiezKauf Berlin",
-    appSubtitle: "Find products in local shops near you.",
-    noteBadge: "Shopping Note",
-    noteTagline: "Write it, find it, walk there.",
-    headerLinePrimary: "Ready to search exact products and buy nearby.",
-    headerLineSecondary: "No login. Fast. Local.",
+    appSubtitle: "Local product search in Berlin.",
     searchPlaceholder: "Search exact product (e.g. oat milk 1L)",
     radiusLabel: "Search radius (km)",
     searchButton: "Search products",
     useMyLocation: "Use my location",
     addressSectionTitle: "Your address",
-    addressSectionHint: "Enter a street address or a postal code in Berlin.",
     locationFallbackLabel: "Fallback without GPS",
     locationFallbackPlaceholder: "Address or postal code in Berlin",
     resolveLocationButton: "Find address on map",
     resultsTitle: "Results near you",
+    mapTitle: "Map",
+    goToResults: "Jump to results",
+    goToMap: "Jump to map",
     noResults: "No matches in this radius. Try a wider radius or another product name.",
     openStore: "Store details",
     routeAction: "Get directions",
     matchedProductLabel: "Product",
+    storeCategoryLabel: "Category",
+    confidenceLabel: "Confidence",
+    validationLabel: "Data status",
+    whyMatchLabel: "Why this match",
+    validationLikely: "Likely",
+    validationValidated: "Validated",
+    validationUnvalidated: "Unvalidated",
+    validationRejected: "Rejected",
+    unknownCategory: "Unclassified",
+    unknownConfidence: "N/A",
     storeProductsTitle: "Products in this store",
     priceUnknown: "Price unavailable",
     availabilityInStock: "In stock",
@@ -118,7 +140,6 @@ const dictionaries: Record<Locale, Dictionary> = {
     queryRequiredError: "Please provide a product query.",
     searchRequestError: "Search request failed.",
     mapYouAreHere: "You are here",
-    storeNoteBadge: "Store Note",
     itemLabel: "Item",
     backToSearch: "Back to search",
     notFoundTitle: "Not found",
@@ -127,25 +148,33 @@ const dictionaries: Record<Locale, Dictionary> = {
   },
   es: {
     appTitle: "KiezKauf Berlin",
-    appSubtitle: "Encuentra productos en tiendas locales cerca de ti.",
-    noteBadge: "Nota de compra",
-    noteTagline: "Apuntalo, encuentralo, ve a por ello.",
-    headerLinePrimary: "Listo para buscar productos exactos y comprar cerca.",
-    headerLineSecondary: "Sin registro. Rapido. Local.",
+    appSubtitle: "Buscador local de productos en Berlin.",
     searchPlaceholder: "Busca un producto exacto (por ej. leche de avena 1L)",
     radiusLabel: "Radio de busqueda (km)",
     searchButton: "Buscar productos",
     useMyLocation: "Usar mi ubicacion",
     addressSectionTitle: "Tu direccion",
-    addressSectionHint: "Puedes escribir calle y numero o codigo postal en Berlin.",
     locationFallbackLabel: "Modo manual sin GPS",
     locationFallbackPlaceholder: "Direccion o codigo postal en Berlin",
     resolveLocationButton: "Buscar direccion en el mapa",
     resultsTitle: "Resultados cerca de ti",
+    mapTitle: "Mapa",
+    goToResults: "Ir a resultados",
+    goToMap: "Ir al mapa",
     noResults: "No hay resultados en este radio. Prueba con un radio mayor u otro producto.",
     openStore: "Ver tienda",
     routeAction: "Como llegar",
     matchedProductLabel: "Producto",
+    storeCategoryLabel: "Categoria",
+    confidenceLabel: "Confianza",
+    validationLabel: "Estado del dato",
+    whyMatchLabel: "Por que coincide",
+    validationLikely: "Probable",
+    validationValidated: "Validado",
+    validationUnvalidated: "Sin validar",
+    validationRejected: "Descartado",
+    unknownCategory: "Sin categoria",
+    unknownConfidence: "Sin dato",
     storeProductsTitle: "Productos en esta tienda",
     priceUnknown: "Precio no disponible",
     availabilityInStock: "En stock",
@@ -159,7 +188,6 @@ const dictionaries: Record<Locale, Dictionary> = {
     queryRequiredError: "Escribe un producto para buscar.",
     searchRequestError: "La busqueda ha fallado.",
     mapYouAreHere: "Tu ubicacion",
-    storeNoteBadge: "Nota de tienda",
     itemLabel: "Articulo",
     backToSearch: "Volver a la busqueda",
     notFoundTitle: "No encontrado",

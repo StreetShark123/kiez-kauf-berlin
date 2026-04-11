@@ -8,3 +8,7 @@ coverage
 .DS_Store
 *.log
 .vercel
+.agents
+skills-lock.json
+data/berlin/.pipeline-state.json
+data/berlin/osm_berlin_establishments.normalized.json

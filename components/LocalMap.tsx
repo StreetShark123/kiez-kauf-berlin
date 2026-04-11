@@ -93,7 +93,7 @@ export function LocalMap({
   return (
     <div
       ref={containerRef}
-      className={`bw-map w-full overflow-hidden rounded-2xl border border-[#cfd6df] bg-white shadow-[0_10px_24px_rgba(16,18,20,0.08)] ${
+      className={`bw-map w-full overflow-hidden rounded-[0.7rem] bg-white ${
         className ?? "h-[320px]"
       }`}
     />

@@ -17,8 +17,7 @@ function haversineMeters(aLat: number, aLng: number, bLat: number, bLng: number)
 
   const part1 =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(aLat)) * Math.cos(toRadians(bLat)) *
-      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    Math.cos(toRadians(aLat)) * Math.cos(toRadians(bLat)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
 
   const part2 = 2 * Math.atan2(Math.sqrt(part1), Math.sqrt(1 - part1));
   return earthRadius * part2;
@@ -28,6 +27,10 @@ type JoinedRow = {
   offer: Offer;
   product: Product;
   store: Store;
+  confidence?: number | null;
+  validationStatus?: SearchResult["validationStatus"];
+  whyThisProductMatches?: string | null;
+  sourceType?: SearchResult["sourceType"];
 };
 
 type SupabaseOfferRow = {
@@ -73,6 +76,25 @@ type SupabaseOfferRow = {
       }>;
 };
 
+type SupabaseSearchDatasetRow = {
+  establishment_id: number;
+  canonical_product_id: number;
+  source_type: SearchResult["sourceType"];
+  confidence: number;
+  validation_status: SearchResult["validationStatus"];
+  why_this_product_matches: string | null;
+  updated_at: string;
+  establishment_name: string;
+  address: string;
+  district: string;
+  lat: number;
+  lon: number;
+  osm_category: string | null;
+  app_categories: string[] | null;
+  product_normalized_name: string;
+  product_group: string;
+};
+
 function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng: number; radius: number }): SearchResult[] {
   const normalized = normalizeQuery(args.query);
 
@@ -85,8 +107,18 @@ function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng:
       );
       const exactMatch = row.product.normalizedName === normalized ? 1 : 0;
       const includesMatch = row.product.normalizedName.includes(normalized) ? 1 : 0;
+      const confidenceScore = typeof row.confidence === "number" ? row.confidence * 2000 : 0;
+      const validationScore =
+        row.validationStatus === "validated"
+          ? 1500
+          : row.validationStatus === "likely"
+            ? 700
+            : row.validationStatus === "rejected"
+              ? -10000
+              : 0;
 
-      const rank = exactMatch * 100000 + includesMatch * 50000 - distanceMeters - freshnessHours * 2;
+      const rank =
+        exactMatch * 100000 + includesMatch * 50000 + confidenceScore + validationScore - distanceMeters - freshnessHours * 2;
 
       return {
         offer: row.offer,
@@ -94,7 +126,11 @@ function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng:
         store: row.store,
         distanceMeters,
         freshnessHours,
-        rank
+        rank,
+        confidence: row.confidence ?? null,
+        validationStatus: row.validationStatus ?? null,
+        whyThisProductMatches: row.whyThisProductMatches ?? null,
+        sourceType: row.sourceType ?? null
       };
     })
     .filter((row) => row.distanceMeters <= args.radius)
@@ -119,7 +155,7 @@ function getMockRows(): JoinedRow[] {
     .filter((row): row is JoinedRow => row !== null);
 }
 
-async function getSupabaseRows(): Promise<JoinedRow[]> {
+async function getSupabaseRowsLegacy(): Promise<JoinedRow[]> {
   if (!supabase) {
     return [];
   }
@@ -174,6 +210,151 @@ async function getSupabaseRows(): Promise<JoinedRow[]> {
     .filter((row): row is JoinedRow => row !== null);
 }
 
+async function searchSupabaseRowsFromDataset(args: { query: string; limit?: number }): Promise<JoinedRow[] | null> {
+  if (!supabase) {
+    return null;
+  }
+
+  const normalized = normalizeQuery(args.query);
+
+  const { data, error } = await supabase
+    .from("search_product_establishment_dataset")
+    .select(
+      "establishment_id, canonical_product_id, source_type, confidence, validation_status, why_this_product_matches, updated_at, establishment_name, address, district, lat, lon, osm_category, app_categories, product_normalized_name, product_group"
+    )
+    .ilike("product_normalized_name", `%${normalized}%`)
+    .limit(args.limit ?? 800);
+
+  if (error) {
+    const message = (error.message || "").toLowerCase();
+    const fallbackEligible =
+      message.includes("relation") ||
+      message.includes("does not exist") ||
+      message.includes("search_product_establishment_dataset") ||
+      message.includes("column");
+
+    if (fallbackEligible) {
+      return null;
+    }
+
+    throw new Error(`Supabase search dataset query failed: ${error.message}`);
+  }
+
+  const rows = (data ?? []) as SupabaseSearchDatasetRow[];
+
+  return rows.map((row) => {
+    const storeId = String(row.establishment_id);
+    const productId = String(row.canonical_product_id);
+    const offerId = `candidate_${storeId}_${productId}_${row.source_type ?? "unknown"}`;
+    const updatedAt = row.updated_at ?? new Date().toISOString();
+
+    return {
+      offer: {
+        id: offerId,
+        storeId,
+        productId,
+        priceOptional: null,
+        availability: "unknown",
+        updatedAt
+      },
+      store: {
+        id: storeId,
+        name: row.establishment_name,
+        address: row.address,
+        district: row.district,
+        openingHours: "",
+        lat: row.lat,
+        lng: row.lon,
+        appCategories: row.app_categories ?? [],
+        osmCategory: row.osm_category
+      },
+      product: {
+        id: productId,
+        normalizedName: row.product_normalized_name,
+        brand: null,
+        category: row.product_group
+      },
+      confidence: row.confidence,
+      validationStatus: row.validation_status,
+      whyThisProductMatches: row.why_this_product_matches,
+      sourceType: row.source_type
+    } satisfies JoinedRow;
+  });
+}
+
+async function getStoreDetailFromDataset(id: string): Promise<StoreDetail | null> {
+  if (!supabase) {
+    return null;
+  }
+
+  const establishmentId = Number(id);
+  if (!Number.isFinite(establishmentId)) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("search_product_establishment_dataset")
+    .select(
+      "establishment_id, canonical_product_id, source_type, confidence, validation_status, why_this_product_matches, updated_at, establishment_name, address, district, lat, lon, osm_category, app_categories, product_normalized_name, product_group"
+    )
+    .eq("establishment_id", establishmentId)
+    .limit(500);
+
+  if (error) {
+    const message = (error.message || "").toLowerCase();
+    if (
+      message.includes("relation") ||
+      message.includes("does not exist") ||
+      message.includes("search_product_establishment_dataset")
+    ) {
+      return null;
+    }
+    throw new Error(`Supabase store detail dataset query failed: ${error.message}`);
+  }
+
+  const rows = (data ?? []) as SupabaseSearchDatasetRow[];
+  if (!rows.length) {
+    return null;
+  }
+
+  const first = rows[0];
+  const store: Store = {
+    id: String(first.establishment_id),
+    name: first.establishment_name,
+    address: first.address,
+    district: first.district,
+    openingHours: "",
+    lat: first.lat,
+    lng: first.lon,
+    appCategories: first.app_categories ?? [],
+    osmCategory: first.osm_category
+  };
+
+  return {
+    store,
+    offers: rows.map((row) => {
+      const storeId = String(row.establishment_id);
+      const productId = String(row.canonical_product_id);
+      return {
+        offer: {
+          id: `candidate_${storeId}_${productId}_${row.source_type ?? "unknown"}`,
+          storeId,
+          productId,
+          priceOptional: null,
+          availability: "unknown",
+          updatedAt: row.updated_at ?? new Date().toISOString()
+        },
+        product: {
+          id: productId,
+          normalizedName: row.product_normalized_name,
+          brand: null,
+          category: row.product_group
+        }
+      };
+    })
+  };
+}
+
 export async function searchOffers(args: {
   query: string;
   lat?: number;
@@ -184,7 +365,13 @@ export async function searchOffers(args: {
   const lng = typeof args.lng === "number" ? args.lng : BERLIN_CENTER.lng;
   const radius = typeof args.radiusMeters === "number" ? args.radiusMeters : 2000;
 
-  const rows = hasSupabase ? await getSupabaseRows() : getMockRows();
+  let rows: JoinedRow[];
+  if (hasSupabase) {
+    const datasetRows = await searchSupabaseRowsFromDataset({ query: args.query });
+    rows = datasetRows ?? (await getSupabaseRowsLegacy());
+  } else {
+    rows = getMockRows();
+  }
 
   const normalized = normalizeQuery(args.query);
   const filtered = rows.filter((row) => {
@@ -196,7 +383,14 @@ export async function searchOffers(args: {
 }
 
 export async function getStoreDetail(id: string): Promise<StoreDetail | null> {
-  const rows = hasSupabase ? await getSupabaseRows() : getMockRows();
+  if (hasSupabase) {
+    const detailFromDataset = await getStoreDetailFromDataset(id);
+    if (detailFromDataset) {
+      return detailFromDataset;
+    }
+  }
+
+  const rows = hasSupabase ? await getSupabaseRowsLegacy() : getMockRows();
   const storeRows = rows.filter((row) => row.store.id === id);
 
   if (storeRows.length === 0) {

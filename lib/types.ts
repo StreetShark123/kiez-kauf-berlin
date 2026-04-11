@@ -8,6 +8,8 @@ export type Store = {
   openingHours: string;
   lat: number;
   lng: number;
+  appCategories?: string[];
+  osmCategory?: string | null;
 };
 
 export type Product = {
@@ -33,6 +35,10 @@ export type SearchResult = {
   distanceMeters: number;
   freshnessHours: number;
   rank: number;
+  confidence?: number | null;
+  validationStatus?: "unvalidated" | "likely" | "validated" | "rejected" | null;
+  whyThisProductMatches?: string | null;
+  sourceType?: "imported" | "rules_generated" | "ai_generated" | "merchant_added" | "user_validated" | null;
 };
 
 export type StoreDetail = {

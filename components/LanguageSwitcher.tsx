@@ -4,8 +4,8 @@ import type { Locale } from "@/lib/types";
 
 export function LanguageSwitcher({ locale, label }: { locale: Locale; label: string }) {
   return (
-    <nav className="flex items-center gap-2 text-xs" aria-label={label}>
-      <span className="mono text-[0.72rem] uppercase tracking-[0.12em] text-neutral-500">{label}</span>
+    <nav className="flex items-center gap-1.5 text-xs" aria-label={label}>
+      <span className="mono text-[0.68rem] uppercase tracking-[0.12em] text-neutral-500">{label}</span>
       {SUPPORTED_LOCALES.map((item) => {
         const active = item === locale;
 
@@ -13,10 +13,10 @@ export function LanguageSwitcher({ locale, label }: { locale: Locale; label: str
           <Link
             key={item}
             href={`/${item}`}
-            className={`mono rounded-full border px-2.5 py-1 text-[0.72rem] uppercase tracking-[0.08em] transition ${
+            className={`mono rounded-md border px-2 py-0.5 text-[0.68rem] uppercase tracking-[0.08em] transition ${
               active
-                ? "border-[#1f4b7a] bg-[#1f4b7a] text-white"
-                : "border-neutral-300 bg-white text-neutral-600 hover:border-[#1f4b7a] hover:text-[#1f4b7a]"
+                ? "border-neutral-900 bg-neutral-900 text-white"
+                : "border-neutral-300 bg-white text-neutral-600 hover:border-neutral-900 hover:text-neutral-900"
             }`}
           >
             {item.toUpperCase()}

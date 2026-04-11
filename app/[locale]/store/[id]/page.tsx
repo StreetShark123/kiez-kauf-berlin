@@ -23,39 +23,42 @@ export default async function StoreDetailPage({
   }
 
   return (
-    <main className="space-y-4 md:space-y-5">
-      <Link href={`/${locale}`} className="mono text-sm text-neutral-600 hover:text-[#1f4b7a]">
+    <main className="space-y-4">
+      <Link href={`/${locale}`} className="mono text-sm text-neutral-600 hover:text-neutral-900">
         {"<-"} {dictionary.backToSearch}
       </Link>
 
-      <section className="surface-card p-5 md:p-6">
-        <p className="section-title">{dictionary.storeNoteBadge}</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight">{detail.store.name}</h2>
-        <p className="mt-1 text-sm text-neutral-600">{detail.store.address}</p>
-        <p className="mono mt-1 text-xs text-neutral-500">{detail.store.openingHours}</p>
-
-        <a
-          href={buildDirectionsUrl({
-            destinationLat: detail.store.lat,
-            destinationLng: detail.store.lng
-          })}
-          target="_blank"
-          rel="noreferrer"
-          className="btn-primary mt-4 inline-flex px-4 py-2 text-sm font-medium"
-        >
-          {dictionary.routeAction}
-        </a>
+      <section className="tool-block">
+        <div className="tool-row p-4">
+          <h2 className="text-xl font-medium tracking-tight">{detail.store.name}</h2>
+          <p className="mt-1 text-sm text-neutral-700">{detail.store.address}</p>
+          {detail.store.openingHours ? <p className="status-text mt-1">{detail.store.openingHours}</p> : null}
+        </div>
+        <div className="p-4">
+          <a
+            href={buildDirectionsUrl({
+              destinationLat: detail.store.lat,
+              destinationLng: detail.store.lng
+            })}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-primary inline-flex"
+          >
+            {dictionary.routeAction}
+          </a>
+        </div>
       </section>
 
-      <section className="surface-card p-5 md:p-6">
-        <h3 className="mb-3 text-xl font-semibold tracking-tight">{dictionary.storeProductsTitle}</h3>
-        <ul className="space-y-3">
+      <section>
+        <h3 className="mb-2 text-base font-medium">{dictionary.storeProductsTitle}</h3>
+        <ul className="border-y border-neutral-300">
           {detail.offers.map((item, index) => (
-            <li key={item.offer.id} className="rounded-xl border border-[#dbe1e8] bg-[#f8fafc] p-3">
-              <p className="mono mb-1 text-[0.7rem] uppercase tracking-[0.13em] text-neutral-500">
+            <li key={item.offer.id} className="result-row">
+              <p className="status-text mb-1">
                 {dictionary.itemLabel} {String(index + 1).padStart(2, "0")}
               </p>
-              <p className="text-sm font-medium text-neutral-800">{item.product.normalizedName}</p>
+              <p className="text-sm">{item.product.normalizedName}</p>
+              <p className="status-text mt-1">{dictionary.storeCategoryLabel}: {item.product.category}</p>
             </li>
           ))}
         </ul>

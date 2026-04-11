@@ -73,3 +73,48 @@ Archivos de salida:
 - `data/moabit/stores.csv` (tiendas de Moabit desde OpenStreetMap)
 - `data/moabit/products.csv` (catalogo de productos ancla)
 - `data/moabit/store_products_template.csv` (plantilla de relaciones tienda-producto para verificacion)
+
+## Berlin pipeline (establecimientos reales + productos probables)
+
+Este pipeline usa OSM (Overpass) para traer establecimientos reales de Berlin, clasificarlos y generar productos probables con trazabilidad.
+
+Fases:
+
+1. Importar y normalizar establecimientos reales (`berlin_establishment_stage` + `establishments`)
+2. Clasificar establecimientos en categorias internas (`app_categories` + `app_category_taxonomy`)
+3. Sembrar catalogo canonico (`canonical_products`)
+4. Generar candidatos por reglas (`source_type = rules_generated`)
+5. Generar candidatos por IA (`source_type = ai_generated`, con fallback heuristico si no hay `OPENAI_API_KEY`)
+6. Fusionar candidatos sin duplicados (`establishment_product_merged`)
+7. Materializar dataset de busqueda (`search_product_establishment_mv`)
+
+Comandos:
+
+```bash
+npm run import:berlin
+npm run classify:establishments
+npm run seed:canonical-products
+npm run generate:rule-candidates
+npm run generate:ai-candidates
+npm run merge:candidates
+npm run build:search-dataset
+```
+
+Ejecucion por lotes y reanudacion:
+
+```bash
+npm run import:berlin -- --batch-size=250 --resume
+npm run classify:establishments -- --batch-size=300 --resume
+npm run generate:rule-candidates -- --batch-size=350 --resume
+npm run generate:ai-candidates -- --batch-size=120 --resume
+npm run merge:candidates -- --batch-size=500 --resume
+```
+
+Checkpoint de estado:
+
+- `data/berlin/.pipeline-state.json`
+
+Salida para buscador:
+
+- Materialized view: `search_product_establishment_mv`
+- View conveniente: `search_product_establishment_dataset`

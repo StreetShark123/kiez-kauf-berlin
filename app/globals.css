@@ -4,22 +4,17 @@
 
 :root {
   color-scheme: light;
-  --bg: #f3f4f6;
-  --surface: #ffffff;
-  --ink: #101214;
-  --ink-soft: #4a5563;
-  --line: #d8dde3;
-  --line-strong: #bcc6d1;
-  --accent: #1f4b7a;
-  --accent-soft: #e8f0f9;
+  --bg: #ffffff;
+  --ink: #111111;
+  --ink-soft: #5a5a5a;
+  --line: #d4d4d4;
+  --line-strong: #aaaaaa;
 }
 
 body {
   margin: 0;
   font-family: var(--font-display), "Helvetica Neue", sans-serif;
-  background:
-    radial-gradient(circle at 0% 0%, rgba(31, 75, 122, 0.06), transparent 40%),
-    linear-gradient(180deg, #f8fafc 0%, var(--bg) 100%);
+  background: var(--bg);
   color: var(--ink);
 }
 
@@ -34,82 +29,143 @@ button {
 
 .surface-card {
   border: 1px solid var(--line);
-  border-radius: 1rem;
-  background: var(--surface);
-  box-shadow: 0 8px 20px rgba(16, 18, 20, 0.05);
+  border-radius: 0.7rem;
+  background: #ffffff;
+}
+
+.tool-block {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.tool-row {
+  border-bottom: 1px solid var(--line);
+}
+
+.tool-row:last-child {
+  border-bottom: 0;
 }
 
 .field-input {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   background: #ffffff;
-  padding: 0.68rem 0.8rem;
+  padding: 0.62rem 0.72rem;
   color: var(--ink);
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition: border-color 120ms ease, outline-color 120ms ease;
 }
 
 .field-input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(31, 75, 122, 0.14);
+  outline: 2px solid #111111;
+  outline-offset: 1px;
+  border-color: #111111;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-ghost {
+  border-radius: 0.5rem;
+  border: 1px solid #111111;
+  padding: 0.58rem 0.84rem;
+  font-size: 0.86rem;
+  line-height: 1;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
 }
 
 .btn-primary {
-  border: 1px solid var(--accent);
-  border-radius: 0.75rem;
-  background: var(--accent);
+  background: #111111;
   color: #ffffff;
-  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
 }
 
 .btn-primary:hover {
-  background: #163a61;
-  border-color: #163a61;
+  background: #000000;
 }
 
 .btn-secondary {
-  border: 1px solid var(--line-strong);
-  border-radius: 0.75rem;
   background: #ffffff;
-  color: var(--ink);
-  transition: border-color 120ms ease, background-color 120ms ease;
+  color: #111111;
+  border-color: var(--line-strong);
 }
 
-.btn-secondary:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+.btn-secondary:hover,
+.btn-ghost:hover {
+  border-color: #111111;
+  background: #f7f7f7;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #111111;
+  border-color: var(--line);
 }
 
 .section-title {
-  font-size: 0.73rem;
-  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   color: var(--ink-soft);
   font-family: var(--font-mono), "Courier New", monospace;
 }
 
 .status-text {
-  font-size: 0.77rem;
+  font-size: 0.74rem;
   color: var(--ink-soft);
   font-family: var(--font-mono), "Courier New", monospace;
 }
 
+.ink-rule {
+  position: relative;
+}
+
+.ink-rule::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  border-bottom: 1px solid #b8b8b8;
+  transform: rotate(-0.22deg);
+  transform-origin: left center;
+}
+
+.result-row {
+  border-bottom: 1px solid var(--line);
+  padding-block: 0.9rem;
+}
+
+.result-row:last-child {
+  border-bottom: 0;
+}
+
+.result-kv {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.7rem;
+  color: #3d3d3d;
+  font-family: var(--font-mono), "Courier New", monospace;
+}
+
 .bw-map .maplibregl-canvas {
-  filter: grayscale(0.92) contrast(1.06) brightness(1.02);
+  filter: grayscale(0.94) contrast(1.06) brightness(1.02);
 }
 
 .bw-map .maplibregl-popup-content {
   border: 1px solid var(--line-strong);
-  border-radius: 0.6rem;
-  box-shadow: 0 6px 16px rgba(16, 18, 20, 0.12);
+  border-radius: 0.45rem;
+  box-shadow: none;
   font-family: var(--font-display), "Helvetica Neue", sans-serif;
   color: var(--ink);
 }
 
 .bw-map .maplibregl-ctrl-group {
   border: 1px solid var(--line-strong);
-  box-shadow: 0 4px 12px rgba(16, 18, 20, 0.1);
+  box-shadow: none;
 }
 
 input,

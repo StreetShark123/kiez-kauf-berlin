@@ -1,0 +1,90 @@
+[
+  {
+    "slug": "grocery",
+    "display_name_es": "Supermercado y alimentacion",
+    "display_name_en": "Groceries",
+    "display_name_de": "Lebensmittel",
+    "description": "General food and household shopping",
+    "parent_slug": null
+  },
+  {
+    "slug": "convenience",
+    "display_name_es": "Conveniencia",
+    "display_name_en": "Convenience",
+    "display_name_de": "Spaeti/Kiosk",
+    "description": "Small convenience and late-night stores",
+    "parent_slug": "grocery"
+  },
+  {
+    "slug": "fresh-food",
+    "display_name_es": "Fresco",
+    "display_name_en": "Fresh food",
+    "display_name_de": "Frischewaren",
+    "description": "Fresh produce, bakery and butcher style food",
+    "parent_slug": "grocery"
+  },
+  {
+    "slug": "bakery",
+    "display_name_es": "Panaderia",
+    "display_name_en": "Bakery",
+    "display_name_de": "Baeckerei",
+    "description": "Bread, pastries and bakery products",
+    "parent_slug": "fresh-food"
+  },
+  {
+    "slug": "butcher",
+    "display_name_es": "Carniceria",
+    "display_name_en": "Butcher",
+    "display_name_de": "Metzgerei",
+    "description": "Meat-specialized stores",
+    "parent_slug": "fresh-food"
+  },
+  {
+    "slug": "produce",
+    "display_name_es": "Fruta y verdura",
+    "display_name_en": "Produce",
+    "display_name_de": "Obst und Gemuese",
+    "description": "Fruit and vegetable oriented stores",
+    "parent_slug": "fresh-food"
+  },
+  {
+    "slug": "drinks",
+    "display_name_es": "Bebidas",
+    "display_name_en": "Drinks",
+    "display_name_de": "Getraenke",
+    "description": "Beverage stores and drink corners",
+    "parent_slug": "grocery"
+  },
+  {
+    "slug": "pharmacy",
+    "display_name_es": "Farmacia",
+    "display_name_en": "Pharmacy",
+    "display_name_de": "Apotheke",
+    "description": "Medicine and pharma products",
+    "parent_slug": null
+  },
+  {
+    "slug": "personal-care",
+    "display_name_es": "Cuidado personal",
+    "display_name_en": "Personal care",
+    "display_name_de": "Pflege",
+    "description": "Hygiene and beauty essentials",
+    "parent_slug": null
+  },
+  {
+    "slug": "household",
+    "display_name_es": "Hogar",
+    "display_name_en": "Household",
+    "display_name_de": "Haushalt",
+    "description": "Cleaning and daily household products",
+    "parent_slug": null
+  },
+  {
+    "slug": "bio",
+    "display_name_es": "Bio",
+    "display_name_en": "Organic",
+    "display_name_de": "Bio",
+    "description": "Organic and natural selection",
+    "parent_slug": "grocery"
+  }
+]

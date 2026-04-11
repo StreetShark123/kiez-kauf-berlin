@@ -8,7 +8,14 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "data:moabit": "node scripts/fetch-moabit-dataset.mjs"
+    "data:moabit": "node scripts/fetch-moabit-dataset.mjs",
+    "import:berlin": "node scripts/pipeline/import-berlin.mjs",
+    "classify:establishments": "node scripts/pipeline/classify-establishments.mjs",
+    "seed:canonical-products": "node scripts/pipeline/seed-canonical-products.mjs",
+    "generate:rule-candidates": "node scripts/pipeline/generate-rule-candidates.mjs",
+    "generate:ai-candidates": "node scripts/pipeline/generate-ai-candidates.mjs",
+    "merge:candidates": "node scripts/pipeline/merge-candidates.mjs",
+    "build:search-dataset": "node scripts/pipeline/build-search-dataset.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.103.0",
