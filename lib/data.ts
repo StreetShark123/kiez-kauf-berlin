@@ -242,6 +242,31 @@ function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng:
     .sort((a, b) => b.rank - a.rank);
 }
 
+function dedupeRankedResults(results: SearchResult[]): SearchResult[] {
+  const seenStoreIds = new Set<string>();
+  const seenFingerprints = new Set<string>();
+  const deduped: SearchResult[] = [];
+
+  for (const item of results) {
+    const storeIdKey = String(item.store.id);
+    const nameKey = normalizeQuery(item.store.name);
+    const addressKey = normalizeQuery(item.store.address);
+    const latKey = Math.round(item.store.lat * 10000);
+    const lngKey = Math.round(item.store.lng * 10000);
+    const fingerprint = `${nameKey}|${addressKey}|${latKey}|${lngKey}`;
+
+    if (seenStoreIds.has(storeIdKey) || seenFingerprints.has(fingerprint)) {
+      continue;
+    }
+
+    seenStoreIds.add(storeIdKey);
+    seenFingerprints.add(fingerprint);
+    deduped.push(item);
+  }
+
+  return deduped;
+}
+
 function getMockRows(): JoinedRow[] {
   return mockOffers
     .map((offer) => {
@@ -511,7 +536,7 @@ export async function searchOffers(args: {
           return productName === normalized || productName.includes(normalized);
         });
 
-  return rankResults(filtered, { query: args.query, lat, lng, radius });
+  return dedupeRankedResults(rankResults(filtered, { query: args.query, lat, lng, radius }));
 }
 
 export async function getStoreDetail(id: string): Promise<StoreDetail | null> {
@@ -541,5 +566,6 @@ export function getBerlinCenter() {
 
 export const __private = {
   inferProductGroupsFromKeyword,
-  findCanonicalProductIdsByQuery
+  findCanonicalProductIdsByQuery,
+  dedupeRankedResults
 };

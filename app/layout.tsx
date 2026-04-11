@@ -20,7 +20,25 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(() => {
+  try {
+    const storageKey = "kiezkauf:theme-preference";
+    const stored = localStorage.getItem(storageKey);
+    const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const theme = stored === "dark" || stored === "light" ? stored : (systemDark ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.style.colorScheme = theme;
+  } catch (_) {}
+})();
+            `
+          }}
+        />
+      </head>
       <body className={`${displayFont.variable} ${monoFont.variable}`}>{children}</body>
     </html>
   );

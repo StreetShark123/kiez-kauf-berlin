@@ -38,7 +38,15 @@ export type SearchResult = {
   confidence?: number | null;
   validationStatus?: "unvalidated" | "likely" | "validated" | "rejected" | null;
   whyThisProductMatches?: string | null;
-  sourceType?: "imported" | "rules_generated" | "ai_generated" | "merchant_added" | "user_validated" | null;
+  sourceType?:
+    | "imported"
+    | "rules_generated"
+    | "ai_generated"
+    | "merchant_added"
+    | "user_validated"
+    | "website_extracted"
+    | "validated"
+    | null;
 };
 
 export type StoreDetail = {

@@ -38,6 +38,8 @@ export type Dictionary = {
   updatedLabel: string;
   centerLabel: string;
   languageLabel: string;
+  themeLabel: string;
+  darkModeLabel: string;
   geolocationError: string;
   geolocationReady: string;
   geolocationRemembered: string;
@@ -93,6 +95,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     updatedLabel: "Aktualisiert",
     centerLabel: "Mitte",
     languageLabel: "Sprache",
+    themeLabel: "Ansicht",
+    darkModeLabel: "Dunkel",
     geolocationError: "Standort nicht gefunden. Suche geht trotzdem.",
     geolocationReady: "Standort aktiv",
     geolocationRemembered: "Letzter Standort aktiv",
@@ -146,6 +150,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     updatedLabel: "Updated",
     centerLabel: "Center",
     languageLabel: "Language",
+    themeLabel: "Theme",
+    darkModeLabel: "Dark",
     geolocationError: "Could not get your location. You can still search.",
     geolocationReady: "Location on",
     geolocationRemembered: "Using your last location",
@@ -199,6 +205,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     updatedLabel: "Actualizado",
     centerLabel: "Centro",
     languageLabel: "Idioma",
+    themeLabel: "Tema",
+    darkModeLabel: "Oscuro",
     geolocationError: "No pude ubicarte. Puedes buscar igual.",
     geolocationReady: "Ubicacion activa",
     geolocationRemembered: "Usando tu ultima ubicacion",

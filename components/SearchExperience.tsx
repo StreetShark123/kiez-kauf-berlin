@@ -59,6 +59,7 @@ export function SearchExperience({
   const [locationMessage, setLocationMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
   const lastHapticAtRef = useRef(0);
 
   function pulse(pattern: number | number[] = 10) {
@@ -104,6 +105,29 @@ export function SearchExperience({
       // Ignore bad local cache and keep default center.
     }
   }, [dictionary.geolocationRemembered]);
+
+  useEffect(() => {
+    const readTheme = () => {
+      if (typeof document === "undefined") {
+        return "light" as const;
+      }
+      return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : ("light" as const);
+    };
+
+    setThemeMode(readTheme());
+
+    const handleThemeChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ theme?: string }>).detail;
+      if (detail?.theme === "dark" || detail?.theme === "light") {
+        setThemeMode(detail.theme);
+        return;
+      }
+      setThemeMode(readTheme());
+    };
+
+    window.addEventListener("kiezkauf-theme-change", handleThemeChange as EventListener);
+    return () => window.removeEventListener("kiezkauf-theme-change", handleThemeChange as EventListener);
+  }, []);
 
   const resultSummary = useMemo(() => {
     if (isLoading) {
@@ -310,6 +334,7 @@ export function SearchExperience({
         <LocalMap
           center={center}
           results={results}
+          themeMode={themeMode}
           userMarkerLabel={dictionary.mapYouAreHere}
           matchedProductLabel={dictionary.matchedProductLabel}
           storeCategoryLabel={dictionary.storeCategoryLabel}

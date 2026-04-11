@@ -106,6 +106,7 @@ function createPinElement(kind: "user" | "result", rank: number) {
 export function LocalMap({
   center,
   results,
+  themeMode,
   userMarkerLabel,
   matchedProductLabel,
   storeCategoryLabel,
@@ -119,6 +120,7 @@ export function LocalMap({
 }: {
   center: { lat: number; lng: number };
   results: SearchResult[];
+  themeMode: "light" | "dark";
   userMarkerLabel: string;
   matchedProductLabel: string;
   storeCategoryLabel: string;
@@ -161,6 +163,10 @@ export function LocalMap({
         zoom: 13
       });
       const mapInstance = map;
+      const radiusLineColor = themeMode === "dark" ? "#f1f1f1" : "#111111";
+      const radiusFillColor = themeMode === "dark" ? "#f1f1f1" : "#111111";
+      const radiusFillOpacity = themeMode === "dark" ? 0.08 : 0.06;
+      const radiusLineOpacity = themeMode === "dark" ? 0.62 : 0.56;
 
       mapInstance.addControl(new maplibregl.NavigationControl(), "top-right");
 
@@ -178,8 +184,8 @@ export function LocalMap({
           type: "fill",
           source: "search-radius",
           paint: {
-            "fill-color": "#111111",
-            "fill-opacity": 0.06
+            "fill-color": radiusFillColor,
+            "fill-opacity": radiusFillOpacity
           }
         });
         mapInstance.addLayer({
@@ -187,10 +193,9 @@ export function LocalMap({
           type: "line",
           source: "search-radius",
           paint: {
-            "line-color": "#111111",
-            "line-width": 1.2,
-            "line-opacity": 0.52,
-            "line-dasharray": [2, 2]
+            "line-color": radiusLineColor,
+            "line-width": 1.25,
+            "line-opacity": radiusLineOpacity
           }
         });
 
@@ -292,7 +297,8 @@ export function LocalMap({
     validationLabel,
     validationLikelyLabel,
     validationValidatedLabel,
-    radiusMeters
+    radiusMeters,
+    themeMode
   ]);
 
   return (
