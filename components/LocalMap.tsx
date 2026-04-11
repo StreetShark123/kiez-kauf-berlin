@@ -298,7 +298,7 @@ export function LocalMap({
   return (
     <div
       ref={containerRef}
-      className={`bw-map w-full overflow-hidden rounded-[0.7rem] bg-white ${
+      className={`bw-map map-stroke-frame w-full overflow-hidden rounded-[0.7rem] bg-white ${
         className ?? "h-[320px]"
       }`}
     />

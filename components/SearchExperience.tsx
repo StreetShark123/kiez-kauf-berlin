@@ -207,7 +207,7 @@ export function SearchExperience({
     <section className="space-y-4">
       <section className="tool-block">
         <div className="tool-row hand-divider p-3 md:p-4">
-          <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-2">
+          <div className="space-y-2 md:grid md:grid-cols-[minmax(0,1fr)_auto_auto] md:gap-2 md:space-y-0">
             <label className="sr-only" htmlFor="search-query-input">
               {dictionary.searchPlaceholder}
             </label>
@@ -222,44 +222,46 @@ export function SearchExperience({
                 }
               }}
               placeholder={dictionary.searchPlaceholder}
-              className="field-input"
+              className="field-input md:col-start-1 md:row-start-1"
             />
-            <button
-              type="button"
-              onClick={runSearch}
-              disabled={isLoading}
-              className={`btn-primary search-submit min-w-[108px] sm:min-w-[124px] md:min-w-[150px] disabled:cursor-not-allowed ${
-                isLoading ? "is-loading-simple" : ""
-              }`}
-              aria-busy={isLoading}
-            >
-              <span className="btn-label">{isLoading ? dictionary.searchingLabel : dictionary.searchButton}</span>
-            </button>
-            <button
-              type="button"
-              onClick={useBrowserLocation}
-              disabled={isLocating}
-              className="btn-icon disabled:cursor-not-allowed disabled:opacity-60"
-              aria-label={dictionary.useMyLocation}
-              title={dictionary.useMyLocation}
-            >
-              <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4">
-                <path
-                  d="M12 3v3m0 12v3M3 12h3m12 0h3m-9-5a5 5 0 100 10 5 5 0 000-10z"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
+            <div className="search-action-row">
+              <button
+                type="button"
+                onClick={runSearch}
+                disabled={isLoading}
+                className={`btn-primary search-submit search-action-btn min-w-[108px] sm:min-w-[124px] md:min-w-[150px] disabled:cursor-not-allowed ${
+                  isLoading ? "is-loading-simple" : ""
+                }`}
+                aria-busy={isLoading}
+              >
+                <span className="btn-label">{isLoading ? dictionary.searchingLabel : dictionary.searchButton}</span>
+              </button>
+              <button
+                type="button"
+                onClick={useBrowserLocation}
+                disabled={isLocating}
+                className="btn-icon search-action-btn disabled:cursor-not-allowed disabled:opacity-60"
+                aria-label={dictionary.useMyLocation}
+                title={dictionary.useMyLocation}
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" className="h-4 w-4">
+                  <path
+                    d="M12 3v3m0 12v3M3 12h3m12 0h3m-9-5a5 5 0 100 10 5 5 0 000-10z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="tool-row hand-divider px-3 pb-3 pt-2 md:px-4 md:pb-4">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <label htmlFor="radius-km-slider" className="mono text-[0.74rem] text-neutral-700">
+            <label htmlFor="radius-km-slider" className="note-label note-mark">
               {dictionary.radiusLabel}
             </label>
             <span className="mono text-[0.74rem] text-neutral-700">{formatRadiusKm(radiusKm)}</span>
@@ -302,7 +304,7 @@ export function SearchExperience({
 
       <section id="map" className="space-y-2">
         <div className="hand-divider flex items-end justify-between pb-2">
-          <h2 className="text-[1.05rem] font-medium tracking-tight">{dictionary.mapTitle}</h2>
+          <h2 className="note-title">{dictionary.mapTitle}</h2>
           <p className="status-text">{resultSummary}</p>
         </div>
         <LocalMap
@@ -317,16 +319,16 @@ export function SearchExperience({
           validationValidatedLabel={dictionary.validationValidated}
           unknownCategoryLabel={dictionary.unknownCategory}
           radiusMeters={Math.round(radiusKm * 1000)}
-          className="h-[58vh] min-h-[300px] border border-neutral-300 md:h-[66vh] md:min-h-[360px]"
+          className="h-[58vh] min-h-[300px] md:h-[66vh] md:min-h-[360px]"
         />
 
         {!isLoading && hasSearched && results.length === 0 ? (
-          <p className="border border-neutral-300 p-3 text-sm text-neutral-600">{dictionary.noResults}</p>
+          <p className="note-empty border border-neutral-300 p-3 text-neutral-600">{dictionary.noResults}</p>
         ) : null}
 
         {results.length > 0 ? (
-          <section className="border-t border-neutral-300 pt-2">
-            <h3 className="mb-2 text-sm font-medium tracking-tight">{dictionary.resultsTitle}</h3>
+          <section className="note-divider pt-2">
+            <h3 className="note-subtitle note-mark mb-2">{dictionary.resultsTitle}</h3>
             <div className="space-y-1.5">
               {results.map((result) => (
                 <details key={result.offer.id} className="store-item" onToggle={() => pulse(6)}>

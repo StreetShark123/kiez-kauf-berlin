@@ -7,8 +7,10 @@
   --bg: #ffffff;
   --ink: #111111;
   --ink-soft: #5a5a5a;
+  --ink-muted: #777777;
   --line: #d4d4d4;
   --line-strong: #aaaaaa;
+  --rule-ink: #b9b9b9;
 }
 
 body {
@@ -16,6 +18,9 @@ body {
   font-family: var(--font-display), "Helvetica Neue", sans-serif;
   background: var(--bg);
   color: var(--ink);
+  font-size: 15px;
+  line-height: 1.42;
+  letter-spacing: 0.003em;
 }
 
 a,
@@ -34,6 +39,7 @@ button {
 }
 
 .tool-block {
+  position: relative;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   background: #ffffff;
@@ -72,18 +78,89 @@ button {
   left: 0;
   right: 0;
   bottom: -1px;
-  height: 1px;
-  background-image: repeating-linear-gradient(
-    90deg,
-    #c4c4c4 0,
-    #c4c4c4 14px,
-    #b6b6b6 14px,
-    #b6b6b6 21px,
-    #cecece 21px,
-    #cecece 36px
-  );
-  transform: rotate(-0.17deg);
-  transform-origin: left center;
+  height: 3px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='4' viewBox='0 0 220 4'%3E%3Cpath d='M0 2 C24 1.45 48 2.62 74 2 C100 1.42 124 2.72 150 2 C176 1.48 198 2.55 220 2' stroke='%23b8b8b8' fill='none' stroke-width='1'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 220px 3px;
+  opacity: 0.95;
+}
+
+.note-title {
+  font-size: 1.03rem;
+  font-weight: 520;
+  letter-spacing: 0.008em;
+  line-height: 1.25;
+}
+
+.note-subtitle {
+  font-size: 0.84rem;
+  font-weight: 540;
+  letter-spacing: 0.01em;
+  line-height: 1.28;
+}
+
+.note-label {
+  font-family: var(--font-mono), "Courier New", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: #4e4e4e;
+}
+
+.note-mark {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.2rem;
+}
+
+.note-mark::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.04rem;
+  height: 3px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='4' viewBox='0 0 120 4'%3E%3Cpath d='M1 2 C18 1.55 32 2.56 49 2 C67 1.5 84 2.6 103 2 C110 1.78 115 2.22 119 2' stroke='%23969696' fill='none' stroke-width='1'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 3px;
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+.note-empty {
+  position: relative;
+  font-size: 0.83rem;
+  line-height: 1.36;
+}
+
+.note-empty::after {
+  content: "";
+  position: absolute;
+  left: 0.68rem;
+  right: 0.68rem;
+  bottom: 0.42rem;
+  height: 3px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='4' viewBox='0 0 180 4'%3E%3Cpath d='M0 2 C21 1.58 44 2.55 66 2 C88 1.55 114 2.58 138 2 C153 1.66 166 2.32 180 2' stroke='%23c2c2c2' fill='none' stroke-width='1'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 3px;
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.note-divider {
+  position: relative;
+}
+
+.note-divider::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 3px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='4' viewBox='0 0 240 4'%3E%3Cpath d='M0 2 C30 1.56 58 2.54 86 2 C116 1.5 146 2.63 176 2 C202 1.52 222 2.36 240 2' stroke='%23c0c0c0' fill='none' stroke-width='1'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 240px 3px;
+  opacity: 0.88;
 }
 
 .field-input:focus {
@@ -191,6 +268,27 @@ button {
   background: #f7f7f7;
 }
 
+.search-action-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+}
+
+.search-action-btn {
+  min-height: 46px;
+}
+
+.search-action-row .btn-icon.search-action-btn {
+  width: 46px;
+  height: 46px;
+}
+
+@media (min-width: 768px) {
+  .search-action-row {
+    display: contents;
+  }
+}
+
 .range-input {
   width: 100%;
   appearance: none;
@@ -248,9 +346,10 @@ button {
 }
 
 .status-text {
-  font-size: 0.74rem;
-  color: var(--ink-soft);
+  font-size: 0.72rem;
+  color: var(--ink-muted);
   font-family: var(--font-mono), "Courier New", monospace;
+  line-height: 1.35;
 }
 
 .ink-rule {
@@ -305,6 +404,36 @@ button {
 .bw-map .maplibregl-ctrl-group {
   border: 1px solid var(--line-strong);
   box-shadow: none;
+}
+
+.map-stroke-frame {
+  position: relative;
+  border: 1px solid var(--line);
+}
+
+.map-stroke-frame::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid var(--rule-ink);
+  border-radius: 0.62rem;
+  transform: rotate(-0.18deg);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.map-stroke-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.7rem;
+  pointer-events: none;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0) calc(100% - 1px),
+    rgba(180, 180, 180, 0.32) 100%
+  );
 }
 
 .map-popup {
@@ -367,9 +496,10 @@ button {
 }
 
 .store-summary-name {
-  font-size: 0.88rem;
-  font-weight: 500;
-  line-height: 1.22;
+  font-size: 0.89rem;
+  font-weight: 510;
+  letter-spacing: 0.007em;
+  line-height: 1.24;
 }
 
 .store-summary-distance {
@@ -379,13 +509,14 @@ button {
 }
 
 .store-details {
-  border-top: 1px solid var(--line);
+  border-top: 1px solid #d8d8d8;
   padding: 0.52rem 0.72rem 0.62rem;
 }
 
 .store-detail-line {
   margin: 0;
-  font-size: 0.77rem;
+  font-size: 0.76rem;
+  line-height: 1.35;
   color: #3c3c3c;
 }
 
@@ -414,6 +545,19 @@ button {
   .search-submit {
     padding-inline: 0.62rem;
     font-size: 0.8rem;
+  }
+
+  .note-title {
+    font-size: 0.98rem;
+  }
+
+  .search-action-btn {
+    min-height: 48px;
+  }
+
+  .search-action-row .btn-icon.search-action-btn {
+    width: 48px;
+    height: 48px;
   }
 
   .range-input::-webkit-slider-runnable-track {

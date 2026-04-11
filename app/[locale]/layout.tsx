@@ -18,11 +18,11 @@ export default async function LocaleLayout({
   const dictionary = getDictionary(locale);
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[1160px] flex-col px-4 pb-6 pt-4 md:px-6 md:pt-5">
+    <div className="mx-auto flex min-h-screen w-full max-w-[1080px] flex-col px-4 pb-7 pt-5 md:px-6 md:pb-8 md:pt-6">
       <main className="flex-1">{children}</main>
-      <footer className="mt-8 border-t border-neutral-300 pt-3">
+      <footer className="mt-9 border-t border-neutral-300 pt-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="mono text-[0.72rem] uppercase tracking-[0.12em] text-neutral-500">{dictionary.appTitle}</p>
+          <p className="mono text-[0.71rem] uppercase tracking-[0.13em] text-neutral-500">{dictionary.appTitle}</p>
           <LanguageSwitcher locale={locale} label={dictionary.languageLabel} />
         </div>
       </footer>
