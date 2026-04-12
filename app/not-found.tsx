@@ -11,6 +11,7 @@ export default function NotFoundPage() {
         <p className="section-title">Error</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">{dictionary.notFoundTitle}</h1>
         <p className="muted-text mt-2 text-sm">{dictionary.notFoundDescription}</p>
+        <p className="status-text mt-2">{dictionary.notFoundJoke}</p>
         <Link href="/" className="btn-primary mt-5 inline-flex px-4 py-2 text-sm font-medium">
           {dictionary.backHome}
         </Link>

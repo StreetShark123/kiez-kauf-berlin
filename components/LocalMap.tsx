@@ -74,6 +74,30 @@ function isValidMapResult(value: unknown): value is SearchResult {
   );
 }
 
+type RenderableMapResult = {
+  item: SearchResult;
+  lat: number;
+  lng: number;
+};
+
+function toRenderableMapResult(value: unknown): RenderableMapResult | null {
+  if (!isValidMapResult(value)) {
+    return null;
+  }
+
+  const lat = value.store.lat;
+  const lng = value.store.lng;
+  if (!isFiniteCoordinate(lat) || !isFiniteCoordinate(lng)) {
+    return null;
+  }
+
+  return {
+    item: value,
+    lat,
+    lng
+  };
+}
+
 function triggerHaptic(pattern: number | number[] = 8) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
     navigator.vibrate(pattern);
@@ -342,132 +366,149 @@ export function LocalMap({
       return;
     }
 
-    const appendPopupLine = (
-      container: HTMLDivElement,
-      kind: "product" | "distance" | "category" | "validation",
-      label: string,
-      value: string
-    ) => {
-      const line = document.createElement("p");
-      line.className = `map-popup-line map-popup-line-${kind}`;
-      line.textContent = `${label}: ${value}`;
-      container.appendChild(line);
-    };
+    try {
+      const appendPopupLine = (
+        container: HTMLDivElement,
+        kind: "product" | "distance" | "category" | "validation",
+        label: string,
+        value: string
+      ) => {
+        const line = document.createElement("p");
+        line.className = `map-popup-line map-popup-line-${kind}`;
+        line.textContent = `${label}: ${value}`;
+        container.appendChild(line);
+      };
 
-    const validResults: SearchResult[] = [];
-    for (let index = 0; index < results.length; index += 1) {
-      const item = results[index];
-      if (isValidMapResult(item)) {
-        validResults.push(item);
-        continue;
-      }
+      const validResults: RenderableMapResult[] = [];
+      for (let index = 0; index < results.length; index += 1) {
+        const item = results[index];
+        const renderable = toRenderableMapResult(item);
+        if (renderable) {
+          validResults.push(renderable);
+          continue;
+        }
 
-      if (DEV_DEBUG) {
-        const maybeOfferId =
-          (item as { offer?: { id?: unknown } } | null | undefined)?.offer?.id;
-        const malformedKey = typeof maybeOfferId === "string" ? `offer:${maybeOfferId}` : `idx:${index}`;
-        if (!loggedMalformedResultKeysRef.current.has(malformedKey)) {
-          loggedMalformedResultKeysRef.current.add(malformedKey);
-          console.warn("[map-data-guard] Dropping malformed map result before pin rendering", {
-            index,
-            malformedKey,
-            item
-          });
+        if (DEV_DEBUG) {
+          const maybeOfferId =
+            (item as { offer?: { id?: unknown } } | null | undefined)?.offer?.id;
+          const malformedKey = typeof maybeOfferId === "string" ? `offer:${maybeOfferId}` : `idx:${index}`;
+          if (!loggedMalformedResultKeysRef.current.has(malformedKey)) {
+            loggedMalformedResultKeysRef.current.add(malformedKey);
+            console.warn("[map-data-guard] Dropping malformed map result before pin rendering", {
+              index,
+              malformedKey,
+              item
+            });
+          }
         }
       }
-    }
 
-    const visibleResults = validResults.slice(0, MAX_PIN_RESULTS);
-    const nextVisibleIds = new Set<string>();
-    const radiusGeoJSON = buildRadiusPolygon(
-      { lat: safeCenter.lat, lng: safeCenter.lng },
-      Math.max(100, radiusMeters)
-    );
-
-    visibleResults.forEach((item, index) => {
-      const popupContainer = document.createElement("div");
-      popupContainer.className = "map-popup";
-
-      const title = document.createElement("h3");
-      title.className = "map-popup-title";
-      title.textContent = item.store.name;
-      popupContainer.appendChild(title);
-
-      appendPopupLine(popupContainer, "product", matchedProductLabel, item.product.normalizedName);
-      appendPopupLine(popupContainer, "distance", distanceLabel, formatDistance(item.distanceMeters));
-      appendPopupLine(
-        popupContainer,
-        "category",
-        storeCategoryLabel,
-        primaryCategory(item, unknownCategoryLabel)
+      const visibleResults = validResults.slice(0, MAX_PIN_RESULTS);
+      const nextVisibleIds = new Set<string>();
+      const radiusGeoJSON = buildRadiusPolygon(
+        { lat: safeCenter.lat, lng: safeCenter.lng },
+        Math.max(100, radiusMeters)
       );
 
-      const validation = validationLabelFor(
-        item.validationStatus,
-        validationLikelyLabel,
-        validationValidatedLabel
-      );
-      if (validation) {
-        appendPopupLine(popupContainer, "validation", validationLabel, validation);
-      }
+      visibleResults.forEach((entry, index) => {
+        const { item, lat, lng } = entry;
+        try {
+          const popupContainer = document.createElement("div");
+          popupContainer.className = "map-popup";
 
-      const markerId = String(item.offer.id);
-      const existingMarker = resultMarkersRef.current.get(markerId);
-      if (existingMarker) {
-        existingMarker
-          .setLngLat([item.store.lng, item.store.lat])
-          .setPopup(new maplibregl.Popup({ closeButton: false, offset: 14 }).setDOMContent(popupContainer));
-        existingMarker.getElement().classList.toggle("map-pin-top", index === 0);
-      } else {
-        const markerElement = createPinElement("result", index);
-        markerElement.addEventListener("click", () => triggerHaptic(7));
+          const title = document.createElement("h3");
+          title.className = "map-popup-title";
+          title.textContent = item.store.name;
+          popupContainer.appendChild(title);
 
-        const marker = new maplibregl.Marker({ element: markerElement, anchor: "bottom" })
-          .setLngLat([item.store.lng, item.store.lat])
-          .setPopup(new maplibregl.Popup({ closeButton: false, offset: 14 }).setDOMContent(popupContainer))
-          .addTo(map);
+          appendPopupLine(popupContainer, "product", matchedProductLabel, item.product.normalizedName);
+          appendPopupLine(popupContainer, "distance", distanceLabel, formatDistance(item.distanceMeters));
+          appendPopupLine(
+            popupContainer,
+            "category",
+            storeCategoryLabel,
+            primaryCategory(item, unknownCategoryLabel)
+          );
 
-        resultMarkersRef.current.set(markerId, marker);
-      }
+          const validation = validationLabelFor(
+            item.validationStatus,
+            validationLikelyLabel,
+            validationValidatedLabel
+          );
+          if (validation) {
+            appendPopupLine(popupContainer, "validation", validationLabel, validation);
+          }
 
-      nextVisibleIds.add(markerId);
-    });
+          const markerId = String(item.offer.id);
+          const existingMarker = resultMarkersRef.current.get(markerId);
+          if (existingMarker) {
+            existingMarker
+              .setLngLat([lng, lat])
+              .setPopup(new maplibregl.Popup({ closeButton: false, offset: 14 }).setDOMContent(popupContainer));
+            existingMarker.getElement().classList.toggle("map-pin-top", index === 0);
+          } else {
+            const markerElement = createPinElement("result", index);
+            markerElement.addEventListener("click", () => triggerHaptic(7));
 
-    for (const [markerId, marker] of resultMarkersRef.current.entries()) {
-      if (nextVisibleIds.has(markerId)) {
-        continue;
-      }
-      marker.remove();
-      resultMarkersRef.current.delete(markerId);
-    }
+            const marker = new maplibregl.Marker({ element: markerElement, anchor: "bottom" })
+              .setLngLat([lng, lat])
+              .setPopup(new maplibregl.Popup({ closeButton: false, offset: 14 }).setDOMContent(popupContainer))
+              .addTo(map);
 
-    const circleCoordinates = radiusGeoJSON.features[0]?.geometry.coordinates[0] ?? [];
-    const boundsFromCircle = circleCoordinates.reduce(
-      (acc, coord) => acc.extend(coord as [number, number]),
-      new maplibregl.LngLatBounds([safeCenter.lng, safeCenter.lat], [safeCenter.lng, safeCenter.lat])
-    );
-    const bounds = visibleResults.reduce(
-      (acc, item) => acc.extend([item.store.lng, item.store.lat]),
-      boundsFromCircle
-    );
+            resultMarkersRef.current.set(markerId, marker);
+          }
 
-    const boundsKey = [
-      safeCenter.lat.toFixed(5),
-      safeCenter.lng.toFixed(5),
-      String(Math.round(radiusMeters)),
-      ...visibleResults.map(
-        (item) =>
-          `${item.offer.id}:${item.store.lat.toFixed(5)}:${item.store.lng.toFixed(5)}`
-      )
-    ].join("|");
-
-    if (boundsKey !== lastBoundsKeyRef.current) {
-      map.fitBounds(bounds, {
-        padding: 56,
-        maxZoom: 14.5,
-        duration: 260
+          nextVisibleIds.add(markerId);
+        } catch (markerError) {
+          if (DEV_DEBUG) {
+            console.error("[map-data-guard] Marker render failed; dropping entry", {
+              markerError,
+              entry
+            });
+          }
+        }
       });
-      lastBoundsKeyRef.current = boundsKey;
+
+      for (const [markerId, marker] of resultMarkersRef.current.entries()) {
+        if (nextVisibleIds.has(markerId)) {
+          continue;
+        }
+        marker.remove();
+        resultMarkersRef.current.delete(markerId);
+      }
+
+      const circleCoordinates = radiusGeoJSON.features[0]?.geometry.coordinates[0] ?? [];
+      const boundsFromCircle = circleCoordinates.reduce(
+        (acc, coord) => acc.extend(coord as [number, number]),
+        new maplibregl.LngLatBounds([safeCenter.lng, safeCenter.lat], [safeCenter.lng, safeCenter.lat])
+      );
+      const bounds = visibleResults.reduce((acc, entry) => acc.extend([entry.lng, entry.lat]), boundsFromCircle);
+
+      const boundsKey = [
+        safeCenter.lat.toFixed(5),
+        safeCenter.lng.toFixed(5),
+        String(Math.round(radiusMeters)),
+        ...visibleResults.map(
+          (entry) =>
+            `${entry.item.offer.id}:${entry.lat.toFixed(5)}:${entry.lng.toFixed(5)}`
+        )
+      ].join("|");
+
+      if (boundsKey !== lastBoundsKeyRef.current) {
+        map.fitBounds(bounds, {
+          padding: 56,
+          maxZoom: 14.5,
+          duration: 260
+        });
+        lastBoundsKeyRef.current = boundsKey;
+      }
+    } catch (mapCycleError) {
+      if (DEV_DEBUG) {
+        console.error("[map-data-guard] Map render cycle failed; preserving map state", {
+          mapCycleError,
+          resultsCount: results.length
+        });
+      }
     }
   }, [
     safeCenter.lat,

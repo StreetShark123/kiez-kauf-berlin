@@ -601,6 +601,15 @@ async function getStoreDetailFromDataset(id: string): Promise<StoreDetail | null
   }
 
   const first = rows[0];
+  if (!hasValidStoreCoordinates({ lat: first.lat, lng: first.lon })) {
+    debugMalformedRecord("Store detail row has invalid coordinates; returning null detail", {
+      establishmentId: first.establishment_id,
+      establishmentName: first.establishment_name,
+      lat: first.lat,
+      lon: first.lon
+    });
+    return null;
+  }
   const store: Store = {
     id: String(first.establishment_id),
     name: first.establishment_name,

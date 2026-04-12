@@ -54,6 +54,11 @@ export type Dictionary = {
   backToSearch: string;
   notFoundTitle: string;
   notFoundDescription: string;
+  notFoundJoke: string;
+  errorTitle: string;
+  errorDescription: string;
+  errorJoke: string;
+  retryAction: string;
   backHome: string;
 };
 
@@ -112,6 +117,11 @@ const dictionaries: Record<Locale, Dictionary> = {
     backToSearch: "Zurueck",
     notFoundTitle: "Nicht gefunden",
     notFoundDescription: "Die Seite oder Filiale ist gerade nicht verfuegbar.",
+    notFoundJoke: "Spielt wohl gerade Verstecken.",
+    errorTitle: "Ups, da hat was geklemmt.",
+    errorDescription: "Die Seite hatte gerade einen kleinen Aussetzer.",
+    errorJoke: "Keine Sorge, nur ein lockerer Pixel.",
+    retryAction: "Nochmal versuchen",
     backHome: "Zur Startseite"
   },
   en: {
@@ -168,6 +178,11 @@ const dictionaries: Record<Locale, Dictionary> = {
     backToSearch: "Back",
     notFoundTitle: "Not found",
     notFoundDescription: "This page or store is not available right now.",
+    notFoundJoke: "Looks like it is playing hide and seek.",
+    errorTitle: "Oops, something jammed.",
+    errorDescription: "This page hit a small hiccup.",
+    errorJoke: "No panic, just one shy pixel.",
+    retryAction: "Try again",
     backHome: "Back home"
   },
   es: {
@@ -224,6 +239,11 @@ const dictionaries: Record<Locale, Dictionary> = {
     backToSearch: "Volver",
     notFoundTitle: "No encontrado",
     notFoundDescription: "Esta pagina o tienda no esta disponible ahora mismo.",
+    notFoundJoke: "Parece que esta jugando al escondite.",
+    errorTitle: "Ups, algo se atasco.",
+    errorDescription: "Esta pantalla tuvo un mini tropiezo.",
+    errorJoke: "Tranqui, solo un pixel despistado.",
+    retryAction: "Reintentar",
     backHome: "Volver al inicio"
   }
 };
