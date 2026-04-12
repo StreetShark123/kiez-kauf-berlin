@@ -15,6 +15,56 @@ type SearchPayload = {
 
 const LOCATION_CACHE_KEY = "kiezkauf:last-location";
 const LOCATION_CACHE_TTL_MS = 1000 * 60 * 30;
+const BERLIN_FALLBACK_CENTER = { lat: 52.5208, lng: 13.4094 };
+const DEV_DEBUG = process.env.NODE_ENV !== "production";
+
+function isFiniteCoordinate(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isValidCenterPoint(value: unknown): value is { lat: number; lng: number } {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as { lat?: unknown; lng?: unknown };
+  return (
+    isFiniteCoordinate(candidate.lat) &&
+    isFiniteCoordinate(candidate.lng) &&
+    candidate.lat >= -90 &&
+    candidate.lat <= 90 &&
+    candidate.lng >= -180 &&
+    candidate.lng <= 180
+  );
+}
+
+function isValidSearchResultRecord(value: unknown): value is SearchResult {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<SearchResult>;
+  if (!candidate.store || !candidate.offer || !candidate.product) {
+    return false;
+  }
+
+  const store = candidate.store as Partial<SearchResult["store"]>;
+  const offer = candidate.offer as Partial<SearchResult["offer"]>;
+  const product = candidate.product as Partial<SearchResult["product"]>;
+
+  return (
+    typeof store.name === "string" &&
+    isFiniteCoordinate(store.lat) &&
+    isFiniteCoordinate(store.lng) &&
+    store.lat >= -90 &&
+    store.lat <= 90 &&
+    store.lng >= -180 &&
+    store.lng <= 180 &&
+    typeof offer.id === "string" &&
+    typeof product.normalizedName === "string" &&
+    isFiniteCoordinate(candidate.distanceMeters)
+  );
+}
 
 function triggerHaptic(pattern: number | number[] = 10) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -127,9 +177,10 @@ export function SearchExperience({
   dictionary: Dictionary;
   initialCenter: { lat: number; lng: number };
 }) {
+  const safeInitialCenter = isValidCenterPoint(initialCenter) ? initialCenter : BERLIN_FALLBACK_CENTER;
   const [query, setQuery] = useState("");
   const [radiusKm, setRadiusKm] = useState(2);
-  const [center, setCenter] = useState(initialCenter);
+  const [center, setCenter] = useState(safeInitialCenter);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
@@ -140,6 +191,28 @@ export function SearchExperience({
   const lastHapticAtRef = useRef(0);
   const searchAbortRef = useRef<AbortController | null>(null);
   const searchRequestIdRef = useRef(0);
+  const loggedMalformedResultKeysRef = useRef<Set<string>>(new Set());
+  const loggedInvalidCenterRef = useRef(false);
+
+  const safeCenter = useMemo(
+    () => (isValidCenterPoint(center) ? center : safeInitialCenter),
+    [center, safeInitialCenter]
+  );
+
+  useEffect(() => {
+    if (!DEV_DEBUG || isValidCenterPoint(initialCenter)) {
+      return;
+    }
+    console.warn("[map-data-guard] Invalid initial center received, using Berlin fallback", initialCenter);
+  }, [initialCenter]);
+
+  useEffect(() => {
+    if (!DEV_DEBUG || isValidCenterPoint(center) || loggedInvalidCenterRef.current) {
+      return;
+    }
+    loggedInvalidCenterRef.current = true;
+    console.warn("[map-data-guard] Runtime center became invalid, using safe fallback for map/search", center);
+  }, [center]);
 
   function pulse(pattern: number | number[] = 10) {
     const now = Date.now();
@@ -164,10 +237,12 @@ export function SearchExperience({
         accuracy?: number;
       };
       if (
-        typeof parsed?.lat !== "number" ||
-        typeof parsed?.lng !== "number" ||
+        !isValidCenterPoint(parsed) ||
         typeof parsed?.timestamp !== "number"
       ) {
+        if (DEV_DEBUG) {
+          console.warn("[map-data-guard] Ignoring malformed cached geolocation", parsed);
+        }
         return;
       }
 
@@ -275,8 +350,8 @@ export function SearchExperience({
     try {
       const params = new URLSearchParams({
         q: query,
-        lat: String(center.lat),
-        lng: String(center.lng),
+        lat: String(safeCenter.lat),
+        lng: String(safeCenter.lng),
         radius: String(Math.round(radiusKm * 1000))
       });
 
@@ -291,11 +366,43 @@ export function SearchExperience({
       if (requestId !== searchRequestIdRef.current) {
         return;
       }
-      setResults(data.results);
+
+      const rawResults = Array.isArray(data?.results) ? data.results : [];
+      const sanitizedResults: SearchResult[] = [];
+      let droppedMalformed = 0;
+
+      for (let index = 0; index < rawResults.length; index += 1) {
+        const item = rawResults[index];
+        if (isValidSearchResultRecord(item)) {
+          sanitizedResults.push(item);
+          continue;
+        }
+
+        droppedMalformed += 1;
+        if (DEV_DEBUG) {
+          const maybeOfferId =
+            (item as { offer?: { id?: unknown } } | null | undefined)?.offer?.id;
+          const malformedKey = typeof maybeOfferId === "string" ? `offer:${maybeOfferId}` : `idx:${index}`;
+          if (!loggedMalformedResultKeysRef.current.has(malformedKey)) {
+            loggedMalformedResultKeysRef.current.add(malformedKey);
+            console.warn("[map-data-guard] Dropping malformed search result from API payload", {
+              index,
+              malformedKey,
+              item
+            });
+          }
+        }
+      }
+
+      if (DEV_DEBUG && droppedMalformed > 0) {
+        console.warn(`[map-data-guard] Dropped ${droppedMalformed} malformed search results`);
+      }
+
+      setResults(sanitizedResults);
       setHasSearched(true);
       const finishedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
       trackEvent("search_success", {
-        results_count: data.results.length,
+        results_count: sanitizedResults.length,
         radius_km: Number(radiusKm.toFixed(1)),
         duration_ms: Math.round(finishedAt - startedAt)
       });
@@ -337,6 +444,14 @@ export function SearchExperience({
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
+      if (!isValidCenterPoint(nextCenter)) {
+        setErrorMessage(dictionary.geolocationError);
+        setIsLocating(false);
+        if (DEV_DEBUG) {
+          console.warn("[map-data-guard] Ignoring malformed browser geolocation coordinates", position.coords);
+        }
+        return;
+      }
       setCenter(nextCenter);
       setLocationMessage(dictionary.geolocationReady);
       setErrorMessage(null);
@@ -490,7 +605,7 @@ export function SearchExperience({
           <p className="status-text">{resultSummary}</p>
         </div>
         <LocalMap
-          center={center}
+          center={safeCenter}
           results={results}
           themeMode={themeMode}
           userMarkerLabel={dictionary.mapYouAreHere}

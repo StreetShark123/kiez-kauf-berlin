@@ -5,6 +5,7 @@ import type { Offer, Product, SearchResult, Store, StoreDetail } from "@/lib/typ
 
 // Berlin Mitte (Alexanderplatz area) as the default map/search center.
 const BERLIN_CENTER = { lat: 52.5208, lng: 13.4094 };
+const DEV_DEBUG = process.env.NODE_ENV !== "production";
 
 function toRadians(value: number): number {
   return (value * Math.PI) / 180;
@@ -21,6 +22,31 @@ function haversineMeters(aLat: number, aLng: number, bLat: number, bLng: number)
 
   const part2 = 2 * Math.atan2(Math.sqrt(part1), Math.sqrt(1 - part1));
   return earthRadius * part2;
+}
+
+function isFiniteCoordinate(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function hasValidStoreCoordinates(
+  store: { lat?: unknown; lng?: unknown } | null | undefined
+): store is { lat: number; lng: number } {
+  return (
+    !!store &&
+    isFiniteCoordinate(store.lat) &&
+    isFiniteCoordinate(store.lng) &&
+    store.lat >= -90 &&
+    store.lat <= 90 &&
+    store.lng >= -180 &&
+    store.lng <= 180
+  );
+}
+
+function debugMalformedRecord(context: string, payload: unknown) {
+  if (!DEV_DEBUG) {
+    return;
+  }
+  console.warn(`[search-data-guard] ${context}`, payload);
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -226,8 +252,28 @@ function findCanonicalProductIdsByQuery(query: string, products: SupabaseCanonic
 
 function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng: number; radius: number }): SearchResult[] {
   const normalized = normalizeQuery(args.query);
+  const validRows: JoinedRow[] = [];
+  let droppedRows = 0;
 
-  return rows
+  for (const row of rows) {
+    if (!hasValidStoreCoordinates(row?.store)) {
+      droppedRows += 1;
+      if (droppedRows <= 5) {
+        debugMalformedRecord("Dropping malformed joined row (invalid store coordinates)", {
+          offerId: row?.offer?.id ?? null,
+          store: row?.store ?? null
+        });
+      }
+      continue;
+    }
+    validRows.push(row);
+  }
+
+  if (droppedRows > 0 && DEV_DEBUG) {
+    console.warn(`[search-data-guard] Dropped ${droppedRows} malformed rows before ranking`);
+  }
+
+  return validRows
     .map((row) => {
       const distanceMeters = haversineMeters(args.lat, args.lng, row.store.lat, row.store.lng);
       const freshnessHours = Math.max(
@@ -270,8 +316,20 @@ function dedupeRankedResults(results: SearchResult[]): SearchResult[] {
   const seenStoreIds = new Set<string>();
   const seenFingerprints = new Set<string>();
   const deduped: SearchResult[] = [];
+  let droppedResults = 0;
 
   for (const item of results) {
+    if (!hasValidStoreCoordinates(item?.store)) {
+      droppedResults += 1;
+      if (droppedResults <= 5) {
+        debugMalformedRecord("Dropping malformed ranked result (invalid store coordinates)", {
+          offerId: item?.offer?.id ?? null,
+          store: item?.store ?? null
+        });
+      }
+      continue;
+    }
+
     const storeIdKey = String(item.store.id);
     const nameKey = normalizeQuery(item.store.name);
     const addressKey = normalizeQuery(item.store.address);
@@ -286,6 +344,10 @@ function dedupeRankedResults(results: SearchResult[]): SearchResult[] {
     seenStoreIds.add(storeIdKey);
     seenFingerprints.add(fingerprint);
     deduped.push(item);
+  }
+
+  if (droppedResults > 0 && DEV_DEBUG) {
+    console.warn(`[search-data-guard] Dropped ${droppedResults} malformed ranked results`);
   }
 
   return deduped;
@@ -331,7 +393,14 @@ async function getSupabaseRowsLegacy(): Promise<JoinedRow[]> {
       const store = Array.isArray(row.stores) ? row.stores[0] : row.stores;
       const product = Array.isArray(row.products) ? row.products[0] : row.products;
 
-      if (!store || !product) {
+      if (!store || !product || !hasValidStoreCoordinates(store)) {
+        if (DEV_DEBUG) {
+          debugMalformedRecord("Skipping malformed legacy row from Supabase", {
+            offerId: row.id,
+            store,
+            product
+          });
+        }
         return null;
       }
 
@@ -431,15 +500,29 @@ async function searchSupabaseRowsFromDataset(args: {
 
   const rows = (data ?? []) as SupabaseSearchDatasetRow[];
 
-  return {
-    strategy,
-    rows: rows.map((row) => {
+  const joinedRows: JoinedRow[] = [];
+  let malformedRows = 0;
+
+  for (const row of rows) {
+    if (!hasValidStoreCoordinates({ lat: row.lat, lng: row.lon })) {
+      malformedRows += 1;
+      if (malformedRows <= 5) {
+        debugMalformedRecord("Skipping malformed dataset row (invalid lat/lon)", {
+          establishmentId: row.establishment_id,
+          establishmentName: row.establishment_name,
+          lat: row.lat,
+          lon: row.lon
+        });
+      }
+      continue;
+    }
+
     const storeId = String(row.establishment_id);
     const productId = String(row.canonical_product_id);
     const offerId = `candidate_${storeId}_${productId}_${row.source_type ?? "unknown"}`;
     const updatedAt = row.updated_at ?? new Date().toISOString();
 
-    return {
+    joinedRows.push({
       offer: {
         id: offerId,
         storeId,
@@ -450,9 +533,9 @@ async function searchSupabaseRowsFromDataset(args: {
       },
       store: {
         id: storeId,
-        name: row.establishment_name,
-        address: row.address,
-        district: row.district,
+        name: String(row.establishment_name ?? "Unknown store"),
+        address: String(row.address ?? ""),
+        district: String(row.district ?? "Berlin"),
         openingHours: "",
         lat: row.lat,
         lng: row.lon,
@@ -461,16 +544,24 @@ async function searchSupabaseRowsFromDataset(args: {
       },
       product: {
         id: productId,
-        normalizedName: row.product_normalized_name,
+        normalizedName: String(row.product_normalized_name ?? ""),
         brand: null,
-        category: row.product_group
+        category: String(row.product_group ?? "")
       },
       confidence: row.confidence,
       validationStatus: row.validation_status,
       whyThisProductMatches: row.why_this_product_matches,
       sourceType: row.source_type
-    } satisfies JoinedRow;
-    })
+    } satisfies JoinedRow);
+  }
+
+  if (malformedRows > 0 && DEV_DEBUG) {
+    console.warn(`[search-data-guard] Skipped ${malformedRows} malformed dataset rows`);
+  }
+
+  return {
+    strategy,
+    rows: joinedRows
   };
 }
 

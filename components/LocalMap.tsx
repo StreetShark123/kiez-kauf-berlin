@@ -1,7 +1,7 @@
 "use client";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   Map as MapLibreMap,
   Marker as MapLibreMarker,
@@ -29,6 +29,50 @@ const BASE_BW_STYLE: StyleSpecification = {
 };
 
 const MAX_PIN_RESULTS = 120;
+const BERLIN_FALLBACK_CENTER = { lat: 52.5208, lng: 13.4094 };
+const DEV_DEBUG = process.env.NODE_ENV !== "production";
+
+function isFiniteCoordinate(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isValidCenterPoint(value: unknown): value is { lat: number; lng: number } {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const point = value as { lat?: unknown; lng?: unknown };
+  return (
+    isFiniteCoordinate(point.lat) &&
+    isFiniteCoordinate(point.lng) &&
+    point.lat >= -90 &&
+    point.lat <= 90 &&
+    point.lng >= -180 &&
+    point.lng <= 180
+  );
+}
+
+function isValidMapResult(value: unknown): value is SearchResult {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const result = value as Partial<SearchResult>;
+  const store = result.store as Partial<SearchResult["store"]> | undefined;
+  const offer = result.offer as Partial<SearchResult["offer"]> | undefined;
+  const product = result.product as Partial<SearchResult["product"]> | undefined;
+
+  return (
+    !!store &&
+    !!offer &&
+    !!product &&
+    isValidCenterPoint({ lat: store.lat, lng: store.lng }) &&
+    typeof store.name === "string" &&
+    typeof offer.id === "string" &&
+    typeof product.normalizedName === "string" &&
+    isFiniteCoordinate(result.distanceMeters)
+  );
+}
 
 function triggerHaptic(pattern: number | number[] = 8) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -137,13 +181,30 @@ export function LocalMap({
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const initialCenterRef = useRef(center);
+  const initialCenterRef = useRef(
+    isValidCenterPoint(center) ? center : BERLIN_FALLBACK_CENTER
+  );
   const mapRef = useRef<MapLibreMap | null>(null);
   const maplibreRef = useRef<typeof import("maplibre-gl") | null>(null);
   const userMarkerRef = useRef<MapLibreMarker | null>(null);
   const resultMarkersRef = useRef<Map<string, MapLibreMarker>>(new Map());
   const lastBoundsKeyRef = useRef<string>("");
+  const loggedMalformedResultKeysRef = useRef<Set<string>>(new Set());
+  const loggedInvalidCenterRef = useRef(false);
   const [mapReady, setMapReady] = useState(false);
+  const safeCenter = useMemo(
+    () => (isValidCenterPoint(center) ? center : BERLIN_FALLBACK_CENTER),
+    [center]
+  );
+
+  useEffect(() => {
+    if (!DEV_DEBUG || isValidCenterPoint(center) || loggedInvalidCenterRef.current) {
+      return;
+    }
+
+    loggedInvalidCenterRef.current = true;
+    console.warn("[map-data-guard] Invalid map center received, using Berlin fallback", center);
+  }, [center]);
 
   useEffect(() => {
     let mounted = true;
@@ -206,7 +267,7 @@ export function LocalMap({
     const radiusLineOpacity = themeMode === "dark" ? 0.62 : 0.56;
 
     const radiusGeoJSON = buildRadiusPolygon(
-      { lat: center.lat, lng: center.lng },
+      { lat: safeCenter.lat, lng: safeCenter.lng },
       Math.max(100, radiusMeters)
     );
 
@@ -253,7 +314,7 @@ export function LocalMap({
       map.setPaintProperty("search-radius-line", "line-color", radiusLineColor);
       map.setPaintProperty("search-radius-line", "line-opacity", radiusLineOpacity);
     }
-  }, [center.lat, center.lng, radiusMeters, themeMode, mapReady]);
+  }, [safeCenter.lat, safeCenter.lng, radiusMeters, themeMode, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -270,9 +331,9 @@ export function LocalMap({
     }
 
     userMarkerRef.current
-      .setLngLat([center.lng, center.lat])
+      .setLngLat([safeCenter.lng, safeCenter.lat])
       .setPopup(new maplibregl.Popup({ closeButton: false }).setText(userMarkerLabel));
-  }, [center.lat, center.lng, userMarkerLabel, mapReady]);
+  }, [safeCenter.lat, safeCenter.lng, userMarkerLabel, mapReady]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -293,10 +354,33 @@ export function LocalMap({
       container.appendChild(line);
     };
 
-    const visibleResults = results.slice(0, MAX_PIN_RESULTS);
+    const validResults: SearchResult[] = [];
+    for (let index = 0; index < results.length; index += 1) {
+      const item = results[index];
+      if (isValidMapResult(item)) {
+        validResults.push(item);
+        continue;
+      }
+
+      if (DEV_DEBUG) {
+        const maybeOfferId =
+          (item as { offer?: { id?: unknown } } | null | undefined)?.offer?.id;
+        const malformedKey = typeof maybeOfferId === "string" ? `offer:${maybeOfferId}` : `idx:${index}`;
+        if (!loggedMalformedResultKeysRef.current.has(malformedKey)) {
+          loggedMalformedResultKeysRef.current.add(malformedKey);
+          console.warn("[map-data-guard] Dropping malformed map result before pin rendering", {
+            index,
+            malformedKey,
+            item
+          });
+        }
+      }
+    }
+
+    const visibleResults = validResults.slice(0, MAX_PIN_RESULTS);
     const nextVisibleIds = new Set<string>();
     const radiusGeoJSON = buildRadiusPolygon(
-      { lat: center.lat, lng: center.lng },
+      { lat: safeCenter.lat, lng: safeCenter.lng },
       Math.max(100, radiusMeters)
     );
 
@@ -360,7 +444,7 @@ export function LocalMap({
     const circleCoordinates = radiusGeoJSON.features[0]?.geometry.coordinates[0] ?? [];
     const boundsFromCircle = circleCoordinates.reduce(
       (acc, coord) => acc.extend(coord as [number, number]),
-      new maplibregl.LngLatBounds([center.lng, center.lat], [center.lng, center.lat])
+      new maplibregl.LngLatBounds([safeCenter.lng, safeCenter.lat], [safeCenter.lng, safeCenter.lat])
     );
     const bounds = visibleResults.reduce(
       (acc, item) => acc.extend([item.store.lng, item.store.lat]),
@@ -368,8 +452,8 @@ export function LocalMap({
     );
 
     const boundsKey = [
-      center.lat.toFixed(5),
-      center.lng.toFixed(5),
+      safeCenter.lat.toFixed(5),
+      safeCenter.lng.toFixed(5),
       String(Math.round(radiusMeters)),
       ...visibleResults.map(
         (item) =>
@@ -386,16 +470,14 @@ export function LocalMap({
       lastBoundsKeyRef.current = boundsKey;
     }
   }, [
-    center.lat,
-    center.lng,
+    safeCenter.lat,
+    safeCenter.lng,
     distanceLabel,
     matchedProductLabel,
     radiusMeters,
     results,
     storeCategoryLabel,
-    themeMode,
     unknownCategoryLabel,
-    userMarkerLabel,
     validationLabel,
     validationLikelyLabel,
     validationValidatedLabel,
