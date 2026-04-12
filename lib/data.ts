@@ -165,15 +165,102 @@ type DatasetSearchResponse = {
 const KEYWORD_GROUP_MAP: Array<{ group: string; terms: string[] }> = [
   {
     group: "beverages",
-    terms: ["beer", "bier", "cerveza", "drink", "bebida", "getraenk", "getrank"]
+    terms: [
+      "beer",
+      "beers",
+      "lager",
+      "ale",
+      "drink",
+      "drinks",
+      "beverage",
+      "beverages",
+      "milk",
+      "mjlk",
+      "milkk"
+    ]
+  },
+  {
+    group: "groceries",
+    terms: [
+      "grocery",
+      "groceries",
+      "food",
+      "foods",
+      "tortilla",
+      "tortillas",
+      "frijol",
+      "frijoles",
+      "black beans",
+      "salsa",
+      "hot sauce",
+      "chipotle",
+      "nori",
+      "norita",
+      "masa harina",
+      "harina de maiz"
+    ]
   },
   {
     group: "fresh_produce",
-    terms: ["garlic", "knoblauch", "ajo", "vegetable", "verdura", "gemuese", "gemuse"]
+    terms: [
+      "garlic",
+      "garicc",
+      "apricot",
+      "apricots",
+      "vegetable",
+      "vegetables",
+      "fruit",
+      "fruits",
+      "chile",
+      "chili",
+      "jalapeno",
+      "jalapenos",
+      "habanero"
+    ]
   },
   {
     group: "household",
-    terms: ["pliers", "zange", "alicates", "tool", "herramienta", "werkzeug"]
+    terms: [
+      "pliers",
+      "plier",
+      "tool",
+      "tools",
+      "hammer",
+      "hammr",
+      "glue",
+      "glu",
+      "adhesive",
+      "hardware"
+    ]
+  },
+  {
+    group: "pharmacy",
+    terms: [
+      "painkiller",
+      "painkillers",
+      "pain killer",
+      "medicine",
+      "meds",
+      "ibuprofen",
+      "paracetamol",
+      "condom",
+      "condoms",
+      "contraceptive",
+      "pharmacy"
+    ]
+  },
+  {
+    group: "personal_care",
+    terms: [
+      "diaper",
+      "diapers",
+      "nappy",
+      "nappies",
+      "baby wipes",
+      "toothpaste",
+      "tooth brush",
+      "deodorant"
+    ]
   }
 ];
 
@@ -190,15 +277,95 @@ function normalizedContains(a: string, b: string): boolean {
   return a.includes(b) || b.includes(a);
 }
 
+function splitNormalizedTokens(value: string): string[] {
+  return value
+    .split(" ")
+    .map((token) => token.trim())
+    .filter(Boolean);
+}
+
+function levenshteinDistanceWithinLimit(a: string, b: string, maxDistance: number): number {
+  if (a === b) {
+    return 0;
+  }
+  if (Math.abs(a.length - b.length) > maxDistance) {
+    return maxDistance + 1;
+  }
+
+  const previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+  const current = new Array<number>(b.length + 1);
+
+  for (let i = 1; i <= a.length; i += 1) {
+    current[0] = i;
+    let rowMin = current[0];
+
+    for (let j = 1; j <= b.length; j += 1) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      current[j] = Math.min(
+        previous[j] + 1,
+        current[j - 1] + 1,
+        previous[j - 1] + cost
+      );
+      rowMin = Math.min(rowMin, current[j]);
+    }
+
+    if (rowMin > maxDistance) {
+      return maxDistance + 1;
+    }
+
+    for (let j = 0; j <= b.length; j += 1) {
+      previous[j] = current[j];
+    }
+  }
+
+  return previous[b.length];
+}
+
+function isFuzzyTokenMatch(a: string, b: string): boolean {
+  if (!a || !b) {
+    return false;
+  }
+  if (a === b) {
+    return true;
+  }
+
+  const longestLength = Math.max(a.length, b.length);
+  if (longestLength < 4) {
+    return false;
+  }
+
+  const maxDistance = longestLength >= 8 ? 2 : 1;
+  return levenshteinDistanceWithinLimit(a, b, maxDistance) <= maxDistance;
+}
+
+function normalizedFuzzyMatch(term: string, normalizedQuery: string): boolean {
+  if (!term || !normalizedQuery) {
+    return false;
+  }
+  if (normalizedContains(term, normalizedQuery)) {
+    return true;
+  }
+
+  const termTokens = splitNormalizedTokens(term);
+  const queryTokens = splitNormalizedTokens(normalizedQuery);
+  if (termTokens.length === 0 || queryTokens.length === 0) {
+    return false;
+  }
+
+  return queryTokens.every((queryToken) =>
+    termTokens.some((termToken) => isFuzzyTokenMatch(termToken, queryToken))
+  );
+}
+
 function inferProductGroupsFromKeyword(query: string): string[] {
   const normalized = normalizeQuery(query);
   if (!normalized) {
     return [];
   }
 
-  return KEYWORD_GROUP_MAP.filter(({ terms }) => terms.some((term) => normalizedContains(normalized, term))).map(
-    ({ group }) => group
-  );
+  return KEYWORD_GROUP_MAP.filter(({ terms }) =>
+    terms.some((term) => normalizedFuzzyMatch(normalizeQuery(term), normalized))
+  ).map(({ group }) => group);
 }
 
 async function getCanonicalCatalog(): Promise<SupabaseCanonicalProductRow[]> {
@@ -244,7 +411,7 @@ function findCanonicalProductIdsByQuery(query: string, products: SupabaseCanonic
       .map((item) => normalizeQuery(item))
       .filter(Boolean);
 
-    return terms.some((term) => normalizedContains(term, normalized));
+    return terms.some((term) => normalizedFuzzyMatch(term, normalized));
   });
 
   return matched.map((product) => product.id);
@@ -443,11 +610,12 @@ async function searchSupabaseRowsFromDataset(args: {
   if (!supabase) {
     return null;
   }
+  const db = supabase;
 
   const normalized = normalizeQuery(args.query);
   const canonicalProducts = await getCanonicalCatalog();
   const canonicalIds = findCanonicalProductIdsByQuery(normalized, canonicalProducts);
-  const inferredGroups = canonicalIds.length === 0 ? inferProductGroupsFromKeyword(normalized) : [];
+  const inferredGroups = inferProductGroupsFromKeyword(normalized);
   const limit = args.limit ?? 450;
   const bounds = getBoundingBoxFromRadius({
     lat: args.lat,
@@ -455,50 +623,83 @@ async function searchSupabaseRowsFromDataset(args: {
     radiusMeters: args.radiusMeters
   });
 
-  let query = supabase
-    .from("search_product_establishment_dataset")
-    .select(
-      "establishment_id, canonical_product_id, source_type, confidence, validation_status, why_this_product_matches, updated_at, establishment_name, address, district, lat, lon, osm_category, app_categories, product_normalized_name, product_group"
-    );
+  const buildScopedQuery = () =>
+    db
+      .from("search_product_establishment_dataset")
+      .select(
+        "establishment_id, canonical_product_id, source_type, confidence, validation_status, why_this_product_matches, updated_at, establishment_name, address, district, lat, lon, osm_category, app_categories, product_normalized_name, product_group"
+      )
+      .gte("lat", bounds.minLat)
+      .lte("lat", bounds.maxLat)
+      .gte("lon", bounds.minLng)
+      .lte("lon", bounds.maxLng);
 
-  query = query
-    .gte("lat", bounds.minLat)
-    .lte("lat", bounds.maxLat)
-    .gte("lon", bounds.minLng)
-    .lte("lon", bounds.maxLng);
+  const executeQuery = async (
+    strategy: DatasetSearchStrategy,
+    applyFilter: (queryBuilder: ReturnType<typeof buildScopedQuery>) => ReturnType<typeof buildScopedQuery>
+  ): Promise<SupabaseSearchDatasetRow[] | null> => {
+    const { data, error } = await applyFilter(buildScopedQuery())
+      .order("confidence", { ascending: false, nullsFirst: false })
+      .order("updated_at", { ascending: false })
+      .limit(limit);
 
-  let strategy: DatasetSearchStrategy = "product_name";
-  if (canonicalIds.length > 0) {
-    query = query.in("canonical_product_id", canonicalIds);
-    strategy = "canonical_multilingual";
-  } else if (inferredGroups.length > 0) {
-    query = query.in("product_group", inferredGroups);
-    strategy = "group_keyword";
-  } else {
-    query = query.ilike("product_normalized_name", `%${normalized}%`);
-  }
+    if (error) {
+      const message = (error.message || "").toLowerCase();
+      const fallbackEligible =
+        message.includes("relation") ||
+        message.includes("does not exist") ||
+        message.includes("search_product_establishment_dataset") ||
+        message.includes("column");
 
-  const { data, error } = await query
-    .order("confidence", { ascending: false, nullsFirst: false })
-    .order("updated_at", { ascending: false })
-    .limit(limit);
+      if (fallbackEligible) {
+        return null;
+      }
 
-  if (error) {
-    const message = (error.message || "").toLowerCase();
-    const fallbackEligible =
-      message.includes("relation") ||
-      message.includes("does not exist") ||
-      message.includes("search_product_establishment_dataset") ||
-      message.includes("column");
-
-    if (fallbackEligible) {
-      return null;
+      throw new Error(`Supabase search dataset query failed (${strategy}): ${error.message}`);
     }
 
-    throw new Error(`Supabase search dataset query failed: ${error.message}`);
+    return (data ?? []) as SupabaseSearchDatasetRow[];
+  };
+
+  let rows: SupabaseSearchDatasetRow[] = [];
+  let strategy: DatasetSearchStrategy = "product_name";
+
+  if (canonicalIds.length > 0) {
+    const canonicalRows = await executeQuery("canonical_multilingual", (queryBuilder) =>
+      queryBuilder.in("canonical_product_id", canonicalIds)
+    );
+    if (canonicalRows === null) {
+      return null;
+    }
+    if (canonicalRows.length > 0) {
+      rows = canonicalRows;
+      strategy = "canonical_multilingual";
+    }
   }
 
-  const rows = (data ?? []) as SupabaseSearchDatasetRow[];
+  if (rows.length === 0 && inferredGroups.length > 0) {
+    const groupRows = await executeQuery("group_keyword", (queryBuilder) =>
+      queryBuilder.in("product_group", inferredGroups)
+    );
+    if (groupRows === null) {
+      return null;
+    }
+    if (groupRows.length > 0) {
+      rows = groupRows;
+      strategy = "group_keyword";
+    }
+  }
+
+  if (rows.length === 0) {
+    const fallbackRows = await executeQuery("product_name", (queryBuilder) =>
+      queryBuilder.ilike("product_normalized_name", `%${normalized}%`)
+    );
+    if (fallbackRows === null) {
+      return null;
+    }
+    rows = fallbackRows;
+    strategy = "product_name";
+  }
 
   const joinedRows: JoinedRow[] = [];
   let malformedRows = 0;

@@ -14,5 +14,10 @@ export function buildDirectionsUrl(args: {
 }
 
 export function normalizeQuery(q: string): string {
-  return q.toLowerCase().trim().replace(/\s+/g, " ");
+  return q
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .replace(/\s+/g, " ");
 }

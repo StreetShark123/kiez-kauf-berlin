@@ -104,10 +104,20 @@ function clampRadiusKm(radiusKm: number) {
   return Math.min(MAX_RADIUS_KM, Math.max(MIN_RADIUS_KM, radiusKm));
 }
 
+function roundRadiusToStep(radiusKm: number) {
+  return Math.round(radiusKm / RADIUS_STEP_KM) * RADIUS_STEP_KM;
+}
+
 function suggestRadiusKmForDistance(distanceMeters: number, currentRadiusKm: number) {
   const bufferedKm = distanceMeters / 1000 + 0.2;
   const roundedToStep = Math.ceil(bufferedKm / RADIUS_STEP_KM) * RADIUS_STEP_KM;
   return clampRadiusKm(Math.max(roundedToStep, currentRadiusKm + RADIUS_STEP_KM));
+}
+
+function suggestNextExpandRadiusKm(currentRadiusKm: number) {
+  const candidate = Math.max(currentRadiusKm + 1, currentRadiusKm * 1.5);
+  const roundedUp = Math.ceil(candidate / RADIUS_STEP_KM) * RADIUS_STEP_KM;
+  return clampRadiusKm(roundRadiusToStep(roundedUp));
 }
 
 function applyTemplate(template: string, replacements: Record<string, string>) {
@@ -135,6 +145,17 @@ function trackEvent(name: string, payload: Record<string, string | number | bool
   } catch {
     // Ignore client analytics errors so UX never breaks.
   }
+}
+
+function normalizeQueryForAnalytics(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 64);
 }
 
 function UiIcon({
@@ -409,6 +430,22 @@ export function SearchExperience({
     });
   }, [dictionary.expandSearchButtonTemplate, noResultsGuidance]);
 
+  const quickExpandRadiusKm = useMemo(() => {
+    if (!hasSearched || radiusKm >= MAX_RADIUS_KM) {
+      return null;
+    }
+    return suggestNextExpandRadiusKm(radiusKm);
+  }, [hasSearched, radiusKm]);
+
+  const quickExpandButtonLabel = useMemo(() => {
+    if (quickExpandRadiusKm === null) {
+      return "";
+    }
+    return applyTemplate(dictionary.expandSearchButtonTemplate, {
+      radius: formatRadiusValue(quickExpandRadiusKm)
+    });
+  }, [dictionary.expandSearchButtonTemplate, quickExpandRadiusKm]);
+
   useEffect(() => {
     return () => {
       searchRequestIdRef.current += 1;
@@ -435,9 +472,11 @@ export function SearchExperience({
     setErrorMessage(null);
     setNoResultsGuidance(null);
     const startedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
+    const queryForAnalytics = normalizeQueryForAnalytics(query);
     trackEvent("search_submit", {
       query_length: query.trim().length,
-      radius_km: Number(effectiveRadiusKm.toFixed(1))
+      radius_km: Number(effectiveRadiusKm.toFixed(1)),
+      query_normalized: queryForAnalytics || null
     });
 
     const fetchSearchPayload = async (radiusKm: number) => {
@@ -545,6 +584,14 @@ export function SearchExperience({
         no_results_guidance: guidance?.type ?? null,
         suggested_radius_km: guidance?.type === "nearby" ? Number(guidance.suggestedRadiusKm.toFixed(1)) : null
       });
+      if (primaryResults.length === 0) {
+        trackEvent("search_zero_results", {
+          query_normalized: queryForAnalytics || null,
+          radius_km: Number(effectiveRadiusKm.toFixed(1)),
+          guidance_type: guidance?.type ?? null,
+          suggested_radius_km: guidance?.type === "nearby" ? Number(guidance.suggestedRadiusKm.toFixed(1)) : null
+        });
+      }
       pulse([12, 28, 10]);
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
@@ -567,6 +614,18 @@ export function SearchExperience({
         setIsLoading(false);
       }
     }
+  }
+
+  function expandSearchTo(radiusToUse: number, source: "no_results" | "results_list") {
+    const nextRadiusKm = clampRadiusKm(radiusToUse);
+    setRadiusKm(nextRadiusKm);
+    pulse(8);
+    trackEvent("search_expand_radius_click", {
+      from_km: Number(radiusKm.toFixed(1)),
+      to_km: Number(nextRadiusKm.toFixed(1)),
+      source
+    });
+    void runSearch({ overrideRadiusKm: nextRadiusKm });
   }
 
   function useBrowserLocation() {
@@ -751,6 +810,7 @@ export function SearchExperience({
           results={results}
           themeMode={themeMode}
           userMarkerLabel={dictionary.mapYouAreHere}
+          berlinOnlyHint={dictionary.berlinOnlyHint}
           matchedProductLabel={dictionary.matchedProductLabel}
           storeCategoryLabel={dictionary.storeCategoryLabel}
           distanceLabel={dictionary.distanceLabel}
@@ -770,10 +830,7 @@ export function SearchExperience({
                 type="button"
                 className="btn-secondary mt-2 w-full text-[0.76rem] md:w-auto"
                 onClick={() => {
-                  const nextRadiusKm = noResultsGuidance.suggestedRadiusKm;
-                  setRadiusKm(nextRadiusKm);
-                  pulse(8);
-                  void runSearch({ overrideRadiusKm: nextRadiusKm });
+                  expandSearchTo(noResultsGuidance.suggestedRadiusKm, "no_results");
                 }}
                 disabled={isLoading}
               >
@@ -785,7 +842,21 @@ export function SearchExperience({
 
         {results.length > 0 ? (
           <section className="note-divider pt-2">
-            <h3 className="note-subtitle note-mark mb-1.5 md:mb-2">{dictionary.resultsTitle}</h3>
+            <div className="mb-1.5 flex items-center justify-between gap-2 md:mb-2">
+              <h3 className="note-subtitle note-mark">{dictionary.resultsTitle}</h3>
+              {quickExpandRadiusKm !== null ? (
+                <button
+                  type="button"
+                  className="btn-ghost text-[0.72rem] px-2.5 py-1.5"
+                  onClick={() => {
+                    expandSearchTo(quickExpandRadiusKm, "results_list");
+                  }}
+                  disabled={isLoading}
+                >
+                  {quickExpandButtonLabel}
+                </button>
+              ) : null}
+            </div>
             <div className="space-y-1">
               {results.map((result, index) => (
                 <details

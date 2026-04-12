@@ -30,29 +30,16 @@ const BASE_BW_STYLE: StyleSpecification = {
 
 const MAX_PIN_RESULTS = 120;
 const BERLIN_FALLBACK_CENTER = { lat: 52.5208, lng: 13.4094 };
+const BERLIN_MAX_BOUNDS: [[number, number], [number, number]] = [
+  [13.0883, 52.3383],
+  [13.7612, 52.6755]
+];
+const BERLIN_MIN_ZOOM = 10.5;
 const DEV_DEBUG = process.env.NODE_ENV !== "production";
-const STROKE_FRAMES = [
-  { dash: [1.42, 0.82], width: 1.88, lineOpacity: 0.94, fillOpacity: 0.16 },
-  { dash: [1.24, 1.04], width: 1.72, lineOpacity: 0.88, fillOpacity: 0.14 },
-  { dash: [1.54, 0.88], width: 1.84, lineOpacity: 0.92, fillOpacity: 0.17 },
-  { dash: [1.3, 1.1], width: 1.68, lineOpacity: 0.86, fillOpacity: 0.13 }
-] as const;
-
-function toThemeStrokeFrame(
-  themeMode: "light" | "dark",
-  frame: (typeof STROKE_FRAMES)[number]
-) {
-  if (themeMode === "dark") {
-    return frame;
-  }
-
-  return {
-    dash: [...frame.dash] as [number, number],
-    width: Math.max(1.46, Number((frame.width - 0.12).toFixed(2))),
-    lineOpacity: Math.max(0.68, Number((frame.lineOpacity - 0.12).toFixed(2))),
-    fillOpacity: Math.max(0.09, Number((frame.fillOpacity - 0.05).toFixed(2)))
-  };
-}
+const RADIUS_STYLE = {
+  dark: { lineWidth: 1.78, lineOpacity: 0.9, fillOpacity: 0.14, lineColor: "#ffffff", fillColor: "#ffffff" },
+  light: { lineWidth: 1.62, lineOpacity: 0.72, fillOpacity: 0.1, lineColor: "#111111", fillColor: "#111111" }
+} as const;
 
 function isFiniteCoordinate(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -138,11 +125,14 @@ function buildRadiusPolygon(center: { lat: number; lng: number }, radiusMeters: 
   const latRad = (center.lat * Math.PI) / 180;
   const metersPerDegreeLat = 111320;
   const metersPerDegreeLng = Math.max(1, 111320 * Math.cos(latRad));
+  const wobbleMeters = Math.max(4, Math.min(18, radiusMeters * 0.012));
 
   for (let i = 0; i <= points; i += 1) {
     const angle = (i / points) * Math.PI * 2;
-    const dx = Math.cos(angle) * radiusMeters;
-    const dy = Math.sin(angle) * radiusMeters;
+    const wobble = Math.sin(angle * 3.7 + 0.2) * wobbleMeters + Math.cos(angle * 6.2 - 0.35) * wobbleMeters * 0.45;
+    const handmadeRadius = Math.max(80, radiusMeters + wobble);
+    const dx = Math.cos(angle) * handmadeRadius;
+    const dy = Math.sin(angle) * handmadeRadius;
     const lng = center.lng + dx / metersPerDegreeLng;
     const lat = center.lat + dy / metersPerDegreeLat;
     coordinates.push([lng, lat]);
@@ -197,11 +187,24 @@ function createPinElement(kind: "user" | "result", rank: number) {
   return marker;
 }
 
+function isNearBerlinBoundsEdge(
+  center: { lat: number; lng: number },
+  epsilon = 0.003
+) {
+  return (
+    center.lng <= BERLIN_MAX_BOUNDS[0][0] + epsilon ||
+    center.lng >= BERLIN_MAX_BOUNDS[1][0] - epsilon ||
+    center.lat <= BERLIN_MAX_BOUNDS[0][1] + epsilon ||
+    center.lat >= BERLIN_MAX_BOUNDS[1][1] - epsilon
+  );
+}
+
 export function LocalMap({
   center,
   results,
   themeMode,
   userMarkerLabel,
+  berlinOnlyHint,
   matchedProductLabel,
   storeCategoryLabel,
   distanceLabel,
@@ -216,6 +219,7 @@ export function LocalMap({
   results: SearchResult[];
   themeMode: "light" | "dark";
   userMarkerLabel: string;
+  berlinOnlyHint: string;
   matchedProductLabel: string;
   storeCategoryLabel: string;
   distanceLabel: string;
@@ -237,11 +241,29 @@ export function LocalMap({
   const lastBoundsKeyRef = useRef<string>("");
   const loggedMalformedResultKeysRef = useRef<Set<string>>(new Set());
   const loggedInvalidCenterRef = useRef(false);
+  const lastUserInteractionAtRef = useRef(0);
+  const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [showBerlinHint, setShowBerlinHint] = useState(false);
   const safeCenter = useMemo(
     () => (isValidCenterPoint(center) ? center : BERLIN_FALLBACK_CENTER),
     [center]
   );
+
+  function markUserMapInteraction() {
+    lastUserInteractionAtRef.current = Date.now();
+  }
+
+  function triggerBerlinOnlyHint() {
+    setShowBerlinHint(true);
+    if (hintTimeoutRef.current) {
+      clearTimeout(hintTimeoutRef.current);
+    }
+    hintTimeoutRef.current = setTimeout(() => {
+      setShowBerlinHint(false);
+      hintTimeoutRef.current = null;
+    }, 2100);
+  }
 
   useEffect(() => {
     if (!DEV_DEBUG || isValidCenterPoint(center) || loggedInvalidCenterRef.current) {
@@ -271,7 +293,11 @@ export function LocalMap({
         container: containerRef.current,
         style: BASE_BW_STYLE,
         center: [initialCenterRef.current.lng, initialCenterRef.current.lat],
-        zoom: 13
+        zoom: 13,
+        minZoom: BERLIN_MIN_ZOOM,
+        maxZoom: 16.8,
+        maxBounds: BERLIN_MAX_BOUNDS,
+        dragRotate: false
       });
 
       map.addControl(new maplibregl.NavigationControl(), "top-right");
@@ -291,6 +317,10 @@ export function LocalMap({
 
     return () => {
       mounted = false;
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current);
+        hintTimeoutRef.current = null;
+      }
       userMarkerRef.current = null;
       resultMarkers.clear();
       mapRef.current?.remove();
@@ -302,14 +332,72 @@ export function LocalMap({
   }, []);
 
   useEffect(() => {
+    return () => {
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current);
+        hintTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) {
       return;
     }
 
-    const radiusLineColor = themeMode === "dark" ? "#ffffff" : "#111111";
-    const radiusFillColor = themeMode === "dark" ? "#ffffff" : "#111111";
-    const baseFrame = toThemeStrokeFrame(themeMode, STROKE_FRAMES[0]);
+    const canvasContainer = map.getCanvasContainer();
+
+    const handleDragStart = () => {
+      markUserMapInteraction();
+    };
+
+    const handleDragEnd = () => {
+      const centerPoint = map.getCenter();
+      if (isNearBerlinBoundsEdge({ lat: centerPoint.lat, lng: centerPoint.lng })) {
+        triggerBerlinOnlyHint();
+      }
+    };
+
+    const handleZoomStart = () => {
+      markUserMapInteraction();
+    };
+
+    const handleZoomEnd = () => {
+      const recentlyInteracted = Date.now() - lastUserInteractionAtRef.current < 1200;
+      if (!recentlyInteracted) {
+        return;
+      }
+
+      if (map.getZoom() <= BERLIN_MIN_ZOOM + 0.03) {
+        triggerBerlinOnlyHint();
+      }
+    };
+
+    map.on("dragstart", handleDragStart);
+    map.on("dragend", handleDragEnd);
+    map.on("zoomstart", handleZoomStart);
+    map.on("zoomend", handleZoomEnd);
+    canvasContainer.addEventListener("wheel", markUserMapInteraction, { passive: true });
+    canvasContainer.addEventListener("touchstart", markUserMapInteraction, { passive: true });
+
+    return () => {
+      map.off("dragstart", handleDragStart);
+      map.off("dragend", handleDragEnd);
+      map.off("zoomstart", handleZoomStart);
+      map.off("zoomend", handleZoomEnd);
+      canvasContainer.removeEventListener("wheel", markUserMapInteraction);
+      canvasContainer.removeEventListener("touchstart", markUserMapInteraction);
+    };
+  }, [mapReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) {
+      return;
+    }
+
+    const style = themeMode === "dark" ? RADIUS_STYLE.dark : RADIUS_STYLE.light;
 
     const radiusGeoJSON = buildRadiusPolygon(
       { lat: safeCenter.lat, lng: safeCenter.lng },
@@ -335,13 +423,13 @@ export function LocalMap({
         type: "fill",
         source: "search-radius",
         paint: {
-          "fill-color": radiusFillColor,
-          "fill-opacity": baseFrame.fillOpacity
+          "fill-color": style.fillColor,
+          "fill-opacity": style.fillOpacity
         }
       });
     } else {
-      map.setPaintProperty("search-radius-fill", "fill-color", radiusFillColor);
-      map.setPaintProperty("search-radius-fill", "fill-opacity", baseFrame.fillOpacity);
+      map.setPaintProperty("search-radius-fill", "fill-color", style.fillColor);
+      map.setPaintProperty("search-radius-fill", "fill-opacity", style.fillOpacity);
     }
 
     if (!map.getLayer("search-radius-line")) {
@@ -349,48 +437,22 @@ export function LocalMap({
         id: "search-radius-line",
         type: "line",
         source: "search-radius",
+        layout: {
+          "line-cap": "round",
+          "line-join": "round"
+        },
         paint: {
-          "line-color": radiusLineColor,
-          "line-width": baseFrame.width,
-          "line-opacity": baseFrame.lineOpacity,
-          "line-dasharray": [...baseFrame.dash]
+          "line-color": style.lineColor,
+          "line-width": style.lineWidth,
+          "line-opacity": style.lineOpacity
         }
       });
     } else {
-      map.setPaintProperty("search-radius-line", "line-color", radiusLineColor);
-      map.setPaintProperty("search-radius-line", "line-width", baseFrame.width);
-      map.setPaintProperty("search-radius-line", "line-opacity", baseFrame.lineOpacity);
-      map.setPaintProperty("search-radius-line", "line-dasharray", [...baseFrame.dash]);
+      map.setPaintProperty("search-radius-line", "line-color", style.lineColor);
+      map.setPaintProperty("search-radius-line", "line-width", style.lineWidth);
+      map.setPaintProperty("search-radius-line", "line-opacity", style.lineOpacity);
     }
   }, [safeCenter.lat, safeCenter.lng, radiusMeters, themeMode, mapReady]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !mapReady) {
-      return;
-    }
-
-    let frameIndex = 0;
-
-    const applyFrame = () => {
-      if (!map.getLayer("search-radius-line") || !map.getLayer("search-radius-fill")) {
-        return;
-      }
-
-      const frame = toThemeStrokeFrame(themeMode, STROKE_FRAMES[frameIndex % STROKE_FRAMES.length]);
-      map.setPaintProperty("search-radius-line", "line-dasharray", [...frame.dash]);
-      map.setPaintProperty("search-radius-line", "line-width", frame.width);
-      map.setPaintProperty("search-radius-line", "line-opacity", frame.lineOpacity);
-      map.setPaintProperty("search-radius-fill", "fill-opacity", frame.fillOpacity);
-      frameIndex += 1;
-    };
-
-    applyFrame();
-    const timer = window.setInterval(applyFrame, 230);
-    return () => {
-      window.clearInterval(timer);
-    };
-  }, [mapReady, themeMode, safeCenter.lat, safeCenter.lng, radiusMeters]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -597,10 +659,16 @@ export function LocalMap({
 
   return (
     <div
-      ref={containerRef}
-      className={`bw-map map-stroke-frame w-full overflow-hidden rounded-[0.7rem] ${
+      className={`bw-map map-stroke-frame relative w-full overflow-hidden rounded-[0.7rem] ${
         className ?? "h-[320px]"
       }`}
-    />
+    >
+      <div ref={containerRef} className="h-full w-full" />
+      {showBerlinHint ? (
+        <div className="map-inline-hint" role="status" aria-live="polite">
+          {berlinOnlyHint}
+        </div>
+      ) : null}
+    </div>
   );
 }

@@ -53,6 +53,7 @@ export type Dictionary = {
   resultsCountLabel: string;
   mapEmptyState: string;
   mapYouAreHere: string;
+  berlinOnlyHint: string;
   itemLabel: string;
   backToSearch: string;
   notFoundTitle: string;
@@ -122,6 +123,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     resultsCountLabel: "Treffer",
     mapEmptyState: "Suche starten, dann erscheinen Pins auf der Karte.",
     mapYouAreHere: "Du bist hier",
+    berlinOnlyHint: "Sorry, aktuell sind wir nur in Berlin unterwegs.",
     itemLabel: "Artikel",
     backToSearch: "Zurueck",
     notFoundTitle: "Nicht gefunden",
@@ -189,6 +191,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     resultsCountLabel: "results",
     mapEmptyState: "Start a search and stores will appear on the map.",
     mapYouAreHere: "You are here",
+    berlinOnlyHint: "Sorry, we are only available in Berlin for now.",
     itemLabel: "Item",
     backToSearch: "Back",
     notFoundTitle: "Not found",
@@ -256,6 +259,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     resultsCountLabel: "resultados",
     mapEmptyState: "Empieza una busqueda y veras tiendas en el mapa.",
     mapYouAreHere: "Estas aqui",
+    berlinOnlyHint: "Sorry, por ahora solo estamos en Berlin.",
     itemLabel: "Articulo",
     backToSearch: "Volver",
     notFoundTitle: "No encontrado",

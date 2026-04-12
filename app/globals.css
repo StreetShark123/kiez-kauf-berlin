@@ -622,6 +622,35 @@ button {
   background: var(--ink);
 }
 
+.map-inline-hint {
+  position: absolute;
+  left: 0.6rem;
+  top: 0.58rem;
+  z-index: 3;
+  max-width: min(88%, 320px);
+  border: 1px solid var(--line-strong);
+  border-radius: 0.46rem;
+  background: color-mix(in srgb, var(--surface) 94%, transparent 6%);
+  color: var(--ink-soft);
+  font-family: var(--font-mono), "Courier New", monospace;
+  font-size: 0.66rem;
+  line-height: 1.28;
+  letter-spacing: 0.015em;
+  padding: 0.36rem 0.48rem;
+  animation: map-hint-in 140ms ease;
+}
+
+@keyframes map-hint-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .store-item {
   border: 1px solid var(--line);
   border-radius: 0.5rem;

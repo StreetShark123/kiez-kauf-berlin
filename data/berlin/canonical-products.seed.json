@@ -1,6 +1,6 @@
 [
-  {"normalized_name":"hafermilch 1l","display_name_es":"Leche de avena 1L","display_name_en":"Oat milk 1L","display_name_de":"Hafermilch 1L","synonyms":["oat milk","hafer drink"],"product_group":"beverages"},
-  {"normalized_name":"vollmilch 1l","display_name_es":"Leche entera 1L","display_name_en":"Whole milk 1L","display_name_de":"Vollmilch 1L","synonyms":["milk 1l"],"product_group":"beverages"},
+  {"normalized_name":"hafermilch 1l","display_name_es":"Leche de avena 1L","display_name_en":"Oat milk 1L","display_name_de":"Hafermilch 1L","synonyms":["oat milk","hafer drink","oat mjlk"],"product_group":"beverages"},
+  {"normalized_name":"vollmilch 1l","display_name_es":"Leche entera 1L","display_name_en":"Whole milk 1L","display_name_de":"Vollmilch 1L","synonyms":["milk 1l","milk","whole milk","mjlk"],"product_group":"beverages"},
   {"normalized_name":"wasser still 1.5l","display_name_es":"Agua sin gas 1.5L","display_name_en":"Still water 1.5L","display_name_de":"Wasser still 1.5L","synonyms":["still water"],"product_group":"beverages"},
   {"normalized_name":"wasser classic 1.5l","display_name_es":"Agua con gas 1.5L","display_name_en":"Sparkling water 1.5L","display_name_de":"Wasser classic 1.5L","synonyms":["sparkling water"],"product_group":"beverages"},
   {"normalized_name":"cola 1l","display_name_es":"Cola 1L","display_name_en":"Cola 1L","display_name_de":"Cola 1L","synonyms":["soft drink cola"],"product_group":"beverages"},
@@ -22,6 +22,13 @@
   {"normalized_name":"zucker 1kg","display_name_es":"Azucar 1kg","display_name_en":"Sugar 1kg","display_name_de":"Zucker 1kg","synonyms":["sugar"],"product_group":"groceries"},
   {"normalized_name":"salz fein 500g","display_name_es":"Sal fino 500g","display_name_en":"Fine salt 500g","display_name_de":"Feines Salz 500g","synonyms":["salt"],"product_group":"groceries"},
   {"normalized_name":"bio haferflocken 500g","display_name_es":"Copos de avena bio 500g","display_name_en":"Organic oats 500g","display_name_de":"Bio Haferflocken 500g","synonyms":["oat flakes"],"product_group":"groceries"},
+  {"normalized_name":"tortilla maiz 500g","display_name_es":"Tortilla de maiz 500g","display_name_en":"Corn tortilla 500g","display_name_de":"Mais Tortilla 500g","synonyms":["tortilla","tortillas","corn tortilla","mexican tortilla"],"product_group":"groceries"},
+  {"normalized_name":"tortilla trigo 8 stueck","display_name_es":"Tortilla de trigo 8 unidades","display_name_en":"Wheat tortilla 8 pack","display_name_de":"Weizen Tortilla 8 Stueck","synonyms":["wheat tortilla","wrap tortilla"],"product_group":"groceries"},
+  {"normalized_name":"frijoles negros 500g","display_name_es":"Frijoles negros 500g","display_name_en":"Black beans 500g","display_name_de":"Schwarze Bohnen 500g","synonyms":["black beans","frijol negro","frijoles"],"product_group":"groceries"},
+  {"normalized_name":"masa harina 1kg","display_name_es":"Harina de maiz 1kg","display_name_en":"Masa harina 1kg","display_name_de":"Maismehl 1kg","synonyms":["corn flour","harina de maiz"],"product_group":"groceries"},
+  {"normalized_name":"salsa picante 150ml","display_name_es":"Salsa picante 150ml","display_name_en":"Hot sauce 150ml","display_name_de":"Scharfe Sauce 150ml","synonyms":["hot sauce","chili sauce","salsa"],"product_group":"groceries"},
+  {"normalized_name":"chipotle adobo 200g","display_name_es":"Chipotle en adobo 200g","display_name_en":"Chipotle in adobo 200g","display_name_de":"Chipotle in Adobo 200g","synonyms":["chipotle","adobo chili"],"product_group":"groceries"},
+  {"normalized_name":"nori blaetter 10","display_name_es":"Nori hojas 10","display_name_en":"Nori sheets 10","display_name_de":"Nori Blaetter 10","synonyms":["nori","nori seaweed","sushi nori","norita"],"product_group":"groceries"},
 
   {"normalized_name":"aepfel 1kg","display_name_es":"Manzanas 1kg","display_name_en":"Apples 1kg","display_name_de":"Aepfel 1kg","synonyms":["apples"],"product_group":"fresh_produce"},
   {"normalized_name":"bananen 1kg","display_name_es":"Bananas 1kg","display_name_en":"Bananas 1kg","display_name_de":"Bananen 1kg","synonyms":["bananas"],"product_group":"fresh_produce"},
@@ -30,7 +37,10 @@
   {"normalized_name":"tomaten 1kg","display_name_es":"Tomates 1kg","display_name_en":"Tomatoes 1kg","display_name_de":"Tomaten 1kg","synonyms":["tomatoes"],"product_group":"fresh_produce"},
   {"normalized_name":"gurke stueck","display_name_es":"Pepino unidad","display_name_en":"Cucumber","display_name_de":"Gurke","synonyms":["cucumber"],"product_group":"fresh_produce"},
   {"normalized_name":"paprika mix 500g","display_name_es":"Pimiento mix 500g","display_name_en":"Bell pepper mix 500g","display_name_de":"Paprika Mix 500g","synonyms":["bell pepper"],"product_group":"fresh_produce"},
+  {"normalized_name":"chile serrano 100g","display_name_es":"Chile serrano 100g","display_name_en":"Serrano chili 100g","display_name_de":"Serrano Chili 100g","synonyms":["chile","chili pepper","serrano chili"],"product_group":"fresh_produce"},
+  {"normalized_name":"jalapeno 100g","display_name_es":"Jalapeno 100g","display_name_en":"Jalapeno 100g","display_name_de":"Jalapeno 100g","synonyms":["jalapeno","green chili"],"product_group":"fresh_produce"},
   {"normalized_name":"zitronen 500g","display_name_es":"Limones 500g","display_name_en":"Lemons 500g","display_name_de":"Zitronen 500g","synonyms":["lemons"],"product_group":"fresh_produce"},
+  {"normalized_name":"apricot 500g","display_name_es":"Albaricoque 500g","display_name_en":"Apricot 500g","display_name_de":"Aprikose 500g","synonyms":["apricot","apricots"],"product_group":"fresh_produce"},
 
   {"normalized_name":"brot weizen","display_name_es":"Pan de trigo","display_name_en":"Wheat bread","display_name_de":"Weizenbrot","synonyms":["wheat bread"],"product_group":"bakery"},
   {"normalized_name":"brot roggen","display_name_es":"Pan de centeno","display_name_en":"Rye bread","display_name_de":"Roggenbrot","synonyms":["rye bread"],"product_group":"bakery"},
@@ -49,6 +59,7 @@
   {"normalized_name":"duschgel 250ml","display_name_es":"Gel de ducha 250ml","display_name_en":"Shower gel 250ml","display_name_de":"Duschgel 250ml","synonyms":["shower gel"],"product_group":"personal_care"},
   {"normalized_name":"deodorant roll on","display_name_es":"Desodorante roll-on","display_name_en":"Roll-on deodorant","display_name_de":"Deo Roll-On","synonyms":["deodorant"],"product_group":"personal_care"},
   {"normalized_name":"tampons 32","display_name_es":"Tampones 32 unidades","display_name_en":"Tampons 32","display_name_de":"Tampons 32","synonyms":["tampons"],"product_group":"personal_care"},
+  {"normalized_name":"diapers pack m","display_name_es":"Pañales talla M","display_name_en":"Diapers pack M","display_name_de":"Windeln Pack M","synonyms":["diaper","diapers","nappy","nappies"],"product_group":"personal_care"},
 
   {"normalized_name":"toilettenpapier 8 rollen","display_name_es":"Papel higienico 8 rollos","display_name_en":"Toilet paper 8 rolls","display_name_de":"Toilettenpapier 8 Rollen","synonyms":["toilet paper"],"product_group":"household"},
   {"normalized_name":"kuechenpapier 4 rollen","display_name_es":"Papel de cocina 4 rollos","display_name_en":"Kitchen paper 4 rolls","display_name_de":"Kuechenpapier 4 Rollen","synonyms":["paper towels"],"product_group":"household"},
@@ -56,12 +67,15 @@
   {"normalized_name":"spuelmittel 500ml","display_name_es":"Lavavajillas 500ml","display_name_en":"Dish soap 500ml","display_name_de":"Spuelmittel 500ml","synonyms":["dish soap"],"product_group":"household"},
   {"normalized_name":"allzweckreiniger 1l","display_name_es":"Limpiador multiusos 1L","display_name_en":"All-purpose cleaner 1L","display_name_de":"Allzweckreiniger 1L","synonyms":["all purpose cleaner"],"product_group":"household"},
   {"normalized_name":"muellbeutel 35l 20","display_name_es":"Bolsas basura 35L 20u","display_name_en":"Trash bags 35L 20","display_name_de":"Muellbeutel 35L 20","synonyms":["trash bags"],"product_group":"household"},
+  {"normalized_name":"allzweckkleber 50ml","display_name_es":"Pegamento multiuso 50ml","display_name_en":"All-purpose glue 50ml","display_name_de":"Allzweckkleber 50ml","synonyms":["glue","super glue","adhesive","glu"],"product_group":"household"},
+  {"normalized_name":"hammer standard","display_name_es":"Martillo estandar","display_name_en":"Hammer standard","display_name_de":"Hammer Standard","synonyms":["hammer","hammr","claw hammer"],"product_group":"household"},
 
-  {"normalized_name":"ibuprofen 400mg","display_name_es":"Ibuprofeno 400mg","display_name_en":"Ibuprofen 400mg","display_name_de":"Ibuprofen 400mg","synonyms":["pain relief"],"product_group":"pharmacy"},
+  {"normalized_name":"ibuprofen 400mg","display_name_es":"Ibuprofeno 400mg","display_name_en":"Ibuprofen 400mg","display_name_de":"Ibuprofen 400mg","synonyms":["pain relief","painkiller"],"product_group":"pharmacy"},
   {"normalized_name":"paracetamol 500mg","display_name_es":"Paracetamol 500mg","display_name_en":"Paracetamol 500mg","display_name_de":"Paracetamol 500mg","synonyms":["acetaminophen"],"product_group":"pharmacy"},
   {"normalized_name":"husten sirup","display_name_es":"Jarabe para la tos","display_name_en":"Cough syrup","display_name_de":"Hustensaft","synonyms":["cough syrup"],"product_group":"pharmacy"},
   {"normalized_name":"vitamin c brausetabletten","display_name_es":"Vitamina C efervescente","display_name_en":"Vitamin C effervescent","display_name_de":"Vitamin C Brausetabletten","synonyms":["vitamin c"],"product_group":"pharmacy"},
   {"normalized_name":"pflaster set","display_name_es":"Set de tiritas","display_name_en":"Bandage set","display_name_de":"Pflaster Set","synonyms":["bandages"],"product_group":"pharmacy"},
+  {"normalized_name":"condoms pack 12","display_name_es":"Preservativos 12 unidades","display_name_en":"Condoms pack 12","display_name_de":"Kondome 12er Pack","synonyms":["condom","condoms","safe sex"],"product_group":"pharmacy"},
 
   {"normalized_name":"chips paprika 150g","display_name_es":"Patatas chips paprika 150g","display_name_en":"Paprika chips 150g","display_name_de":"Paprika Chips 150g","synonyms":["chips"],"product_group":"snacks"},
   {"normalized_name":"schokolade dunkel 100g","display_name_es":"Chocolate negro 100g","display_name_en":"Dark chocolate 100g","display_name_de":"Dunkle Schokolade 100g","synonyms":["dark chocolate"],"product_group":"snacks"},
