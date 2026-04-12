@@ -7,7 +7,7 @@ import type {
   Marker as MapLibreMarker,
   StyleSpecification
 } from "maplibre-gl";
-import { buildDirectionsUrl, estimateTravelMinutes } from "@/lib/maps";
+import { estimateTravelMinutes } from "@/lib/maps";
 import type { SearchResult } from "@/lib/types";
 
 const BASE_BW_STYLE: StyleSpecification = {
@@ -40,6 +40,10 @@ const DEV_DEBUG = process.env.NODE_ENV !== "production";
 const RADIUS_STYLE = {
   dark: { lineWidth: 1.78, lineOpacity: 0.9, fillOpacity: 0.14, lineColor: "#ffffff", fillColor: "#ffffff" },
   light: { lineWidth: 1.62, lineOpacity: 0.72, fillOpacity: 0.1, lineColor: "#111111", fillColor: "#111111" }
+} as const;
+const ROUTE_STYLE = {
+  dark: { lineWidth: 2.75, lineOpacity: 0.96, lineColor: "#ffffff" },
+  light: { lineWidth: 2.55, lineOpacity: 0.86, lineColor: "#111111" }
 } as const;
 
 function isFiniteCoordinate(value: unknown): value is number {
@@ -161,6 +165,29 @@ function buildRadiusPolygon(center: { lat: number; lng: number }, radiusMeters: 
   };
 }
 
+function sanitizeRouteGeometry(
+  geometry: [number, number][] | null | undefined
+): [number, number][] {
+  if (!Array.isArray(geometry)) {
+    return [];
+  }
+
+  return geometry.filter((point) => {
+    if (!Array.isArray(point) || point.length < 2) {
+      return false;
+    }
+    const [lng, lat] = point;
+    return (
+      isFiniteCoordinate(lng) &&
+      isFiniteCoordinate(lat) &&
+      lat >= -90 &&
+      lat <= 90 &&
+      lng >= -180 &&
+      lng <= 180
+    );
+  });
+}
+
 function primaryCategory(result: SearchResult, unknownCategoryLabel: string) {
   const firstCategory = result.store.appCategories?.[0];
   if (firstCategory) {
@@ -221,12 +248,12 @@ export function LocalMap({
   walkTimeLabel,
   bikeTimeLabel,
   etaApproxLabel,
-  routeActionLabel,
   validationLabel,
   validationLikelyLabel,
   validationValidatedLabel,
   unknownCategoryLabel,
   radiusMeters,
+  activeRouteGeometry,
   className
 }: {
   center: { lat: number; lng: number };
@@ -242,12 +269,12 @@ export function LocalMap({
   walkTimeLabel: string;
   bikeTimeLabel: string;
   etaApproxLabel: string;
-  routeActionLabel: string;
   validationLabel: string;
   validationLikelyLabel: string;
   validationValidatedLabel: string;
   unknownCategoryLabel: string;
   radiusMeters: number;
+  activeRouteGeometry?: [number, number][] | null;
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -268,6 +295,10 @@ export function LocalMap({
   const safeCenter = useMemo(
     () => (isValidCenterPoint(center) ? center : BERLIN_FALLBACK_CENTER),
     [center]
+  );
+  const safeRouteGeometry = useMemo(
+    () => sanitizeRouteGeometry(activeRouteGeometry),
+    [activeRouteGeometry]
   );
 
   function markUserMapInteraction() {
@@ -483,6 +514,73 @@ export function LocalMap({
 
   useEffect(() => {
     const map = mapRef.current;
+    if (!map || !mapReady) {
+      return;
+    }
+
+    const style = themeMode === "dark" ? ROUTE_STYLE.dark : ROUTE_STYLE.light;
+    const hasRoute = safeRouteGeometry.length >= 2;
+    const routeSource = map.getSource("active-route") as
+      | { setData: (data: unknown) => void }
+      | undefined;
+
+    if (!hasRoute) {
+      if (map.getLayer("active-route-line")) {
+        map.removeLayer("active-route-line");
+      }
+      if (map.getSource("active-route")) {
+        map.removeSource("active-route");
+      }
+      return;
+    }
+
+    const routeGeoJSON = {
+      type: "FeatureCollection" as const,
+      features: [
+        {
+          type: "Feature" as const,
+          properties: {},
+          geometry: {
+            type: "LineString" as const,
+            coordinates: safeRouteGeometry
+          }
+        }
+      ]
+    };
+
+    if (routeSource) {
+      routeSource.setData(routeGeoJSON);
+    } else {
+      map.addSource("active-route", {
+        type: "geojson",
+        data: routeGeoJSON
+      });
+    }
+
+    if (!map.getLayer("active-route-line")) {
+      map.addLayer({
+        id: "active-route-line",
+        type: "line",
+        source: "active-route",
+        layout: {
+          "line-cap": "round",
+          "line-join": "round"
+        },
+        paint: {
+          "line-color": style.lineColor,
+          "line-width": style.lineWidth,
+          "line-opacity": style.lineOpacity
+        }
+      });
+    } else {
+      map.setPaintProperty("active-route-line", "line-color", style.lineColor);
+      map.setPaintProperty("active-route-line", "line-width", style.lineWidth);
+      map.setPaintProperty("active-route-line", "line-opacity", style.lineOpacity);
+    }
+  }, [mapReady, safeRouteGeometry, themeMode]);
+
+  useEffect(() => {
+    const map = mapRef.current;
     const maplibregl = maplibreRef.current;
     if (!map || !maplibregl || !mapReady) {
       return;
@@ -617,19 +715,6 @@ export function LocalMap({
             primaryCategory(item, unknownCategoryLabel)
           );
 
-          const routeLink = document.createElement("a");
-          routeLink.className = "map-popup-route";
-          routeLink.href = buildDirectionsUrl({
-            destinationLat: lat,
-            destinationLng: lng,
-            originLat: safeCenter.lat,
-            originLng: safeCenter.lng
-          });
-          routeLink.target = "_blank";
-          routeLink.rel = "noreferrer";
-          routeLink.textContent = routeActionLabel;
-          popupContainer.appendChild(routeLink);
-
           const validation = validationLabelFor(
             item.validationStatus,
             validationLikelyLabel,
@@ -682,12 +767,20 @@ export function LocalMap({
         (acc, coord) => acc.extend(coord as [number, number]),
         new maplibregl.LngLatBounds([safeCenter.lng, safeCenter.lat], [safeCenter.lng, safeCenter.lat])
       );
-      const bounds = visibleResults.reduce((acc, entry) => acc.extend([entry.lng, entry.lat]), boundsFromCircle);
+      const boundsWithResults = visibleResults.reduce(
+        (acc, entry) => acc.extend([entry.lng, entry.lat]),
+        boundsFromCircle
+      );
+      const bounds = safeRouteGeometry.reduce(
+        (acc, coord) => acc.extend(coord),
+        boundsWithResults
+      );
 
       const boundsKey = [
         safeCenter.lat.toFixed(5),
         safeCenter.lng.toFixed(5),
         String(Math.round(radiusMeters)),
+        ...safeRouteGeometry.map((coord) => `${coord[1].toFixed(5)}:${coord[0].toFixed(5)}`),
         ...visibleResults.map(
           (entry) =>
             `${entry.item.offer.id}:${entry.lat.toFixed(5)}:${entry.lng.toFixed(5)}`
@@ -719,7 +812,7 @@ export function LocalMap({
     matchedProductLabel,
     radiusMeters,
     results,
-    routeActionLabel,
+    safeRouteGeometry,
     storeCategoryLabel,
     unknownCategoryLabel,
     validationLabel,

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LocalMap } from "@/components/LocalMap";
 import { track } from "@vercel/analytics";
 import type { Dictionary } from "@/lib/i18n";
-import { buildDirectionsUrl, estimateTravelMinutes } from "@/lib/maps";
+import { estimateTravelMinutes } from "@/lib/maps";
 import type { SearchResult } from "@/lib/types";
 
 type SearchPayload = {
@@ -12,6 +12,25 @@ type SearchPayload = {
   origin: { lat: number; lng: number };
   radius: number;
   results: SearchResult[];
+};
+
+type RouteMode = "walk" | "bike";
+
+type RouteApiPayload = {
+  mode: RouteMode;
+  durationSeconds: number;
+  distanceMeters: number;
+  geometry: [number, number][];
+  fallback?: boolean;
+};
+
+type ActiveRoute = {
+  offerId: string;
+  mode: RouteMode;
+  durationMinutes: number;
+  distanceMeters: number;
+  geometry: [number, number][];
+  fallback: boolean;
 };
 
 type GeolocationPermissionState = "unknown" | "prompt" | "granted" | "denied" | "unsupported";
@@ -275,10 +294,13 @@ export function SearchExperience({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [noResultsGuidance, setNoResultsGuidance] = useState<NoResultsGuidance | null>(null);
+  const [activeRoute, setActiveRoute] = useState<ActiveRoute | null>(null);
+  const [routeLoadingKey, setRouteLoadingKey] = useState<string | null>(null);
   const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
   const lastHapticAtRef = useRef(0);
   const searchAbortRef = useRef<AbortController | null>(null);
   const searchRequestIdRef = useRef(0);
+  const routeRequestIdRef = useRef(0);
   const loggedMalformedResultKeysRef = useRef<Set<string>>(new Set());
   const loggedInvalidCenterRef = useRef(false);
 
@@ -671,6 +693,14 @@ export function SearchExperience({
   const manualCenterEnabled =
     geolocationPermission === "denied" || geolocationPermission === "unsupported";
 
+  const activeRouteSummary = useMemo(() => {
+    if (!activeRoute) {
+      return null;
+    }
+    const modeLabel = activeRoute.mode === "walk" ? dictionary.walkTimeLabel : dictionary.bikeTimeLabel;
+    return `${modeLabel} ${formatEtaLabel(dictionary.etaApproxLabel, activeRoute.durationMinutes)}`;
+  }, [activeRoute, dictionary.bikeTimeLabel, dictionary.etaApproxLabel, dictionary.walkTimeLabel]);
+
   const estimateTravel = useCallback(
     (distanceMeters: number) => {
       const walkMin = estimateTravelMinutes(distanceMeters, "walk");
@@ -692,6 +722,16 @@ export function SearchExperience({
     };
   }, []);
 
+  useEffect(() => {
+    if (!activeRoute) {
+      return;
+    }
+    const stillVisible = results.some((result) => result.offer.id === activeRoute.offerId);
+    if (!stillVisible) {
+      setActiveRoute(null);
+    }
+  }, [activeRoute, results]);
+
   async function runSearch(options?: { overrideRadiusKm?: number }) {
     if (!query.trim()) {
       setErrorMessage(dictionary.queryRequiredError);
@@ -709,6 +749,8 @@ export function SearchExperience({
     pulse(8);
     setIsLoading(true);
     setErrorMessage(null);
+    setActiveRoute(null);
+    setRouteLoadingKey(null);
     setNoResultsGuidance(null);
     const startedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     const queryForAnalytics = normalizeQueryForAnalytics(query);
@@ -867,6 +909,86 @@ export function SearchExperience({
     void runSearch({ overrideRadiusKm: nextRadiusKm });
   }
 
+  async function drawRouteOnMap(result: SearchResult, mode: RouteMode) {
+    const routeKey = `${result.offer.id}:${mode}`;
+    const isActiveSameRoute =
+      activeRoute?.offerId === result.offer.id && activeRoute.mode === mode;
+
+    if (isActiveSameRoute) {
+      setActiveRoute(null);
+      trackEvent("route_clear_on_map", {
+        offer_id: result.offer.id,
+        mode
+      });
+      return;
+    }
+
+    routeRequestIdRef.current += 1;
+    const requestId = routeRequestIdRef.current;
+    setRouteLoadingKey(routeKey);
+    setErrorMessage(null);
+
+    try {
+      const params = new URLSearchParams({
+        mode,
+        originLat: String(safeCenter.lat),
+        originLng: String(safeCenter.lng),
+        destinationLat: String(result.store.lat),
+        destinationLng: String(result.store.lng)
+      });
+
+      const response = await fetch(`/api/route?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error(`Route request failed with status ${response.status}`);
+      }
+      const data = (await response.json()) as RouteApiPayload;
+      if (requestId !== routeRequestIdRef.current) {
+        return;
+      }
+
+      if (!Array.isArray(data.geometry) || data.geometry.length < 2) {
+        throw new Error("Invalid route geometry");
+      }
+
+      const durationMinutes = Math.max(1, Math.round((data.durationSeconds ?? 0) / 60));
+      setActiveRoute({
+        offerId: result.offer.id,
+        mode,
+        durationMinutes,
+        distanceMeters: data.distanceMeters,
+        geometry: data.geometry,
+        fallback: Boolean(data.fallback)
+      });
+      setLocationMessage(
+        `${dictionary.routeOnMapAction}: ${mode === "walk" ? dictionary.walkTimeLabel : dictionary.bikeTimeLabel} ${formatEtaLabel(dictionary.etaApproxLabel, durationMinutes)}`
+      );
+      trackEvent("route_on_map_success", {
+        offer_id: result.offer.id,
+        mode,
+        duration_min: durationMinutes,
+        fallback: Boolean(data.fallback)
+      });
+      pulse([8, 18, 8]);
+    } catch (error) {
+      if (requestId !== routeRequestIdRef.current) {
+        return;
+      }
+      if (DEV_DEBUG) {
+        console.error("[route-on-map] failed to draw route", error);
+      }
+      setErrorMessage(dictionary.routeError);
+      trackEvent("route_on_map_error", {
+        offer_id: result.offer.id,
+        mode
+      });
+      pulse(22);
+    } finally {
+      if (requestId === routeRequestIdRef.current) {
+        setRouteLoadingKey((current) => (current === routeKey ? null : current));
+      }
+    }
+  }
+
   return (
     <section className="space-y-3 md:space-y-3.5">
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
@@ -998,7 +1120,7 @@ export function SearchExperience({
       <section id="map" className="space-y-1.5 md:space-y-2">
         <div className="hand-divider flex items-end justify-between pb-2">
           <h2 className="note-title">{dictionary.mapTitle}</h2>
-          <p className="status-text">{resultSummary}</p>
+          <p className="status-text">{activeRouteSummary ?? resultSummary}</p>
         </div>
         <LocalMap
           center={safeCenter}
@@ -1018,12 +1140,12 @@ export function SearchExperience({
           walkTimeLabel={dictionary.walkTimeLabel}
           bikeTimeLabel={dictionary.bikeTimeLabel}
           etaApproxLabel={dictionary.etaApproxLabel}
-          routeActionLabel={dictionary.routeAction}
           validationLabel={dictionary.validationLabel}
           validationLikelyLabel={dictionary.validationLikely}
           validationValidatedLabel={dictionary.validationValidated}
           unknownCategoryLabel={dictionary.unknownCategory}
           radiusMeters={Math.round(radiusKm * 1000)}
+          activeRouteGeometry={activeRoute?.geometry ?? null}
           className="h-[55vh] min-h-[280px] md:h-[66vh] md:min-h-[360px]"
         />
 
@@ -1065,12 +1187,14 @@ export function SearchExperience({
             <div className="space-y-1">
               {results.map((result, index) => {
                 const travel = estimateTravel(result.distanceMeters);
-                const routeHref = buildDirectionsUrl({
-                  destinationLat: result.store.lat,
-                  destinationLng: result.store.lng,
-                  originLat: safeCenter.lat,
-                  originLng: safeCenter.lng
-                });
+                const walkRouteKey = `${result.offer.id}:walk`;
+                const bikeRouteKey = `${result.offer.id}:bike`;
+                const walkRouteActive =
+                  activeRoute?.offerId === result.offer.id && activeRoute.mode === "walk";
+                const bikeRouteActive =
+                  activeRoute?.offerId === result.offer.id && activeRoute.mode === "bike";
+                const walkRouteLoading = routeLoadingKey === walkRouteKey;
+                const bikeRouteLoading = routeLoadingKey === bikeRouteKey;
 
                 return (
                   <details
@@ -1134,20 +1258,40 @@ export function SearchExperience({
                           <span>{result.whyThisProductMatches}</span>
                         </p>
                       ) : null}
-                      <a
-                        href={routeHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn-ghost mt-1 inline-flex text-[0.72rem] px-2.5 py-1.5"
-                        onClick={() => {
-                          trackEvent("route_open_from_results", {
-                            offer_id: result.offer.id,
-                            distance_m: Math.round(result.distanceMeters)
-                          });
-                        }}
-                      >
-                        {dictionary.routeAction}
-                      </a>
+                      <div className="mt-1.5 flex flex-wrap gap-1.5">
+                        <button
+                          type="button"
+                          className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
+                            walkRouteActive ? "is-active" : ""
+                          }`}
+                          disabled={walkRouteLoading}
+                          onClick={() => {
+                            void drawRouteOnMap(result, "walk");
+                          }}
+                        >
+                          {walkRouteLoading
+                            ? dictionary.routeLoadingLabel
+                            : walkRouteActive
+                              ? dictionary.clearRouteAction
+                              : `${dictionary.routeOnMapAction} · ${dictionary.walkTimeLabel} ${travel.walkMin}m`}
+                        </button>
+                        <button
+                          type="button"
+                          className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
+                            bikeRouteActive ? "is-active" : ""
+                          }`}
+                          disabled={bikeRouteLoading}
+                          onClick={() => {
+                            void drawRouteOnMap(result, "bike");
+                          }}
+                        >
+                          {bikeRouteLoading
+                            ? dictionary.routeLoadingLabel
+                            : bikeRouteActive
+                              ? dictionary.clearRouteAction
+                              : `${dictionary.routeOnMapAction} · ${dictionary.bikeTimeLabel} ${travel.bikeMin}m`}
+                        </button>
+                      </div>
                     </div>
                   </details>
                 );

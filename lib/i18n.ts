@@ -71,6 +71,10 @@ export type Dictionary = {
   clearNoteAction: string;
   retryAction: string;
   backHome: string;
+  routeOnMapAction: string;
+  clearRouteAction: string;
+  routeLoadingLabel: string;
+  routeError: string;
 };
 
 const dictionaries: Record<Locale, Dictionary> = {
@@ -145,7 +149,11 @@ const dictionaries: Record<Locale, Dictionary> = {
     errorCanvasHint: "Immerhin: Du kannst dir hier schnell eine kleine Notiz malen.",
     clearNoteAction: "Notiz loeschen",
     retryAction: "Nochmal versuchen",
-    backHome: "Zur Startseite"
+    backHome: "Zur Startseite",
+    routeOnMapAction: "Route auf Karte",
+    clearRouteAction: "Route entfernen",
+    routeLoadingLabel: "Route wird geladen...",
+    routeError: "Route konnte gerade nicht geladen werden."
   },
   en: {
     appTitle: "KiezKauf Berlin",
@@ -218,7 +226,11 @@ const dictionaries: Record<Locale, Dictionary> = {
     errorCanvasHint: "At least you can sketch a quick note here while we recover.",
     clearNoteAction: "Clear note",
     retryAction: "Try again",
-    backHome: "Back home"
+    backHome: "Back home",
+    routeOnMapAction: "Route on map",
+    clearRouteAction: "Clear route",
+    routeLoadingLabel: "Loading route...",
+    routeError: "Could not load route right now."
   },
   es: {
     appTitle: "KiezKauf Berlin",
@@ -291,7 +303,11 @@ const dictionaries: Record<Locale, Dictionary> = {
     errorCanvasHint: "Dibuja una nota rapida en toda la pantalla mientras volvemos.",
     clearNoteAction: "Limpiar nota",
     retryAction: "Reintentar",
-    backHome: "Volver al inicio"
+    backHome: "Volver al inicio",
+    routeOnMapAction: "Ruta en mapa",
+    clearRouteAction: "Quitar ruta",
+    routeLoadingLabel: "Cargando ruta...",
+    routeError: "No se pudo cargar la ruta ahora."
   }
 };
 
