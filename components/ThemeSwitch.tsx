@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { track } from "@vercel/analytics";
 
 const THEME_STORAGE_KEY = "kiezkauf:theme-preference";
 const THEME_EVENT_NAME = "kiezkauf-theme-change";
@@ -11,7 +12,15 @@ function applyTheme(theme: "light" | "dark") {
   window.dispatchEvent(new CustomEvent(THEME_EVENT_NAME, { detail: { theme } }));
 }
 
-export function ThemeSwitch({ label, darkModeLabel }: { label: string; darkModeLabel: string }) {
+export function ThemeSwitch({
+  label,
+  darkModeLabel,
+  lightModeLabel
+}: {
+  label: string;
+  darkModeLabel: string;
+  lightModeLabel: string;
+}) {
   const [isDark, setIsDark] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
@@ -54,14 +63,14 @@ export function ThemeSwitch({ label, darkModeLabel }: { label: string; darkModeL
   }, []);
 
   return (
-    <label className="theme-switch" aria-label={`${label}: ${darkModeLabel}`}>
+    <label className="theme-switch" aria-label={`${label}: ${isDark ? darkModeLabel : lightModeLabel}`}>
       <span className="mono theme-switch-label">
-        {label}: {darkModeLabel}
+        {label}: {isDark ? darkModeLabel : lightModeLabel}
       </span>
       <input
         type="checkbox"
         role="switch"
-        aria-label={darkModeLabel}
+        aria-label={isDark ? darkModeLabel : lightModeLabel}
         checked={isDark}
         disabled={!isReady}
         onChange={(event) => {
@@ -73,6 +82,14 @@ export function ThemeSwitch({ label, darkModeLabel }: { label: string; darkModeL
           }
           applyTheme(next);
           setIsDark(next === "dark");
+          try {
+            track("theme_changed", {
+              theme: next,
+              source: "footer_switch"
+            });
+          } catch {
+            // Ignore analytics errors.
+          }
         }}
       />
       <span className="theme-switch-track" aria-hidden="true">

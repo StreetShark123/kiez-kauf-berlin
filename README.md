@@ -9,6 +9,7 @@ MVP web responsive para buscar productos concretos y encontrar tiendas de barrio
 - Supabase (Postgres + PostGIS)
 - MapLibre + OpenStreetMap
 - i18n: Aleman e Ingles
+- Vercel Web Analytics + Speed Insights
 
 ## Flujo MVP
 
@@ -44,6 +45,23 @@ NEXT_PUBLIC_MAP_STYLE_URL=https://demotiles.maplibre.org/style.json
 ```
 
 Si no hay credenciales de Supabase, la app usa dataset mock para desarrollo.
+
+## Observabilidad en Vercel
+
+La app incluye:
+
+- `@vercel/analytics` para eventos de uso
+- `@vercel/speed-insights` para rendimiento de frontend
+
+Eventos custom de cliente actualmente enviados:
+
+- `search_submit`
+- `search_success`
+- `search_error`
+- `geolocation_request`
+- `geolocation_success`
+- `geolocation_error`
+- `theme_changed`
 
 ## Base de datos (Supabase SQL)
 

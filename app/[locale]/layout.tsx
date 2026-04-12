@@ -21,11 +21,15 @@ export default async function LocaleLayout({
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[1080px] flex-col px-4 pb-7 pt-5 md:px-6 md:pb-8 md:pt-6">
       <main className="flex-1">{children}</main>
-      <footer className="mt-9 border-t border-neutral-300 pt-3">
+      <footer className="footer-shell mt-9 pt-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="mono text-[0.71rem] uppercase tracking-[0.13em] text-neutral-500">{dictionary.appTitle}</p>
+          <p className="mono footer-brand">{dictionary.appTitle}</p>
           <div className="flex flex-wrap items-center gap-3">
-            <ThemeSwitch label={dictionary.themeLabel} darkModeLabel={dictionary.darkModeLabel} />
+            <ThemeSwitch
+              label={dictionary.themeLabel}
+              darkModeLabel={dictionary.darkModeLabel}
+              lightModeLabel={dictionary.lightModeLabel}
+            />
             <LanguageSwitcher locale={locale} label={dictionary.languageLabel} />
           </div>
         </div>

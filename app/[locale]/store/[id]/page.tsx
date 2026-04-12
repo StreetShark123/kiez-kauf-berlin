@@ -24,14 +24,14 @@ export default async function StoreDetailPage({
 
   return (
     <main className="space-y-4">
-      <Link href={`/${locale}`} className="mono text-sm text-neutral-600 hover:text-neutral-900">
+      <Link href={`/${locale}`} className="mono back-link text-sm">
         {"<-"} {dictionary.backToSearch}
       </Link>
 
       <section className="tool-block">
         <div className="tool-row p-4">
           <h2 className="text-xl font-medium tracking-tight">{detail.store.name}</h2>
-          <p className="mt-1 text-sm text-neutral-700">{detail.store.address}</p>
+          <p className="detail-address mt-1 text-sm">{detail.store.address}</p>
           {detail.store.openingHours ? <p className="status-text mt-1">{detail.store.openingHours}</p> : null}
         </div>
         <div className="p-4">
@@ -51,7 +51,7 @@ export default async function StoreDetailPage({
 
       <section>
         <h3 className="mb-2 text-base font-medium">{dictionary.storeProductsTitle}</h3>
-        <ul className="border-y border-neutral-300">
+        <ul className="detail-list border-y">
           {detail.offers.map((item, index) => (
             <li key={item.offer.id} className="result-row">
               <p className="status-text mb-1">
