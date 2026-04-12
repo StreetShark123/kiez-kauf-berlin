@@ -1,6 +1,7 @@
 import type { Locale } from "@/lib/types";
 
-export const SUPPORTED_LOCALES: Locale[] = ["de", "en", "es"];
+// Keep Spanish resources in the repo, but limit active app locales during development.
+export const SUPPORTED_LOCALES: Locale[] = ["en", "de"];
 
 export function isSupportedLocale(locale: string): locale is Locale {
   return SUPPORTED_LOCALES.includes(locale as Locale);
@@ -8,10 +9,10 @@ export function isSupportedLocale(locale: string): locale is Locale {
 
 export function getDefaultLocale(): Locale {
   const env = process.env.NEXT_PUBLIC_DEFAULT_LOCALE;
-  if (env === "en" || env === "es" || env === "de") {
+  if (env === "en" || env === "de") {
     return env;
   }
-  return "de";
+  return "en";
 }
 
 export function detectLocaleFromAcceptLanguage(value: string | null | undefined): Locale {

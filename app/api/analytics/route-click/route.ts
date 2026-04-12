@@ -46,7 +46,7 @@ export async function POST(request: Request) {
           origin_lng: body.originLng,
           destination_lat: body.destinationLat,
           destination_lng: body.destinationLng,
-          locale: body.locale ?? "de"
+          locale: body.locale ?? "en"
         },
         { onConflict: "interaction_id", ignoreDuplicates: true }
       );

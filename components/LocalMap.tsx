@@ -31,6 +31,28 @@ const BASE_BW_STYLE: StyleSpecification = {
 const MAX_PIN_RESULTS = 120;
 const BERLIN_FALLBACK_CENTER = { lat: 52.5208, lng: 13.4094 };
 const DEV_DEBUG = process.env.NODE_ENV !== "production";
+const STROKE_FRAMES = [
+  { dash: [1.42, 0.82], width: 1.88, lineOpacity: 0.94, fillOpacity: 0.16 },
+  { dash: [1.24, 1.04], width: 1.72, lineOpacity: 0.88, fillOpacity: 0.14 },
+  { dash: [1.54, 0.88], width: 1.84, lineOpacity: 0.92, fillOpacity: 0.17 },
+  { dash: [1.3, 1.1], width: 1.68, lineOpacity: 0.86, fillOpacity: 0.13 }
+] as const;
+
+function toThemeStrokeFrame(
+  themeMode: "light" | "dark",
+  frame: (typeof STROKE_FRAMES)[number]
+) {
+  if (themeMode === "dark") {
+    return frame;
+  }
+
+  return {
+    dash: [...frame.dash] as [number, number],
+    width: Math.max(1.46, Number((frame.width - 0.12).toFixed(2))),
+    lineOpacity: Math.max(0.68, Number((frame.lineOpacity - 0.12).toFixed(2))),
+    fillOpacity: Math.max(0.09, Number((frame.fillOpacity - 0.05).toFixed(2)))
+  };
+}
 
 function isFiniteCoordinate(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -285,10 +307,9 @@ export function LocalMap({
       return;
     }
 
-    const radiusLineColor = themeMode === "dark" ? "#f1f1f1" : "#111111";
-    const radiusFillColor = themeMode === "dark" ? "#f1f1f1" : "#111111";
-    const radiusFillOpacity = themeMode === "dark" ? 0.08 : 0.06;
-    const radiusLineOpacity = themeMode === "dark" ? 0.62 : 0.56;
+    const radiusLineColor = themeMode === "dark" ? "#ffffff" : "#111111";
+    const radiusFillColor = themeMode === "dark" ? "#ffffff" : "#111111";
+    const baseFrame = toThemeStrokeFrame(themeMode, STROKE_FRAMES[0]);
 
     const radiusGeoJSON = buildRadiusPolygon(
       { lat: safeCenter.lat, lng: safeCenter.lng },
@@ -315,12 +336,12 @@ export function LocalMap({
         source: "search-radius",
         paint: {
           "fill-color": radiusFillColor,
-          "fill-opacity": radiusFillOpacity
+          "fill-opacity": baseFrame.fillOpacity
         }
       });
     } else {
       map.setPaintProperty("search-radius-fill", "fill-color", radiusFillColor);
-      map.setPaintProperty("search-radius-fill", "fill-opacity", radiusFillOpacity);
+      map.setPaintProperty("search-radius-fill", "fill-opacity", baseFrame.fillOpacity);
     }
 
     if (!map.getLayer("search-radius-line")) {
@@ -330,15 +351,46 @@ export function LocalMap({
         source: "search-radius",
         paint: {
           "line-color": radiusLineColor,
-          "line-width": 1.25,
-          "line-opacity": radiusLineOpacity
+          "line-width": baseFrame.width,
+          "line-opacity": baseFrame.lineOpacity,
+          "line-dasharray": [...baseFrame.dash]
         }
       });
     } else {
       map.setPaintProperty("search-radius-line", "line-color", radiusLineColor);
-      map.setPaintProperty("search-radius-line", "line-opacity", radiusLineOpacity);
+      map.setPaintProperty("search-radius-line", "line-width", baseFrame.width);
+      map.setPaintProperty("search-radius-line", "line-opacity", baseFrame.lineOpacity);
+      map.setPaintProperty("search-radius-line", "line-dasharray", [...baseFrame.dash]);
     }
   }, [safeCenter.lat, safeCenter.lng, radiusMeters, themeMode, mapReady]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) {
+      return;
+    }
+
+    let frameIndex = 0;
+
+    const applyFrame = () => {
+      if (!map.getLayer("search-radius-line") || !map.getLayer("search-radius-fill")) {
+        return;
+      }
+
+      const frame = toThemeStrokeFrame(themeMode, STROKE_FRAMES[frameIndex % STROKE_FRAMES.length]);
+      map.setPaintProperty("search-radius-line", "line-dasharray", [...frame.dash]);
+      map.setPaintProperty("search-radius-line", "line-width", frame.width);
+      map.setPaintProperty("search-radius-line", "line-opacity", frame.lineOpacity);
+      map.setPaintProperty("search-radius-fill", "fill-opacity", frame.fillOpacity);
+      frameIndex += 1;
+    };
+
+    applyFrame();
+    const timer = window.setInterval(applyFrame, 230);
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [mapReady, themeMode, safeCenter.lat, safeCenter.lng, radiusMeters]);
 
   useEffect(() => {
     const map = mapRef.current;

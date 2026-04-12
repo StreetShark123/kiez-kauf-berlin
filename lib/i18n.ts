@@ -58,6 +58,8 @@ export type Dictionary = {
   errorTitle: string;
   errorDescription: string;
   errorJoke: string;
+  errorCanvasHint: string;
+  clearNoteAction: string;
   retryAction: string;
   backHome: string;
 };
@@ -121,6 +123,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     errorTitle: "Ups, da hat was geklemmt.",
     errorDescription: "Die Seite hatte gerade einen kleinen Aussetzer.",
     errorJoke: "Keine Sorge, nur ein lockerer Pixel.",
+    errorCanvasHint: "Immerhin: Du kannst dir hier schnell eine kleine Notiz malen.",
+    clearNoteAction: "Notiz loeschen",
     retryAction: "Nochmal versuchen",
     backHome: "Zur Startseite"
   },
@@ -182,6 +186,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     errorTitle: "Oops, something jammed.",
     errorDescription: "This page hit a small hiccup.",
     errorJoke: "No panic, just one shy pixel.",
+    errorCanvasHint: "At least you can sketch a quick note here while we recover.",
+    clearNoteAction: "Clear note",
     retryAction: "Try again",
     backHome: "Back home"
   },
@@ -242,7 +248,9 @@ const dictionaries: Record<Locale, Dictionary> = {
     notFoundJoke: "Parece que esta jugando al escondite.",
     errorTitle: "Ups, algo se atasco.",
     errorDescription: "Esta pantalla tuvo un mini tropiezo.",
-    errorJoke: "Tranqui, solo un pixel despistado.",
+    errorJoke: "Bueno, siempre puedes tomar notas a la vieja usanza.",
+    errorCanvasHint: "Dibuja una nota rapida en toda la pantalla mientras volvemos.",
+    clearNoteAction: "Limpiar nota",
     retryAction: "Reintentar",
     backHome: "Volver al inicio"
   }
