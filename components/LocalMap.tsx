@@ -8,6 +8,7 @@ import type {
   StyleSpecification
 } from "maplibre-gl";
 import { estimateTravelMinutes } from "@/lib/maps";
+import { evaluateOpeningStatus, type OpeningStatus } from "@/lib/opening-hours";
 import type { SearchResult } from "@/lib/types";
 
 const BASE_BW_STYLE: StyleSpecification = {
@@ -216,7 +217,26 @@ function validationLabelFor(
   return null;
 }
 
-function createPinElement(kind: "user" | "result", rank: number) {
+function openingStatusLabelFor(
+  status: OpeningStatus,
+  openNowLabel: string,
+  closedNowLabel: string,
+  hoursUnknownLabel: string
+) {
+  if (status === "open") {
+    return openNowLabel;
+  }
+  if (status === "closed") {
+    return closedNowLabel;
+  }
+  return hoursUnknownLabel;
+}
+
+function createPinElement(
+  kind: "user" | "result",
+  rank: number,
+  status: OpeningStatus = "unknown"
+) {
   const marker = document.createElement("div");
 
   if (kind === "user") {
@@ -245,6 +265,7 @@ function createPinElement(kind: "user" | "result", rank: number) {
   }
 
   marker.className = "map-pin";
+  marker.classList.add(`map-pin-${status}`);
   if (rank === 0) {
     marker.classList.add("map-pin-top");
   }
@@ -273,6 +294,10 @@ export function LocalMap({
   onManualCenterChange,
   matchedProductLabel,
   openingHoursLabel,
+  openingStatusLabel,
+  openNowLabel,
+  closedNowLabel,
+  hoursUnknownLabel,
   storeCategoryLabel,
   distanceLabel,
   walkTimeLabel,
@@ -297,6 +322,10 @@ export function LocalMap({
   onManualCenterChange?: (center: { lat: number; lng: number }) => void;
   matchedProductLabel: string;
   openingHoursLabel: string;
+  openingStatusLabel: string;
+  openNowLabel: string;
+  closedNowLabel: string;
+  hoursUnknownLabel: string;
   storeCategoryLabel: string;
   distanceLabel: string;
   walkTimeLabel: string;
@@ -669,6 +698,29 @@ export function LocalMap({
 
   useEffect(() => {
     const map = mapRef.current;
+    if (!map || !mapReady) {
+      return;
+    }
+
+    if (results.length > 0 || safeRouteGeometry.length > 0) {
+      return;
+    }
+
+    const current = map.getCenter();
+    const deltaLat = Math.abs(current.lat - safeCenter.lat);
+    const deltaLng = Math.abs(current.lng - safeCenter.lng);
+    if (deltaLat < 0.0002 && deltaLng < 0.0002) {
+      return;
+    }
+
+    map.easeTo({
+      center: [safeCenter.lng, safeCenter.lat],
+      duration: 220
+    });
+  }, [mapReady, results.length, safeRouteGeometry.length, safeCenter.lat, safeCenter.lng]);
+
+  useEffect(() => {
+    const map = mapRef.current;
     const maplibregl = maplibreRef.current;
     if (!map || !maplibregl || !mapReady) {
       return;
@@ -677,7 +729,7 @@ export function LocalMap({
     try {
       const appendPopupLine = (
         container: HTMLDivElement,
-        kind: "product" | "distance" | "category" | "validation" | "walk" | "bike" | "hours",
+        kind: "product" | "distance" | "category" | "validation" | "walk" | "bike" | "hours" | "status",
         label: string,
         value: string
       ) => {
@@ -721,6 +773,7 @@ export function LocalMap({
       visibleResults.forEach((entry, index) => {
         const { item, lat, lng } = entry;
         try {
+          const openingStatus = evaluateOpeningStatus(item.store.openingHours);
           const popupContainer = document.createElement("div");
           popupContainer.className = "map-popup";
 
@@ -748,6 +801,12 @@ export function LocalMap({
             "category",
             storeCategoryLabel,
             primaryCategory(item, unknownCategoryLabel)
+          );
+          appendPopupLine(
+            popupContainer,
+            "status",
+            openingStatusLabel,
+            openingStatusLabelFor(openingStatus, openNowLabel, closedNowLabel, hoursUnknownLabel)
           );
           if (item.store.openingHours) {
             appendPopupLine(popupContainer, "hours", openingHoursLabel, item.store.openingHours);
@@ -811,9 +870,12 @@ export function LocalMap({
             existingMarker
               .setLngLat([lng, lat])
               .setPopup(new maplibregl.Popup({ closeButton: false, offset: 14 }).setDOMContent(popupContainer));
-            existingMarker.getElement().classList.toggle("map-pin-top", index === 0);
+            const markerElement = existingMarker.getElement();
+            markerElement.classList.toggle("map-pin-top", index === 0);
+            markerElement.classList.remove("map-pin-open", "map-pin-closed", "map-pin-unknown");
+            markerElement.classList.add(`map-pin-${openingStatus}`);
           } else {
-            const markerElement = createPinElement("result", index);
+            const markerElement = createPinElement("result", index, openingStatus);
             markerElement.addEventListener("click", () => triggerHaptic(7));
 
             const marker = new maplibregl.Marker({ element: markerElement, anchor: "bottom" })
@@ -896,6 +958,10 @@ export function LocalMap({
     etaApproxLabel,
     matchedProductLabel,
     openingHoursLabel,
+    openingStatusLabel,
+    openNowLabel,
+    closedNowLabel,
+    hoursUnknownLabel,
     radiusMeters,
     results,
     safeRouteGeometry,

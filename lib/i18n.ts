@@ -30,6 +30,10 @@ export type Dictionary = {
   routeAction: string;
   matchedProductLabel: string;
   openingHoursLabel: string;
+  openingStatusLabel: string;
+  openNowLabel: string;
+  closedNowLabel: string;
+  hoursUnknownLabel: string;
   storeCategoryLabel: string;
   confidenceLabel: string;
   sourceLabel: string;
@@ -124,6 +128,10 @@ const dictionaries: Record<Locale, Dictionary> = {
     routeAction: "Route",
     matchedProductLabel: "Produkt",
     openingHoursLabel: "Oeffnungszeiten",
+    openingStatusLabel: "Status",
+    openNowLabel: "Jetzt offen",
+    closedNowLabel: "Jetzt zu",
+    hoursUnknownLabel: "Unbekannt",
     storeCategoryLabel: "Kategorie",
     confidenceLabel: "Treffer-Sicherheit",
     sourceLabel: "Quelle",
@@ -216,6 +224,10 @@ const dictionaries: Record<Locale, Dictionary> = {
     routeAction: "Route",
     matchedProductLabel: "Product",
     openingHoursLabel: "Opening hours",
+    openingStatusLabel: "Status",
+    openNowLabel: "Open now",
+    closedNowLabel: "Closed now",
+    hoursUnknownLabel: "Unknown",
     storeCategoryLabel: "Category",
     confidenceLabel: "Confidence",
     sourceLabel: "Source",
@@ -308,6 +320,10 @@ const dictionaries: Record<Locale, Dictionary> = {
     routeAction: "Ruta",
     matchedProductLabel: "Producto",
     openingHoursLabel: "Horario",
+    openingStatusLabel: "Estado",
+    openNowLabel: "Abierto ahora",
+    closedNowLabel: "Cerrado ahora",
+    hoursUnknownLabel: "Sin dato",
     storeCategoryLabel: "Categoria",
     confidenceLabel: "Confianza",
     sourceLabel: "Fuente",

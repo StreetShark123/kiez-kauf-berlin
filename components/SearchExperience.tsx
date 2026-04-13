@@ -5,6 +5,7 @@ import { LocalMap } from "@/components/LocalMap";
 import { track } from "@vercel/analytics";
 import type { Dictionary } from "@/lib/i18n";
 import { estimateTravelMinutes } from "@/lib/maps";
+import { evaluateOpeningStatus, type OpeningStatus } from "@/lib/opening-hours";
 import type { SearchResult } from "@/lib/types";
 
 type SearchPayload = {
@@ -65,6 +66,51 @@ const RADIUS_STEP_KM = 0.5;
 const SEARCH_CACHE_TTL_MS = 1000 * 60;
 const ROUTE_CACHE_TTL_MS = 1000 * 60 * 5;
 const DEV_DEBUG = process.env.NODE_ENV !== "production";
+
+function readCachedLocation(): { lat: number; lng: number } | null {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const cached = localStorage.getItem(LOCATION_CACHE_KEY);
+    if (!cached) {
+      return null;
+    }
+
+    const parsed = JSON.parse(cached) as {
+      lat?: unknown;
+      lng?: unknown;
+      timestamp?: unknown;
+      accuracy?: unknown;
+    };
+
+    const timestamp =
+      typeof parsed.timestamp === "number" && Number.isFinite(parsed.timestamp)
+        ? parsed.timestamp
+        : null;
+    const accuracy =
+      typeof parsed.accuracy === "number" && Number.isFinite(parsed.accuracy)
+        ? parsed.accuracy
+        : null;
+
+    if (!isValidCenterPoint(parsed) || timestamp === null) {
+      return null;
+    }
+
+    if (Date.now() - timestamp > LOCATION_CACHE_TTL_MS) {
+      return null;
+    }
+
+    if (accuracy !== null && accuracy > 300) {
+      return null;
+    }
+
+    return { lat: parsed.lat, lng: parsed.lng };
+  } catch {
+    return null;
+  }
+}
 
 function isFiniteCoordinate(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -239,6 +285,18 @@ function validationToneClass(status: SearchResult["validationStatus"]) {
   return "is-unvalidated";
 }
 
+function formatOpeningStatusLabel(dictionary: Dictionary, status: OpeningStatus) {
+  if (status === "open") return dictionary.openNowLabel;
+  if (status === "closed") return dictionary.closedNowLabel;
+  return dictionary.hoursUnknownLabel;
+}
+
+function openingStatusToneClass(status: OpeningStatus) {
+  if (status === "open") return "is-open-now";
+  if (status === "closed") return "is-closed-now";
+  return "is-hours-unknown";
+}
+
 function buildSearchCacheKey(args: {
   query: string;
   lat: number;
@@ -392,14 +450,17 @@ export function SearchExperience({
   initialCenter: { lat: number; lng: number };
 }) {
   const safeInitialCenter = isValidCenterPoint(initialCenter) ? initialCenter : BERLIN_FALLBACK_CENTER;
+  const cachedCenter = useMemo(() => readCachedLocation(), []);
   const [query, setQuery] = useState("");
   const [radiusKm, setRadiusKm] = useState(2);
-  const [center, setCenter] = useState(safeInitialCenter);
+  const [center, setCenter] = useState<{ lat: number; lng: number }>(() => cachedCenter ?? safeInitialCenter);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [geolocationPermission, setGeolocationPermission] = useState<GeolocationPermissionState>("unknown");
-  const [locationMessage, setLocationMessage] = useState<string | null>(null);
+  const [locationMessage, setLocationMessage] = useState<string | null>(
+    cachedCenter ? dictionary.geolocationRemembered : null
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [routeErrorMessage, setRouteErrorMessage] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
@@ -565,43 +626,6 @@ export function SearchExperience({
     pulse,
     resetSearchForLocationChange
   ]);
-
-  useEffect(() => {
-    try {
-      const cached = localStorage.getItem(LOCATION_CACHE_KEY);
-      if (!cached) {
-        return;
-      }
-
-      const parsed = JSON.parse(cached) as {
-        lat: number;
-        lng: number;
-        timestamp: number;
-        accuracy?: number;
-      };
-      if (
-        !isValidCenterPoint(parsed) ||
-        typeof parsed?.timestamp !== "number"
-      ) {
-        if (DEV_DEBUG) {
-          console.warn("[map-data-guard] Ignoring malformed cached geolocation", parsed);
-        }
-        return;
-      }
-
-      if (Date.now() - parsed.timestamp > LOCATION_CACHE_TTL_MS) {
-        return;
-      }
-      if (typeof parsed.accuracy === "number" && parsed.accuracy > 300) {
-        return;
-      }
-
-      setCenter({ lat: parsed.lat, lng: parsed.lng });
-      setLocationMessage(dictionary.geolocationRemembered);
-    } catch {
-      // Ignore bad local cache and keep default center.
-    }
-  }, [dictionary.geolocationRemembered]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1467,6 +1491,10 @@ export function SearchExperience({
           }}
           matchedProductLabel={dictionary.matchedProductLabel}
           openingHoursLabel={dictionary.openingHoursLabel}
+          openingStatusLabel={dictionary.openingStatusLabel}
+          openNowLabel={dictionary.openNowLabel}
+          closedNowLabel={dictionary.closedNowLabel}
+          hoursUnknownLabel={dictionary.hoursUnknownLabel}
           storeCategoryLabel={dictionary.storeCategoryLabel}
           distanceLabel={dictionary.distanceLabel}
           walkTimeLabel={dictionary.walkTimeLabel}
@@ -1540,6 +1568,7 @@ export function SearchExperience({
             <div className="space-y-1">
               {results.map((result, index) => {
                 const travel = estimateTravel(result.distanceMeters);
+                const openingStatus = evaluateOpeningStatus(result.store.openingHours);
                 const walkRouteKey = `${result.offer.id}:walk`;
                 const bikeRouteKey = `${result.offer.id}:bike`;
                 const walkRouteActive =
@@ -1552,7 +1581,7 @@ export function SearchExperience({
                 return (
                   <details
                     key={result.offer.id}
-                    className="store-item result-enter"
+                    className={`store-item result-enter ${openingStatusToneClass(openingStatus)}`}
                     style={{ animationDelay: `${Math.min(index, 10) * 26}ms` }}
                     onToggle={() => pulse(6)}
                   >
@@ -1562,6 +1591,9 @@ export function SearchExperience({
                         <span className="mono store-summary-distance">
                           <UiIcon kind="distance" className="store-summary-icon" />
                           {formatDistance(result.distanceMeters)}
+                        </span>
+                        <span className={`store-summary-badge ${openingStatusToneClass(openingStatus)}`}>
+                          {formatOpeningStatusLabel(dictionary, openingStatus)}
                         </span>
                         <span className="mono store-summary-travel" title={`${dictionary.walkTimeLabel}: ${travel.walkLabel}`}>
                           <UiIcon kind="walk" className="store-summary-icon" />
@@ -1594,6 +1626,12 @@ export function SearchExperience({
                         <UiIcon kind="category" className="store-detail-icon" />
                         <span>
                           {dictionary.storeCategoryLabel}: {primaryCategory(result, dictionary.unknownCategory)}
+                        </span>
+                      </p>
+                      <p className="store-detail-line">
+                        <UiIcon kind="validation" className="store-detail-icon" />
+                        <span>
+                          {dictionary.openingStatusLabel}: {formatOpeningStatusLabel(dictionary, openingStatus)}
                         </span>
                       </p>
                       {result.store.openingHours ? (
