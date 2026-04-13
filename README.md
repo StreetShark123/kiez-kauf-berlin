@@ -86,6 +86,24 @@ npm test
 
 Incluye pruebas de ranking y detalle de tienda.
 
+## Vocabulary extension (EN-first)
+
+Busqueda y matching de intencion usan un vocabulario central en:
+
+- `data/berlin/vocabulary.en.json`
+
+El archivo soporta:
+
+- `groups`: terminos por `product_group`
+- `typo_corrections`: correcciones conservadoras de errores comunes (`mjlk -> milk`)
+- `generic_terms`: consultas demasiado genericas que se filtran para evitar ruido
+
+Al ampliar vocabulario:
+
+1. Anade terminos en `groups` (preferir EN durante desarrollo).
+2. Anade solo typos reales y frecuentes en `typo_corrections`.
+3. Corre `npm test` para validar regresion de matching.
+
 ## Data pipeline (Moabit)
 
 Genera automaticamente una base inicial de tiendas y plantilla de relaciones producto-tienda:

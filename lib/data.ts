@@ -2,6 +2,7 @@ import { normalizeQuery } from "@/lib/maps";
 import { mockOffers, mockProducts, mockStores } from "@/lib/mock-data";
 import { hasSupabase, supabase } from "@/lib/supabase";
 import type { Offer, Product, SearchResult, Store, StoreDetail } from "@/lib/types";
+import { applyVocabularyTypos, GENERIC_QUERY_TERMS, KEYWORD_GROUP_MAP } from "@/lib/vocabulary";
 
 // Berlin Mitte (Alexanderplatz area) as the default map/search center.
 const BERLIN_CENTER = { lat: 52.5208, lng: 13.4094 };
@@ -165,162 +166,8 @@ type DatasetSearchResponse = {
   strategy: DatasetSearchStrategy;
 };
 
-const KEYWORD_GROUP_MAP: Array<{ group: string; terms: string[] }> = [
-  {
-    group: "beverages",
-    terms: [
-      "beer",
-      "beers",
-      "beeer",
-      "lager",
-      "ale",
-      "drink",
-      "drinks",
-      "beverage",
-      "beverages",
-      "juice",
-      "soda",
-      "water",
-      "wine",
-      "milk",
-      "mjlk",
-      "milkk",
-      "oat milk",
-      "soy milk",
-      "almond milk"
-    ]
-  },
-  {
-    group: "groceries",
-    terms: [
-      "grocery",
-      "groceries",
-      "food",
-      "foods",
-      "tortilla",
-      "tortillas",
-      "frijol",
-      "frijoles",
-      "black beans",
-      "salsa",
-      "hot sauce",
-      "chipotle",
-      "nori",
-      "norita",
-      "masa harina",
-      "harina de maiz",
-      "jalapeno can",
-      "chipotle can",
-      "corn tortilla",
-      "flour tortilla"
-    ]
-  },
-  {
-    group: "fresh_produce",
-    terms: [
-      "garlic",
-      "garicc",
-      "apricot",
-      "apricots",
-      "vegetable",
-      "vegetables",
-      "fruit",
-      "fruits",
-      "chile",
-      "chili",
-      "jalapeno",
-      "jalapenos",
-      "habanero",
-      "lime",
-      "limes",
-      "avocado"
-    ]
-  },
-  {
-    group: "household",
-    terms: [
-      "pliers",
-      "plier",
-      "tool",
-      "tools",
-      "hammer",
-      "hammr",
-      "glue",
-      "glu",
-      "adhesive",
-      "hardware",
-      "screwdriver",
-      "screwdrivers",
-      "screw",
-      "screws",
-      "nail",
-      "nails",
-      "drill",
-      "tape",
-      "duct tape",
-      "zip tie",
-      "zip ties",
-      "battery",
-      "batteries",
-      "light bulb",
-      "lightbulb",
-      "bulb",
-      "bombilla",
-      "cd",
-      "cds",
-      "cassette",
-      "cassettes"
-    ]
-  },
-  {
-    group: "pharmacy",
-    terms: [
-      "painkiller",
-      "painkillers",
-      "pain killer",
-      "medicine",
-      "meds",
-      "ibuprofen",
-      "paracetamol",
-      "condom",
-      "condoms",
-      "contraceptive",
-      "pharmacy",
-      "first aid",
-      "bandage",
-      "bandages"
-    ]
-  },
-  {
-    group: "personal_care",
-    terms: [
-      "diaper",
-      "diapers",
-      "nappy",
-      "nappies",
-      "baby wipes",
-      "toothpaste",
-      "tooth brush",
-      "deodorant",
-      "shampoo",
-      "soap"
-    ]
-  }
-];
-
 const MAX_SEARCH_RESULTS = 80;
 const MIN_CONFIDENCE_FOR_WEAK_MATCH = 0.28;
-const GENERIC_QUERY_TERMS = new Set([
-  "shop",
-  "store",
-  "thing",
-  "things",
-  "stuff",
-  "item",
-  "items",
-  "product",
-  "products"
-]);
 
 let canonicalCatalogCache:
   | {
@@ -340,6 +187,11 @@ function splitNormalizedTokens(value: string): string[] {
     .split(" ")
     .map((token) => token.trim())
     .filter(Boolean);
+}
+
+function normalizeSearchQuery(value: string): string {
+  const normalized = normalizeQuery(value);
+  return applyVocabularyTypos(normalized);
 }
 
 function levenshteinDistanceWithinLimit(a: string, b: string, maxDistance: number): number {
@@ -416,7 +268,7 @@ function normalizedFuzzyMatch(term: string, normalizedQuery: string): boolean {
 }
 
 function inferProductGroupsFromKeyword(query: string): string[] {
-  const normalized = normalizeQuery(query);
+  const normalized = normalizeSearchQuery(query);
   if (!normalized) {
     return [];
   }
@@ -453,7 +305,7 @@ async function getCanonicalCatalog(): Promise<SupabaseCanonicalProductRow[]> {
 }
 
 function findCanonicalProductIdsByQuery(query: string, products: SupabaseCanonicalProductRow[]): number[] {
-  const normalized = normalizeQuery(query);
+  const normalized = normalizeSearchQuery(query);
   if (!normalized) {
     return [];
   }
@@ -476,7 +328,7 @@ function findCanonicalProductIdsByQuery(query: string, products: SupabaseCanonic
 }
 
 function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng: number; radius: number }): SearchResult[] {
-  const normalized = normalizeQuery(args.query);
+  const normalized = normalizeSearchQuery(args.query);
   const validRows: JoinedRow[] = [];
   let droppedRows = 0;
 
@@ -671,10 +523,10 @@ async function searchSupabaseRowsFromDataset(args: {
   }
   const db = supabase;
 
-  const normalized = normalizeQuery(args.query);
+  const normalized = normalizeSearchQuery(args.query);
   const canonicalProducts = await getCanonicalCatalog();
-  const canonicalIds = findCanonicalProductIdsByQuery(normalized, canonicalProducts);
-  const inferredGroups = inferProductGroupsFromKeyword(normalized);
+  const canonicalIds = findCanonicalProductIdsByQuery(args.query, canonicalProducts);
+  const inferredGroups = inferProductGroupsFromKeyword(args.query);
   const limit = args.limit ?? 450;
   const bounds = getBoundingBoxFromRadius({
     lat: args.lat,
@@ -937,7 +789,7 @@ export async function searchOffers(args: {
     rows = getMockRows();
   }
 
-  const normalized = normalizeQuery(args.query);
+  const normalized = normalizeSearchQuery(args.query);
   if (GENERIC_QUERY_TERMS.has(normalized)) {
     return [];
   }

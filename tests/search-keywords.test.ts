@@ -13,12 +13,16 @@ describe("keyword intent helpers", () => {
     expect(__private.inferProductGroupsFromKeyword("glu")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("lightbulb")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("cassette")).toContain("household");
+    expect(__private.inferProductGroupsFromKeyword("casete")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("condoms")).toContain("pharmacy");
+    expect(__private.inferProductGroupsFromKeyword("condons")).toContain("pharmacy");
     expect(__private.inferProductGroupsFromKeyword("painkiller")).toContain("pharmacy");
     expect(__private.inferProductGroupsFromKeyword("diapers")).toContain("personal_care");
     expect(__private.inferProductGroupsFromKeyword("tortilla")).toContain("groceries");
     expect(__private.inferProductGroupsFromKeyword("nori")).toContain("groceries");
     expect(__private.inferProductGroupsFromKeyword("jalapeno")).toContain("fresh_produce");
+    expect(__private.inferProductGroupsFromKeyword("jalapneo")).toContain("fresh_produce");
+    expect(__private.inferProductGroupsFromKeyword("scrwedriver")).toContain("household");
   });
 
   it("matches canonical products through english names, synonyms and typo-tolerant matching", () => {
