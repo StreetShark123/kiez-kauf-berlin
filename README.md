@@ -102,7 +102,8 @@ Al ampliar vocabulario:
 
 1. Anade terminos en `groups` (preferir EN durante desarrollo).
 2. Anade solo typos reales y frecuentes en `typo_corrections`.
-3. Corre `npm test` para validar regresion de matching.
+3. Corre `npm run vocab:lint` para validar calidad y consistencia del vocabulario.
+4. Corre `npm test` para validar regresion de matching.
 
 ## Data pipeline (Moabit)
 

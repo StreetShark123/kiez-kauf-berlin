@@ -12,6 +12,24 @@
     "product",
     "products"
   ],
+  "broad_terms": [
+    "food",
+    "foods",
+    "drink",
+    "drinks",
+    "beverage",
+    "beverages",
+    "tool",
+    "tools",
+    "hardware",
+    "repair",
+    "medicine",
+    "meds",
+    "item",
+    "items",
+    "product",
+    "products"
+  ],
   "typo_corrections": {
     "mjlk": "milk",
     "milkk": "milk",

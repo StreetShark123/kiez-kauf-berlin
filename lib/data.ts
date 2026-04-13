@@ -2,11 +2,20 @@ import { normalizeQuery } from "@/lib/maps";
 import { mockOffers, mockProducts, mockStores } from "@/lib/mock-data";
 import { hasSupabase, supabase } from "@/lib/supabase";
 import type { Offer, Product, SearchResult, Store, StoreDetail } from "@/lib/types";
-import { applyVocabularyTypos, GENERIC_QUERY_TERMS, KEYWORD_GROUP_MAP } from "@/lib/vocabulary";
+import {
+  applyVocabularyTypos,
+  BROAD_QUERY_TERMS,
+  GENERIC_QUERY_TERMS,
+  getCandidateGroupsFromVocabulary,
+  KEYWORD_GROUP_MAP,
+  KEYWORD_GROUP_TERMS_BY_GROUP
+} from "@/lib/vocabulary";
 
 // Berlin Mitte (Alexanderplatz area) as the default map/search center.
 const BERLIN_CENTER = { lat: 52.5208, lng: 13.4094 };
 const DEV_DEBUG = process.env.NODE_ENV !== "production";
+const MAX_INFERRED_GROUPS = 4;
+const MIN_GROUP_SCORE = 2;
 
 function toRadians(value: number): number {
   return (value * Math.PI) / 180;
@@ -267,15 +276,93 @@ function normalizedFuzzyMatch(term: string, normalizedQuery: string): boolean {
   );
 }
 
+function scoreMatchedVocabularyTerm(term: string, normalizedQuery: string): number {
+  const queryTokens = splitNormalizedTokens(normalizedQuery);
+  const termTokens = splitNormalizedTokens(term);
+  const isBroad = BROAD_QUERY_TERMS.has(term);
+  const exact = term === normalizedQuery;
+  const contains = normalizedContains(term, normalizedQuery);
+
+  let score = 0;
+  if (exact) {
+    score += isBroad ? 4 : 8;
+  } else if (contains) {
+    score += isBroad ? 2 : 5;
+  } else {
+    score += isBroad ? 1 : 3;
+  }
+
+  if (termTokens.length >= 2) {
+    score += 2;
+  }
+  if (queryTokens.length >= 2 && termTokens.length >= 2) {
+    score += 1;
+  }
+  if (isBroad) {
+    score -= 1;
+  }
+
+  return score;
+}
+
 function inferProductGroupsFromKeyword(query: string): string[] {
   const normalized = normalizeSearchQuery(query);
   if (!normalized) {
     return [];
   }
 
-  return KEYWORD_GROUP_MAP.filter(({ terms }) =>
-    terms.some((term) => normalizedFuzzyMatch(normalizeQuery(term), normalized))
-  ).map(({ group }) => group);
+  const candidateGroups = new Set(getCandidateGroupsFromVocabulary(normalized));
+  const queryTokens = splitNormalizedTokens(normalized);
+
+  const scoreGroups = (groups: string[]) => {
+    const scored: Array<{ group: string; score: number }> = [];
+
+    for (const group of groups) {
+      const terms = KEYWORD_GROUP_TERMS_BY_GROUP.get(group) ?? [];
+      let bestScore = 0;
+      let matches = 0;
+
+      for (const term of terms) {
+        if (!normalizedFuzzyMatch(term, normalized)) {
+          continue;
+        }
+
+        matches += 1;
+        bestScore = Math.max(bestScore, scoreMatchedVocabularyTerm(term, normalized));
+      }
+
+      if (bestScore <= 0) {
+        continue;
+      }
+
+      const score = bestScore + Math.min(matches - 1, 2);
+      scored.push({ group, score });
+    }
+
+    return scored;
+  };
+
+  const scopedGroupList =
+    candidateGroups.size > 0 ? Array.from(candidateGroups) : KEYWORD_GROUP_MAP.map(({ group }) => group);
+  let scoredGroups = scoreGroups(scopedGroupList);
+
+  if (scoredGroups.length === 0 && candidateGroups.size > 0) {
+    scoredGroups = scoreGroups(KEYWORD_GROUP_MAP.map(({ group }) => group));
+  }
+  if (scoredGroups.length === 0) {
+    return [];
+  }
+
+  scoredGroups.sort((a, b) => b.score - a.score);
+  const topScore = scoredGroups[0]?.score ?? 0;
+  const acceptedScore = Math.max(MIN_GROUP_SCORE, topScore - 3);
+  const isShortSingleTokenQuery = queryTokens.length === 1 && queryTokens[0].length <= 4;
+
+  return scoredGroups
+    .filter(({ score }) => score >= acceptedScore)
+    .filter(({ score }) => !isShortSingleTokenQuery || score >= topScore)
+    .slice(0, MAX_INFERRED_GROUPS)
+    .map(({ group }) => group);
 }
 
 async function getCanonicalCatalog(): Promise<SupabaseCanonicalProductRow[]> {
@@ -310,21 +397,76 @@ function findCanonicalProductIdsByQuery(query: string, products: SupabaseCanonic
     return [];
   }
 
-  const matched = products.filter((product) => {
-    const terms = [
-      product.normalized_name,
-      product.display_name_en ?? "",
-      product.display_name_es ?? "",
-      product.display_name_de ?? "",
-      ...(product.synonyms ?? [])
-    ]
-      .map((item) => normalizeQuery(item))
-      .filter(Boolean);
+  const queryTokens = splitNormalizedTokens(normalized);
+  const productIndex = products.map((product) => {
+    const terms = Array.from(
+      new Set(
+        [
+          product.normalized_name,
+          product.display_name_en ?? "",
+          product.display_name_es ?? "",
+          product.display_name_de ?? "",
+          ...(product.synonyms ?? [])
+        ]
+          .map((item) => normalizeQuery(item))
+          .filter(Boolean)
+      )
+    );
 
-    return terms.some((term) => normalizedFuzzyMatch(term, normalized));
+    const tokenSet = new Set<string>();
+    for (const term of terms) {
+      for (const token of splitNormalizedTokens(term)) {
+        tokenSet.add(token);
+      }
+    }
+
+    return {
+      id: product.id,
+      terms,
+      tokenSet
+    };
   });
 
-  return matched.map((product) => product.id);
+  const exactMatches = productIndex.filter(({ terms }) => terms.some((term) => term === normalized));
+  if (exactMatches.length > 0) {
+    return exactMatches.map((entry) => entry.id);
+  }
+
+  const inclusiveMatches = productIndex.filter(({ terms }) =>
+    terms.some((term) => normalizedContains(term, normalized))
+  );
+  if (inclusiveMatches.length > 0) {
+    return inclusiveMatches.map((entry) => entry.id);
+  }
+
+  const shortlist = productIndex.filter(({ tokenSet, terms }) => {
+    if (queryTokens.length === 0) {
+      return false;
+    }
+
+    const hasTokenOverlap = queryTokens.some((queryToken) => {
+      for (const productToken of tokenSet) {
+        if (
+          productToken === queryToken ||
+          productToken.startsWith(queryToken) ||
+          queryToken.startsWith(productToken)
+        ) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    if (hasTokenOverlap) {
+      return true;
+    }
+
+    return queryTokens.some((queryToken) => queryToken.length >= 3 && terms.some((term) => term.includes(queryToken)));
+  });
+
+  return shortlist
+    .filter(({ terms }) => terms.some((term) => normalizedFuzzyMatch(term, normalized)))
+    .map((entry) => entry.id);
 }
 
 function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng: number; radius: number }): SearchResult[] {
