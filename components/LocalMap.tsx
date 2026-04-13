@@ -914,7 +914,8 @@ export function LocalMap({
 
       const interactedRecently =
         Date.now() - lastUserInteractionAtRef.current < USER_MAP_INTERACTION_AUTO_FIT_COOLDOWN_MS;
-      const shouldSkipAutoFit = interactedRecently && safeRouteGeometry.length === 0;
+      const routeIsFocused = Boolean(activeRouteFitKey) && safeRouteGeometry.length >= 2;
+      const shouldSkipAutoFit = routeIsFocused || (interactedRecently && safeRouteGeometry.length === 0);
 
       if (boundsKey !== lastBoundsKeyRef.current && !shouldSkipAutoFit) {
         map.fitBounds(bounds, {
@@ -938,6 +939,7 @@ export function LocalMap({
     radiusMeters,
     results,
     safeRouteGeometry,
+    activeRouteFitKey,
     selectedOfferId,
     mapReady,
     onMarkerSelect

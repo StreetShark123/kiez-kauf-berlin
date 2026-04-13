@@ -1070,7 +1070,6 @@ export function SearchExperience({
     setSelectedOfferId(null);
     setRouteLoadingKey(null);
     setNoResultsGuidance(null);
-    setIsResultsExpanded(false);
     const startedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     const queryForAnalytics = normalizeQueryForAnalytics(effectiveQuery);
     trackEvent("search_submit", {
@@ -1323,9 +1322,6 @@ export function SearchExperience({
           geometry: cachedRoute.payload.geometry,
           fallback: Boolean(cachedRoute.payload.fallback)
         });
-        setLocationMessage(
-          `${dictionary.routeOnMapAction}: ${mode === "walk" ? dictionary.walkTimeLabel : dictionary.bikeTimeLabel} ${formatEtaLabel(dictionary.etaApproxLabel, cachedDurationMinutes)}`
-        );
         trackEvent("route_cache_hit", {
           offer_id: result.offer.id,
           mode
@@ -1374,9 +1370,6 @@ export function SearchExperience({
         geometry: data.geometry,
         fallback: Boolean(data.fallback)
       });
-      setLocationMessage(
-        `${dictionary.routeOnMapAction}: ${mode === "walk" ? dictionary.walkTimeLabel : dictionary.bikeTimeLabel} ${formatEtaLabel(dictionary.etaApproxLabel, durationMinutes)}`
-      );
       setRouteErrorMessage(null);
       trackEvent("route_on_map_success", {
         offer_id: result.offer.id,
@@ -1606,7 +1599,6 @@ export function SearchExperience({
           selectedOfferId={selectedOfferId}
           onMarkerSelect={(result) => {
             setSelectedOfferId(result.offer.id);
-            setIsResultsExpanded(false);
           }}
           className="h-[clamp(300px,52svh,520px)] md:h-[66vh] md:min-h-[360px]"
         />
@@ -1650,6 +1642,7 @@ export function SearchExperience({
           <section className="note-divider pt-2">
             {selectedResultEntry ? (
               <article
+                id="selected-store-card"
                 className={`store-item selected-store-card ${openingStatusToneClass(
                   selectedResultEntry.openingStatus
                 )} is-selected`}
@@ -1841,15 +1834,21 @@ export function SearchExperience({
             {compactListSummary ? (
               <p className="status-text results-toolbar-summary mb-1.5">{compactListSummary}</p>
             ) : null}
-            <div className="space-y-1">
+            <div
+              className="space-y-1"
+              role="listbox"
+              aria-label={dictionary.resultsTitle}
+              aria-activedescendant={selectedOfferId ? `result-row-${selectedOfferId}` : undefined}
+            >
               {visibleListResults.map(({ result, openingStatus }, index) => {
                 const travel = estimateTravel(result.distanceMeters);
+                const isSelected = selectedOfferId === result.offer.id;
 
                 return (
                   <div
                     key={result.offer.id}
                     className={`store-item result-enter ${openingStatusToneClass(openingStatus)} ${
-                      selectedOfferId === result.offer.id ? "is-selected" : ""
+                      isSelected ? "is-selected" : ""
                     }`}
                     style={{ animationDelay: `${Math.min(index, 10) * 26}ms` }}
                   >
@@ -1857,10 +1856,13 @@ export function SearchExperience({
                       id={`result-row-${result.offer.id}`}
                       type="button"
                       className="store-summary store-summary-button w-full text-left"
+                      role="option"
+                      aria-selected={isSelected}
+                      aria-current={isSelected ? "true" : undefined}
+                      aria-describedby={isSelected ? "selected-store-card" : undefined}
                       onClick={() => {
                         pulse(6);
                         setSelectedOfferId(result.offer.id);
-                        setIsResultsExpanded(false);
                       }}
                     >
                       <span className="store-summary-name">{result.store.name}</span>
