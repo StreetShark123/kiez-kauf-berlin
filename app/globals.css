@@ -937,6 +937,12 @@ button {
   transition: background-color var(--motion-fast) ease;
 }
 
+.store-summary-button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
 .store-summary:hover {
   background: color-mix(in srgb, var(--surface) 84%, var(--surface-soft) 16%);
 }
@@ -1084,6 +1090,22 @@ button {
   border-top: 1px solid var(--line);
   padding: 0.45rem 0.66rem 0.52rem;
   animation: details-in var(--motion-medium) ease;
+}
+
+.selected-store-card {
+  margin-bottom: 0.6rem;
+}
+
+.selected-store-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.62rem;
+  padding: 0.56rem 0.66rem 0.5rem;
+}
+
+.selected-store-details {
+  padding-top: 0.48rem;
 }
 
 .store-detail-line {
@@ -1510,6 +1532,16 @@ button {
 
   .store-details {
     padding: 0.38rem 0.56rem 0.44rem;
+  }
+
+  .selected-store-head {
+    padding: 0.48rem 0.56rem 0.42rem;
+    gap: 0.5rem;
+  }
+
+  .selected-store-head .store-summary-meta {
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .store-detail-line {

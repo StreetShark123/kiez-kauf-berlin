@@ -917,6 +917,19 @@ export function SearchExperience({
     return prioritizedListResults.slice(0, COLLAPSED_RESULTS_LIMIT);
   }, [isResultsExpanded, prioritizedListResults]);
 
+  const selectedResultEntry = useMemo(() => {
+    if (prioritizedListResults.length === 0) {
+      return null;
+    }
+    if (!selectedOfferId) {
+      return prioritizedListResults[0];
+    }
+    return (
+      prioritizedListResults.find((entry) => entry.result.offer.id === selectedOfferId) ??
+      prioritizedListResults[0]
+    );
+  }, [prioritizedListResults, selectedOfferId]);
+
   const hasHiddenListResults = prioritizedListResults.length > COLLAPSED_RESULTS_LIMIT;
 
   const compactListSummary = useMemo(() => {
@@ -974,6 +987,23 @@ export function SearchExperience({
       setActiveRoute(null);
     }
   }, [activeRoute, results]);
+
+  useEffect(() => {
+    if (prioritizedListResults.length === 0) {
+      if (selectedOfferId !== null) {
+        setSelectedOfferId(null);
+      }
+      return;
+    }
+
+    const selectedStillExists = selectedOfferId
+      ? prioritizedListResults.some((entry) => entry.result.offer.id === selectedOfferId)
+      : false;
+
+    if (!selectedStillExists) {
+      setSelectedOfferId(prioritizedListResults[0]?.result.offer.id ?? null);
+    }
+  }, [prioritizedListResults, selectedOfferId]);
 
   useEffect(() => {
     if (!selectedOfferId) {
@@ -1036,6 +1066,7 @@ export function SearchExperience({
     setErrorMessage(null);
     setRouteErrorMessage(null);
     setActiveRoute(null);
+    setIsResultsExpanded(false);
     setSelectedOfferId(null);
     setRouteLoadingKey(null);
     setNoResultsGuidance(null);
@@ -1567,10 +1598,15 @@ export function SearchExperience({
           }}
           radiusMeters={Math.round(radiusKm * 1000)}
           activeRouteGeometry={activeRoute?.geometry ?? null}
+          activeRouteFitKey={
+            activeRoute
+              ? `${activeRoute.offerId}:${activeRoute.mode}:${Math.round(activeRoute.distanceMeters)}`
+              : null
+          }
           selectedOfferId={selectedOfferId}
           onMarkerSelect={(result) => {
             setSelectedOfferId(result.offer.id);
-            setIsResultsExpanded(true);
+            setIsResultsExpanded(false);
           }}
           className="h-[clamp(300px,52svh,520px)] md:h-[66vh] md:min-h-[360px]"
         />
@@ -1612,6 +1648,166 @@ export function SearchExperience({
 
         {results.length > 0 ? (
           <section className="note-divider pt-2">
+            {selectedResultEntry ? (
+              <article
+                className={`store-item selected-store-card ${openingStatusToneClass(
+                  selectedResultEntry.openingStatus
+                )} is-selected`}
+              >
+                <div className="selected-store-head">
+                  <p className="store-summary-name">{selectedResultEntry.result.store.name}</p>
+                  <span className="store-summary-meta">
+                    <span className="mono store-summary-distance">
+                      <UiIcon kind="distance" className="store-summary-icon" />
+                      {formatDistance(selectedResultEntry.result.distanceMeters)}
+                    </span>
+                    <span
+                      className={`store-summary-badge ${openingStatusToneClass(
+                        selectedResultEntry.openingStatus
+                      )}`}
+                    >
+                      {formatOpeningStatusLabel(dictionary, selectedResultEntry.openingStatus)}
+                    </span>
+                    {selectedResultEntry.result.validationStatus ? (
+                      <span
+                        className={`store-summary-badge ${validationToneClass(
+                          selectedResultEntry.result.validationStatus
+                        )}`}
+                      >
+                        {formatValidation(dictionary, selectedResultEntry.result.validationStatus)}
+                      </span>
+                    ) : null}
+                  </span>
+                </div>
+                <div className="store-details selected-store-details">
+                  <p className="store-detail-line">
+                    <UiIcon kind="product" className="store-detail-icon" />
+                    <span>
+                      {dictionary.matchedProductLabel}: {selectedResultEntry.result.product.normalizedName}
+                    </span>
+                  </p>
+                  <p className="store-detail-line">
+                    <UiIcon kind="category" className="store-detail-icon" />
+                    <span>
+                      {dictionary.storeCategoryLabel}:{" "}
+                      {primaryCategory(selectedResultEntry.result, dictionary.unknownCategory)}
+                    </span>
+                  </p>
+                  <p className="store-detail-line">
+                    <UiIcon kind="validation" className="store-detail-icon" />
+                    <span>
+                      {dictionary.openingStatusLabel}:{" "}
+                      {formatOpeningStatusLabel(dictionary, selectedResultEntry.openingStatus)}
+                    </span>
+                  </p>
+                  {selectedResultEntry.result.store.openingHours ? (
+                    <p className="store-detail-line">
+                      <UiIcon kind="hours" className="store-detail-icon" />
+                      <span>
+                        {dictionary.openingHoursLabel}: {selectedResultEntry.result.store.openingHours}
+                      </span>
+                    </p>
+                  ) : null}
+                  <p className="store-detail-line">
+                    <UiIcon kind="walk" className="store-detail-icon" />
+                    <span>
+                      {dictionary.walkTimeLabel}:{" "}
+                      {
+                        estimateTravel(selectedResultEntry.result.distanceMeters).walkLabel
+                      } · {dictionary.bikeTimeLabel}:{" "}
+                      {
+                        estimateTravel(selectedResultEntry.result.distanceMeters).bikeLabel
+                      }
+                    </span>
+                  </p>
+                  <div className="store-meta-wrap">
+                    <span className="store-meta-chip">
+                      {dictionary.confidenceLabel}:{" "}
+                      {formatConfidencePercent(
+                        selectedResultEntry.result.confidence,
+                        dictionary.unknownConfidence
+                      )}
+                    </span>
+                    <span className="store-meta-chip">
+                      {dictionary.sourceLabel}: {formatSourceType(selectedResultEntry.result.sourceType)}
+                    </span>
+                    <span className="store-meta-chip">
+                      {dictionary.checkedLabel}:{" "}
+                      {formatRelativeCheckedAt(selectedResultEntry.result.lastCheckedAt, {
+                        checkedUnknown: dictionary.checkedUnknown,
+                        checkedToday: dictionary.checkedToday,
+                        checkedYesterday: dictionary.checkedYesterday,
+                        checkedDaysAgoTemplate: dictionary.checkedDaysAgoTemplate
+                      })}
+                    </span>
+                    {selectedResultEntry.result.validationStatus ? (
+                      <span className={`store-meta-chip ${validationToneClass(selectedResultEntry.result.validationStatus)}`}>
+                        {dictionary.validationLabel}: {formatValidation(dictionary, selectedResultEntry.result.validationStatus)}
+                      </span>
+                    ) : null}
+                  </div>
+                  {selectedResultEntry.result.whyThisProductMatches ? (
+                    <p className="store-detail-line">
+                      <UiIcon kind="note" className="store-detail-icon" />
+                      <span>
+                        {dictionary.whyMatchLabel}: {compactWhyText(selectedResultEntry.result.whyThisProductMatches)}
+                      </span>
+                    </p>
+                  ) : null}
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {(() => {
+                      const selectedTravel = estimateTravel(selectedResultEntry.result.distanceMeters);
+                      const walkRouteKey = `${selectedResultEntry.result.offer.id}:walk`;
+                      const bikeRouteKey = `${selectedResultEntry.result.offer.id}:bike`;
+                      const walkRouteActive =
+                        activeRoute?.offerId === selectedResultEntry.result.offer.id && activeRoute.mode === "walk";
+                      const bikeRouteActive =
+                        activeRoute?.offerId === selectedResultEntry.result.offer.id && activeRoute.mode === "bike";
+                      const walkRouteLoading = routeLoadingKey === walkRouteKey;
+                      const bikeRouteLoading = routeLoadingKey === bikeRouteKey;
+
+                      return (
+                        <>
+                          <button
+                            type="button"
+                            className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
+                              walkRouteActive ? "is-active" : ""
+                            }`}
+                            disabled={walkRouteLoading}
+                            onClick={() => {
+                              void drawRouteOnMap(selectedResultEntry.result, "walk");
+                            }}
+                          >
+                            {walkRouteLoading
+                              ? dictionary.routeLoadingLabel
+                              : walkRouteActive
+                                ? dictionary.clearRouteAction
+                                : `${dictionary.routeOnMapAction} · ${dictionary.walkTimeLabel} ${selectedTravel.walkMin}m`}
+                          </button>
+                          <button
+                            type="button"
+                            className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
+                              bikeRouteActive ? "is-active" : ""
+                            }`}
+                            disabled={bikeRouteLoading}
+                            onClick={() => {
+                              void drawRouteOnMap(selectedResultEntry.result, "bike");
+                            }}
+                          >
+                            {bikeRouteLoading
+                              ? dictionary.routeLoadingLabel
+                              : bikeRouteActive
+                                ? dictionary.clearRouteAction
+                                : `${dictionary.routeOnMapAction} · ${dictionary.bikeTimeLabel} ${selectedTravel.bikeMin}m`}
+                          </button>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </article>
+            ) : null}
+
             <div className="results-toolbar mb-1.5 md:mb-2">
               <h3 className="note-subtitle note-mark">{dictionary.resultsTitle}</h3>
               <div className="results-toolbar-actions">
@@ -1648,32 +1844,23 @@ export function SearchExperience({
             <div className="space-y-1">
               {visibleListResults.map(({ result, openingStatus }, index) => {
                 const travel = estimateTravel(result.distanceMeters);
-                const walkRouteKey = `${result.offer.id}:walk`;
-                const bikeRouteKey = `${result.offer.id}:bike`;
-                const walkRouteActive =
-                  activeRoute?.offerId === result.offer.id && activeRoute.mode === "walk";
-                const bikeRouteActive =
-                  activeRoute?.offerId === result.offer.id && activeRoute.mode === "bike";
-                const walkRouteLoading = routeLoadingKey === walkRouteKey;
-                const bikeRouteLoading = routeLoadingKey === bikeRouteKey;
 
                 return (
-                  <details
+                  <div
                     key={result.offer.id}
-                    id={`result-row-${result.offer.id}`}
                     className={`store-item result-enter ${openingStatusToneClass(openingStatus)} ${
                       selectedOfferId === result.offer.id ? "is-selected" : ""
                     }`}
                     style={{ animationDelay: `${Math.min(index, 10) * 26}ms` }}
-                    onToggle={() => {
-                      pulse(6);
-                      setSelectedOfferId(result.offer.id);
-                    }}
                   >
-                    <summary
-                      className="store-summary"
+                    <button
+                      id={`result-row-${result.offer.id}`}
+                      type="button"
+                      className="store-summary store-summary-button w-full text-left"
                       onClick={() => {
+                        pulse(6);
                         setSelectedOfferId(result.offer.id);
+                        setIsResultsExpanded(false);
                       }}
                     >
                       <span className="store-summary-name">{result.store.name}</span>
@@ -1700,118 +1887,13 @@ export function SearchExperience({
                           {travel.bikeMin}m
                         </span>
                         {result.validationStatus ? (
-                          <span
-                            className={`store-summary-badge store-summary-desktop-meta ${validationToneClass(result.validationStatus)}`}
-                          >
+                          <span className={`store-summary-badge store-summary-desktop-meta ${validationToneClass(result.validationStatus)}`}>
                             {formatValidation(dictionary, result.validationStatus)}
                           </span>
                         ) : null}
-                        <span className="store-summary-caret" aria-hidden="true">
-                          <svg viewBox="0 0 20 20">
-                            <path d="M5 7.5L10 12.5L15 7.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
-                          </svg>
-                        </span>
                       </span>
-                    </summary>
-                    <div className="store-details">
-                      <p className="store-detail-line">
-                        <UiIcon kind="product" className="store-detail-icon" />
-                        <span>
-                          {dictionary.matchedProductLabel}: {result.product.normalizedName}
-                        </span>
-                      </p>
-                      <p className="store-detail-line">
-                        <UiIcon kind="category" className="store-detail-icon" />
-                        <span>
-                          {dictionary.storeCategoryLabel}: {primaryCategory(result, dictionary.unknownCategory)}
-                        </span>
-                      </p>
-                      <p className="store-detail-line">
-                        <UiIcon kind="validation" className="store-detail-icon" />
-                        <span>
-                          {dictionary.openingStatusLabel}: {formatOpeningStatusLabel(dictionary, openingStatus)}
-                        </span>
-                      </p>
-                      {result.store.openingHours ? (
-                        <p className="store-detail-line">
-                          <UiIcon kind="hours" className="store-detail-icon" />
-                          <span>
-                            {dictionary.openingHoursLabel}: {result.store.openingHours}
-                          </span>
-                        </p>
-                      ) : null}
-                      <p className="store-detail-line">
-                        <UiIcon kind="walk" className="store-detail-icon" />
-                        <span>
-                          {dictionary.walkTimeLabel}: {travel.walkLabel} · {dictionary.bikeTimeLabel}: {travel.bikeLabel}
-                        </span>
-                      </p>
-                      <div className="store-meta-wrap">
-                        <span className="store-meta-chip">
-                          {dictionary.confidenceLabel}: {formatConfidencePercent(result.confidence, dictionary.unknownConfidence)}
-                        </span>
-                        <span className="store-meta-chip">
-                          {dictionary.sourceLabel}: {formatSourceType(result.sourceType)}
-                        </span>
-                        <span className="store-meta-chip">
-                          {dictionary.checkedLabel}:{" "}
-                          {formatRelativeCheckedAt(result.lastCheckedAt, {
-                            checkedUnknown: dictionary.checkedUnknown,
-                            checkedToday: dictionary.checkedToday,
-                            checkedYesterday: dictionary.checkedYesterday,
-                            checkedDaysAgoTemplate: dictionary.checkedDaysAgoTemplate
-                          })}
-                        </span>
-                        {result.validationStatus ? (
-                          <span className={`store-meta-chip ${validationToneClass(result.validationStatus)}`}>
-                            {dictionary.validationLabel}: {formatValidation(dictionary, result.validationStatus)}
-                          </span>
-                        ) : null}
-                      </div>
-                      {result.whyThisProductMatches ? (
-                        <p className="store-detail-line">
-                          <UiIcon kind="note" className="store-detail-icon" />
-                          <span>
-                            {dictionary.whyMatchLabel}: {compactWhyText(result.whyThisProductMatches)}
-                          </span>
-                        </p>
-                      ) : null}
-                      <div className="mt-1.5 flex flex-wrap gap-1.5">
-                        <button
-                          type="button"
-                          className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
-                            walkRouteActive ? "is-active" : ""
-                          }`}
-                          disabled={walkRouteLoading}
-                          onClick={() => {
-                            void drawRouteOnMap(result, "walk");
-                          }}
-                        >
-                          {walkRouteLoading
-                            ? dictionary.routeLoadingLabel
-                            : walkRouteActive
-                              ? dictionary.clearRouteAction
-                              : `${dictionary.routeOnMapAction} · ${dictionary.walkTimeLabel} ${travel.walkMin}m`}
-                        </button>
-                        <button
-                          type="button"
-                          className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
-                            bikeRouteActive ? "is-active" : ""
-                          }`}
-                          disabled={bikeRouteLoading}
-                          onClick={() => {
-                            void drawRouteOnMap(result, "bike");
-                          }}
-                        >
-                          {bikeRouteLoading
-                            ? dictionary.routeLoadingLabel
-                            : bikeRouteActive
-                              ? dictionary.clearRouteAction
-                              : `${dictionary.routeOnMapAction} · ${dictionary.bikeTimeLabel} ${travel.bikeMin}m`}
-                        </button>
-                      </div>
-                    </div>
-                  </details>
+                    </button>
+                  </div>
                 );
               })}
             </div>

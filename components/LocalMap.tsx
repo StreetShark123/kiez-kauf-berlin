@@ -333,6 +333,7 @@ export function LocalMap({
   onManualCenterChange,
   radiusMeters,
   activeRouteGeometry,
+  activeRouteFitKey,
   selectedOfferId,
   onMarkerSelect,
   className
@@ -345,6 +346,7 @@ export function LocalMap({
   onManualCenterChange?: (center: { lat: number; lng: number }) => void;
   radiusMeters: number;
   activeRouteGeometry?: [number, number][] | null;
+  activeRouteFitKey?: string | null;
   selectedOfferId?: string | null;
   onMarkerSelect?: (result: SearchResult) => void;
   className?: string;
@@ -940,6 +942,29 @@ export function LocalMap({
     mapReady,
     onMarkerSelect
   ]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const maplibregl = maplibreRef.current;
+    if (!map || !maplibregl || !mapReady) {
+      return;
+    }
+    if (!activeRouteFitKey || safeRouteGeometry.length < 2) {
+      return;
+    }
+
+    const first = safeRouteGeometry[0];
+    const routeBounds = safeRouteGeometry.reduce(
+      (acc, coord) => acc.extend(coord),
+      new maplibregl.LngLatBounds(first, first)
+    );
+
+    map.fitBounds(routeBounds, {
+      padding: { top: 68, right: 68, bottom: 68, left: 68 },
+      maxZoom: 15.6,
+      duration: 280
+    });
+  }, [activeRouteFitKey, mapReady, safeRouteGeometry]);
 
   return (
     <div
