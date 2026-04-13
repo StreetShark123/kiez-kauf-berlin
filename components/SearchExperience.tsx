@@ -475,6 +475,7 @@ export function SearchExperience({
   const [isResultsExpanded, setIsResultsExpanded] = useState(false);
   const [activeRoute, setActiveRoute] = useState<ActiveRoute | null>(null);
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
+  const [flashedOfferId, setFlashedOfferId] = useState<string | null>(null);
   const [routeLoadingKey, setRouteLoadingKey] = useState<string | null>(null);
   const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
   const lastHapticAtRef = useRef(0);
@@ -930,6 +931,25 @@ export function SearchExperience({
     );
   }, [prioritizedListResults, selectedOfferId]);
 
+  const selectedMatchSummary = useMemo(() => {
+    if (!selectedResultEntry) {
+      return "";
+    }
+
+    const matchReason = compactWhyText(selectedResultEntry.result.whyThisProductMatches, 150);
+    if (matchReason) {
+      return matchReason;
+    }
+
+    const categoryLabel = primaryCategory(selectedResultEntry.result, dictionary.unknownCategory);
+    return `${dictionary.storeCategoryLabel}: ${categoryLabel} · ${dictionary.sourceLabel}: ${formatSourceType(selectedResultEntry.result.sourceType)}`;
+  }, [
+    dictionary.sourceLabel,
+    dictionary.storeCategoryLabel,
+    dictionary.unknownCategory,
+    selectedResultEntry
+  ]);
+
   const hasHiddenListResults = prioritizedListResults.length > COLLAPSED_RESULTS_LIMIT;
 
   const compactListSummary = useMemo(() => {
@@ -961,6 +981,13 @@ export function SearchExperience({
     },
     [dictionary.etaApproxLabel]
   );
+
+  const selectedTravel = useMemo(() => {
+    if (!selectedResultEntry) {
+      return null;
+    }
+    return estimateTravel(selectedResultEntry.result.distanceMeters);
+  }, [estimateTravel, selectedResultEntry]);
 
   useEffect(() => {
     const searchCache = searchCacheRef.current;
@@ -1010,16 +1037,30 @@ export function SearchExperience({
       return;
     }
 
+    setFlashedOfferId(selectedOfferId);
+    const flashTimeout = setTimeout(() => {
+      setFlashedOfferId((current) => (current === selectedOfferId ? null : current));
+    }, 760);
+
     const element = document.getElementById(`result-row-${selectedOfferId}`);
     if (!element) {
-      return;
+      return () => clearTimeout(flashTimeout);
     }
 
     element.scrollIntoView({
       behavior: "smooth",
       block: "nearest"
     });
+
+    return () => {
+      clearTimeout(flashTimeout);
+    };
   }, [selectedOfferId]);
+
+  const mapPanelClassName =
+    activeRoute && hasSearched
+      ? "h-[clamp(248px,42svh,430px)] md:h-[66vh] md:min-h-[360px]"
+      : "h-[clamp(320px,56svh,560px)] md:h-[66vh] md:min-h-[360px]";
 
   function triggerQuickIntentSearch(term: string, source: "quick_intent" | "no_results") {
     const trimmed = term.trim();
@@ -1600,7 +1641,7 @@ export function SearchExperience({
           onMarkerSelect={(result) => {
             setSelectedOfferId(result.offer.id);
           }}
-          className="h-[clamp(300px,52svh,520px)] md:h-[66vh] md:min-h-[360px]"
+          className={mapPanelClassName}
         />
 
         {!isLoading && hasSearched && results.length === 0 ? (
@@ -1643,9 +1684,10 @@ export function SearchExperience({
             {selectedResultEntry ? (
               <article
                 id="selected-store-card"
+                key={selectedResultEntry.result.offer.id}
                 className={`store-item selected-store-card ${openingStatusToneClass(
                   selectedResultEntry.openingStatus
-                )} is-selected`}
+                )} is-selected selected-store-card-enter`}
               >
                 <div className="selected-store-head">
                   <p className="store-summary-name">{selectedResultEntry.result.store.name}</p>
@@ -1672,6 +1714,12 @@ export function SearchExperience({
                     ) : null}
                   </span>
                 </div>
+                <p className="selected-store-match">
+                  <UiIcon kind="note" className="store-detail-icon" />
+                  <span>
+                    {dictionary.whyMatchLabel}: {selectedMatchSummary}
+                  </span>
+                </p>
                 <div className="store-details selected-store-details">
                   <p className="store-detail-line">
                     <UiIcon kind="product" className="store-detail-icon" />
@@ -1705,12 +1753,8 @@ export function SearchExperience({
                     <UiIcon kind="walk" className="store-detail-icon" />
                     <span>
                       {dictionary.walkTimeLabel}:{" "}
-                      {
-                        estimateTravel(selectedResultEntry.result.distanceMeters).walkLabel
-                      } · {dictionary.bikeTimeLabel}:{" "}
-                      {
-                        estimateTravel(selectedResultEntry.result.distanceMeters).bikeLabel
-                      }
+                      {selectedTravel?.walkLabel ?? formatEtaLabel(dictionary.etaApproxLabel, 0)} · {dictionary.bikeTimeLabel}:{" "}
+                      {selectedTravel?.bikeLabel ?? formatEtaLabel(dictionary.etaApproxLabel, 0)}
                     </span>
                   </p>
                   <div className="store-meta-wrap">
@@ -1739,17 +1783,9 @@ export function SearchExperience({
                       </span>
                     ) : null}
                   </div>
-                  {selectedResultEntry.result.whyThisProductMatches ? (
-                    <p className="store-detail-line">
-                      <UiIcon kind="note" className="store-detail-icon" />
-                      <span>
-                        {dictionary.whyMatchLabel}: {compactWhyText(selectedResultEntry.result.whyThisProductMatches)}
-                      </span>
-                    </p>
-                  ) : null}
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {(() => {
-                      const selectedTravel = estimateTravel(selectedResultEntry.result.distanceMeters);
+                      const travel = selectedTravel ?? estimateTravel(selectedResultEntry.result.distanceMeters);
                       const walkRouteKey = `${selectedResultEntry.result.offer.id}:walk`;
                       const bikeRouteKey = `${selectedResultEntry.result.offer.id}:bike`;
                       const walkRouteActive =
@@ -1775,7 +1811,7 @@ export function SearchExperience({
                               ? dictionary.routeLoadingLabel
                               : walkRouteActive
                                 ? dictionary.clearRouteAction
-                                : `${dictionary.routeOnMapAction} · ${dictionary.walkTimeLabel} ${selectedTravel.walkMin}m`}
+                                : `${dictionary.routeOnMapAction} · ${dictionary.walkTimeLabel} ${travel.walkMin}m`}
                           </button>
                           <button
                             type="button"
@@ -1791,7 +1827,7 @@ export function SearchExperience({
                               ? dictionary.routeLoadingLabel
                               : bikeRouteActive
                                 ? dictionary.clearRouteAction
-                                : `${dictionary.routeOnMapAction} · ${dictionary.bikeTimeLabel} ${selectedTravel.bikeMin}m`}
+                                : `${dictionary.routeOnMapAction} · ${dictionary.bikeTimeLabel} ${travel.bikeMin}m`}
                           </button>
                         </>
                       );
@@ -1849,7 +1885,7 @@ export function SearchExperience({
                     key={result.offer.id}
                     className={`store-item result-enter ${openingStatusToneClass(openingStatus)} ${
                       isSelected ? "is-selected" : ""
-                    }`}
+                    } ${flashedOfferId === result.offer.id ? "is-flashing" : ""}`}
                     style={{ animationDelay: `${Math.min(index, 10) * 26}ms` }}
                   >
                     <button
