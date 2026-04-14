@@ -13,6 +13,7 @@ type SearchPayload = {
   origin: { lat: number; lng: number };
   radius: number;
   results: SearchResult[];
+  endpoint?: string;
 };
 
 type RouteMode = "walk" | "bike";
@@ -28,6 +29,7 @@ type RouteApiPayload = {
 type SearchCacheEntry = {
   payload: SearchPayload;
   savedAt: number;
+  endpointUsed: string;
 };
 
 type RouteCacheEntry = {
@@ -64,8 +66,11 @@ const MIN_RADIUS_KM = 0.5;
 const MAX_RADIUS_KM = 15;
 const RADIUS_STEP_KM = 0.5;
 const COLLAPSED_RESULTS_LIMIT = 3;
-const SEARCH_CACHE_TTL_MS = 1000 * 60;
+const SEARCH_CACHE_TTL_MS = 1000 * 60 * 10;
 const ROUTE_CACHE_TTL_MS = 1000 * 60 * 5;
+const SEARCH_TIMEOUT_MS = 10000;
+const SEARCH_PRIMARY_ENDPOINT = "/api/search";
+const SEARCH_FALLBACK_ENDPOINT = "/api/search?fallback=1";
 const DEV_DEBUG = process.env.NODE_ENV !== "production";
 
 function readCachedLocation(): { lat: number; lng: number } | null {
@@ -312,9 +317,9 @@ function buildSearchCacheKey(args: {
 }) {
   return [
     normalizeQueryForAnalytics(args.query),
-    args.lat.toFixed(5),
-    args.lng.toFixed(5),
-    args.radiusKm.toFixed(2)
+    args.lat.toFixed(3),
+    args.lng.toFixed(3),
+    args.radiusKm.toFixed(1)
   ].join("|");
 }
 
@@ -478,6 +483,9 @@ export function SearchExperience({
   const [flashedOfferId, setFlashedOfferId] = useState<string | null>(null);
   const [routeLoadingKey, setRouteLoadingKey] = useState<string | null>(null);
   const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
+  const [activeQuickIntent, setActiveQuickIntent] = useState<string | null>(null);
+  const [showCachedResultBadge, setShowCachedResultBadge] = useState(false);
+  const [lastSearchEndpoint, setLastSearchEndpoint] = useState<string | null>(null);
   const lastHapticAtRef = useRef(0);
   const searchAbortRef = useRef<AbortController | null>(null);
   const radiusAutoSearchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -864,13 +872,19 @@ export function SearchExperience({
     });
   }, [dictionary.expandSearchButtonTemplate, quickExpandRadiusKm]);
 
-  const quickIntentTerms = useMemo(
+  const quickIntents = useMemo(
     () => [
-      dictionary.quickIntentPharmacy,
-      dictionary.quickIntentHardware,
-      dictionary.quickIntentSpati
+      { id: "pharmacy", label: dictionary.quickIntentPharmacy },
+      { id: "hardware", label: dictionary.quickIntentHardware },
+      { id: "spaeti", label: dictionary.quickIntentSpati },
+      { id: "essentials", label: dictionary.quickIntentEssentials }
     ],
-    [dictionary.quickIntentHardware, dictionary.quickIntentPharmacy, dictionary.quickIntentSpati]
+    [
+      dictionary.quickIntentEssentials,
+      dictionary.quickIntentHardware,
+      dictionary.quickIntentPharmacy,
+      dictionary.quickIntentSpati
+    ]
   );
 
   const manualCenterEnabled = geolocationPermission !== "granted";
@@ -1062,23 +1076,98 @@ export function SearchExperience({
       ? "h-[clamp(248px,42svh,430px)] md:h-[66vh] md:min-h-[360px]"
       : "h-[clamp(320px,56svh,560px)] md:h-[66vh] md:min-h-[360px]";
 
-  function triggerQuickIntentSearch(term: string, source: "quick_intent" | "no_results") {
+  function inferSearchCategoryFromQuery(searchQuery: string) {
+    const normalized = normalizeQueryForAnalytics(searchQuery);
+    if (!normalized) {
+      return null;
+    }
+    const matched = quickIntents.find((intent) => normalizeQueryForAnalytics(intent.label) === normalized);
+    return matched?.id ?? null;
+  }
+
+  async function fetchSearchWithTimeout(
+    url: string,
+    abortController: AbortController
+  ): Promise<Response> {
+    const timeoutController = new AbortController();
+    let didTimeout = false;
+    const timeoutHandle = setTimeout(() => {
+      didTimeout = true;
+      timeoutController.abort("timeout");
+    }, SEARCH_TIMEOUT_MS);
+    const onAbort = () => timeoutController.abort("aborted");
+    abortController.signal.addEventListener("abort", onAbort, { once: true });
+
+    try {
+      const response = await fetch(url, {
+        signal: timeoutController.signal
+      });
+      return response;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        if (abortController.signal.aborted) {
+          throw error;
+        }
+        if (didTimeout) {
+          throw new Error("SEARCH_TIMEOUT");
+        }
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutHandle);
+      abortController.signal.removeEventListener("abort", onAbort);
+    }
+  }
+
+  async function logSearchAnalytics(args: {
+    searchTerm: string;
+    category: string | null;
+    radiusKm: number;
+    resultsCount: number;
+    hasResults: boolean;
+    endpoint: string;
+  }) {
+    try {
+      await fetch("/api/analytics/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          searchTerm: args.searchTerm,
+          category: args.category,
+          lat: safeCenter.lat,
+          lng: safeCenter.lng,
+          radiusKm: Number(args.radiusKm.toFixed(1)),
+          resultsCount: args.resultsCount,
+          hasResults: args.hasResults,
+          endpoint: args.endpoint
+        })
+      });
+    } catch {
+      // Keep analytics best-effort only.
+    }
+  }
+
+  function triggerQuickIntentSearch(intentId: string, term: string, source: "quick_intent" | "no_results") {
     const trimmed = term.trim();
     if (!trimmed) {
       return;
     }
     setQuery(trimmed);
+    setActiveQuickIntent(intentId);
     setErrorMessage(null);
     setRouteErrorMessage(null);
     pulse(8);
     trackEvent("search_quick_term", {
       source,
-      term: normalizeQueryForAnalytics(trimmed)
+      term: normalizeQueryForAnalytics(trimmed),
+      category: intentId
     });
-    void runSearch({ overrideQuery: trimmed });
+    void runSearch({ overrideQuery: trimmed, category: intentId });
   }
 
-  async function runSearch(options?: { overrideRadiusKm?: number; overrideQuery?: string }) {
+  async function runSearch(options?: { overrideRadiusKm?: number; overrideQuery?: string; category?: string | null }) {
     const effectiveQuery = (options?.overrideQuery ?? query).trim();
     if (!effectiveQuery) {
       setErrorMessage(dictionary.queryRequiredError);
@@ -1086,8 +1175,17 @@ export function SearchExperience({
       return;
     }
 
+    const inferredCategory = inferSearchCategoryFromQuery(effectiveQuery);
+    const effectiveCategory = options?.category ?? inferredCategory;
+    if (effectiveCategory) {
+      setActiveQuickIntent(effectiveCategory);
+    }
+
     if (options?.overrideQuery && options.overrideQuery !== query) {
       setQuery(options.overrideQuery);
+    }
+    if (!options?.category && activeQuickIntent && effectiveCategory !== activeQuickIntent) {
+      setActiveQuickIntent(null);
     }
 
     if (radiusAutoSearchTimeoutRef.current) {
@@ -1111,12 +1209,14 @@ export function SearchExperience({
     setSelectedOfferId(null);
     setRouteLoadingKey(null);
     setNoResultsGuidance(null);
+    setShowCachedResultBadge(false);
     const startedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     const queryForAnalytics = normalizeQueryForAnalytics(effectiveQuery);
     trackEvent("search_submit", {
       query_length: effectiveQuery.length,
       radius_km: Number(effectiveRadiusKm.toFixed(1)),
-      query_normalized: queryForAnalytics || null
+      query_normalized: queryForAnalytics || null,
+      category: effectiveCategory
     });
 
     const fetchSearchPayload = async (radiusKm: number) => {
@@ -1130,9 +1230,14 @@ export function SearchExperience({
       if (cached && Date.now() - cached.savedAt < SEARCH_CACHE_TTL_MS) {
         trackEvent("search_cache_hit", {
           radius_km: Number(radiusKm.toFixed(1)),
-          query_normalized: queryForAnalytics || null
+          query_normalized: queryForAnalytics || null,
+          endpoint: cached.endpointUsed
         });
-        return cached.payload;
+        return {
+          payload: cached.payload,
+          cacheHit: true,
+          endpointUsed: cached.endpointUsed
+        };
       }
 
       const params = new URLSearchParams({
@@ -1142,17 +1247,42 @@ export function SearchExperience({
         radius: String(Math.round(radiusKm * 1000))
       });
 
-      const response = await fetch(`/api/search?${params.toString()}`, {
-        signal: abortController.signal
-      });
-      if (!response.ok) {
-        throw new Error(`Search failed with status ${response.status}`);
+      const attemptEndpoints = [SEARCH_PRIMARY_ENDPOINT, SEARCH_FALLBACK_ENDPOINT];
+      let payload: SearchPayload | null = null;
+      let endpointUsed = "unknown";
+      let lastAttemptError: unknown = null;
+
+      for (let index = 0; index < attemptEndpoints.length; index += 1) {
+        const endpoint = attemptEndpoints[index];
+        try {
+          const url = `${endpoint}${endpoint.includes("?") ? "&" : "?"}${params.toString()}`;
+          const response = await fetchSearchWithTimeout(url, abortController);
+          if (!response.ok) {
+            throw new Error(`Search failed with status ${response.status}`);
+          }
+          payload = (await response.json()) as SearchPayload;
+          endpointUsed = payload.endpoint ?? (index === 0 ? "search_api_primary" : "search_api_fallback");
+          break;
+        } catch (error) {
+          if (error instanceof DOMException && error.name === "AbortError") {
+            throw error;
+          }
+          lastAttemptError = error;
+          if (index === 0) {
+            continue;
+          }
+          throw error;
+        }
       }
 
-      const payload = (await response.json()) as SearchPayload;
+      if (!payload) {
+        throw lastAttemptError ?? new Error("Search failed");
+      }
+
       searchCacheRef.current.set(cacheKey, {
         payload,
-        savedAt: Date.now()
+        savedAt: Date.now(),
+        endpointUsed
       });
       if (searchCacheRef.current.size > 80) {
         const oldestKey = searchCacheRef.current.keys().next().value;
@@ -1160,7 +1290,11 @@ export function SearchExperience({
           searchCacheRef.current.delete(oldestKey);
         }
       }
-      return payload;
+      return {
+        payload,
+        cacheHit: false,
+        endpointUsed
+      };
     };
 
     const sanitizeResults = (rawResults: unknown[], radiusKm: number) => {
@@ -1198,20 +1332,28 @@ export function SearchExperience({
     };
 
     try {
-      const data = await fetchSearchPayload(effectiveRadiusKm);
+      const primaryResponse = await fetchSearchPayload(effectiveRadiusKm);
+      const data = primaryResponse.payload;
       if (requestId !== searchRequestIdRef.current) {
         return;
       }
+      setShowCachedResultBadge(primaryResponse.cacheHit);
+      setLastSearchEndpoint(primaryResponse.endpointUsed);
 
       const primaryResults = sanitizeResults(Array.isArray(data?.results) ? data.results : [], effectiveRadiusKm);
       let guidance: NoResultsGuidance | null = null;
 
       if (primaryResults.length === 0) {
         if (effectiveRadiusKm < MAX_RADIUS_KM) {
-          const nearbyData = await fetchSearchPayload(MAX_RADIUS_KM);
+          const nearbyResponse = await fetchSearchPayload(MAX_RADIUS_KM);
+          const nearbyData = nearbyResponse.payload;
           if (requestId !== searchRequestIdRef.current) {
             return;
           }
+          if (nearbyResponse.cacheHit) {
+            setShowCachedResultBadge(true);
+          }
+          setLastSearchEndpoint((current) => current ?? nearbyResponse.endpointUsed);
 
           const nearbyResults = sanitizeResults(
             Array.isArray(nearbyData?.results) ? nearbyData.results : [],
@@ -1274,6 +1416,14 @@ export function SearchExperience({
         likely_count: likelyCount,
         avg_confidence: avgConfidence
       });
+      void logSearchAnalytics({
+        searchTerm: effectiveQuery,
+        category: effectiveCategory,
+        radiusKm: effectiveRadiusKm,
+        resultsCount: primaryResults.length,
+        hasResults: primaryResults.length > 0,
+        endpoint: primaryResponse.endpointUsed
+      });
       if (primaryResults.length === 0) {
         trackEvent("search_zero_results", {
           query_normalized: queryForAnalytics || null,
@@ -1294,9 +1444,21 @@ export function SearchExperience({
       setErrorMessage(dictionary.searchRequestError);
       setNoResultsGuidance(null);
       const finishedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
+      const isTimeoutError =
+        error instanceof Error &&
+        (error.message === "SEARCH_TIMEOUT" || error.message.includes("status 504"));
       trackEvent("search_error", {
         radius_km: Number(effectiveRadiusKm.toFixed(1)),
-        duration_ms: Math.round(finishedAt - startedAt)
+        duration_ms: Math.round(finishedAt - startedAt),
+        timeout: isTimeoutError
+      });
+      void logSearchAnalytics({
+        searchTerm: effectiveQuery,
+        category: effectiveCategory,
+        radiusKm: effectiveRadiusKm,
+        resultsCount: -1,
+        hasResults: false,
+        endpoint: isTimeoutError ? "search_timeout" : "search_failed"
       });
       pulse(24);
     } finally {
@@ -1455,7 +1617,17 @@ export function SearchExperience({
               <input
                 id="search-query-input"
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  const nextValue = event.target.value;
+                  setQuery(nextValue);
+                  if (activeQuickIntent) {
+                    const activeLabel =
+                      quickIntents.find((intent) => intent.id === activeQuickIntent)?.label ?? "";
+                    if (normalizeQueryForAnalytics(nextValue) !== normalizeQueryForAnalytics(activeLabel)) {
+                      setActiveQuickIntent(null);
+                    }
+                  }
+                }}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") {
                     event.preventDefault();
@@ -1473,9 +1645,7 @@ export function SearchExperience({
                   void runSearch();
                 }}
                 disabled={isLoading}
-                className={`btn-primary search-submit search-action-btn min-w-[108px] sm:min-w-[124px] md:min-w-[150px] disabled:cursor-not-allowed ${
-                  isLoading ? "is-loading-simple" : ""
-                }`}
+                className="btn-primary search-submit search-action-btn min-w-[108px] sm:min-w-[124px] md:min-w-[150px] disabled:cursor-not-allowed"
                 aria-busy={isLoading}
               >
                 <span className="btn-label">{isLoading ? dictionary.searchingLabel : dictionary.searchButton}</span>
@@ -1523,17 +1693,19 @@ export function SearchExperience({
             </div>
             <p className="status-text hidden md:col-span-3 sm:block">{dictionary.searchHint}</p>
             <div className="quick-intents md:col-span-3" aria-label={dictionary.quickIntentLabel}>
-              {quickIntentTerms.map((term) => (
+              {quickIntents.map((intent) => (
                 <button
-                  key={term}
+                  key={intent.id}
                   type="button"
-                  className="btn-ghost quick-intent-chip px-2.5 py-1.5 text-[0.72rem]"
+                  className={`btn-ghost quick-intent-chip px-2.5 py-1.5 text-[0.72rem] ${
+                    activeQuickIntent === intent.id ? "is-active" : ""
+                  }`}
                   onClick={() => {
-                    triggerQuickIntentSearch(term, "quick_intent");
+                    triggerQuickIntentSearch(intent.id, intent.label, "quick_intent");
                   }}
                   disabled={isLoading}
                 >
-                  {term}
+                  {intent.label}
                 </button>
               ))}
             </div>
@@ -1594,7 +1766,14 @@ export function SearchExperience({
 
       <section id="map" className="space-y-1.5 md:space-y-2">
         <div className="hand-divider flex items-end justify-end pb-2">
-          <p className="status-text">{resultSummary}</p>
+          <div className="flex items-center gap-2">
+            {showCachedResultBadge && !isLoading ? (
+              <span className="status-chip" title={lastSearchEndpoint ?? undefined}>
+                {dictionary.cachedResultLabel}
+              </span>
+            ) : null}
+            <p className="status-text">{resultSummary}</p>
+          </div>
         </div>
         {(routeLoadingKey || activeRouteLabel || routeErrorMessage) && (
           <div className="route-status-row" role="status" aria-live="polite" aria-atomic="true">
@@ -1641,6 +1820,9 @@ export function SearchExperience({
           onMarkerSelect={(result) => {
             setSelectedOfferId(result.offer.id);
           }}
+          isLoading={isLoading}
+          loadingLabel={dictionary.searchingLabel}
+          cacheIndicatorLabel={showCachedResultBadge && !isLoading ? dictionary.cachedResultLabel : null}
           className={mapPanelClassName}
         />
 
@@ -1662,17 +1844,19 @@ export function SearchExperience({
             <p className="status-text mt-2">{dictionary.noResultsRefineHint}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               <span className="status-text">{dictionary.noResultsSuggestionLabel}</span>
-              {quickIntentTerms.map((term) => (
+              {quickIntents.map((intent) => (
                 <button
-                  key={`no-results-${term}`}
+                  key={`no-results-${intent.id}`}
                   type="button"
-                  className="btn-ghost quick-intent-chip px-2.5 py-1.5 text-[0.72rem]"
+                  className={`btn-ghost quick-intent-chip px-2.5 py-1.5 text-[0.72rem] ${
+                    activeQuickIntent === intent.id ? "is-active" : ""
+                  }`}
                   onClick={() => {
-                    triggerQuickIntentSearch(term, "no_results");
+                    triggerQuickIntentSearch(intent.id, intent.label, "no_results");
                   }}
                   disabled={isLoading}
                 >
-                  {term}
+                  {intent.label}
                 </button>
               ))}
             </div>

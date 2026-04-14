@@ -11,6 +11,7 @@ export type Dictionary = {
   quickIntentPharmacy: string;
   quickIntentHardware: string;
   quickIntentSpati: string;
+  quickIntentEssentials: string;
   useMyLocation: string;
   addressSectionTitle: string;
   locationFallbackLabel: string;
@@ -97,6 +98,7 @@ export type Dictionary = {
   routeLoadingLabel: string;
   routeError: string;
   activeRouteLabel: string;
+  cachedResultLabel: string;
 };
 
 const dictionaries: Record<Locale, Dictionary> = {
@@ -111,6 +113,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     quickIntentPharmacy: "Apotheke",
     quickIntentHardware: "Baumarkt",
     quickIntentSpati: "Spaeti Basics",
+    quickIntentEssentials: "Essentials",
     useMyLocation: "Standort",
     addressSectionTitle: "Adresse",
     locationFallbackLabel: "Ohne GPS",
@@ -197,7 +200,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     clearRouteAction: "Route entfernen",
     routeLoadingLabel: "Route wird geladen...",
     routeError: "Route konnte gerade nicht geladen werden.",
-    activeRouteLabel: "Aktive Route"
+    activeRouteLabel: "Aktive Route",
+    cachedResultLabel: "Cache"
   },
   en: {
     appTitle: "KiezKauf Berlin",
@@ -210,6 +214,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     quickIntentPharmacy: "pharmacy",
     quickIntentHardware: "hardware",
     quickIntentSpati: "spaeti essentials",
+    quickIntentEssentials: "essentials",
     useMyLocation: "Use my location",
     addressSectionTitle: "Address",
     locationFallbackLabel: "Without GPS",
@@ -296,7 +301,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     clearRouteAction: "Clear route",
     routeLoadingLabel: "Loading route...",
     routeError: "Could not load route right now.",
-    activeRouteLabel: "Active route"
+    activeRouteLabel: "Active route",
+    cachedResultLabel: "Cached result"
   },
   es: {
     appTitle: "KiezKauf Berlin",
@@ -309,6 +315,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     quickIntentPharmacy: "farmacia",
     quickIntentHardware: "ferreteria",
     quickIntentSpati: "basicos spaeti",
+    quickIntentEssentials: "esenciales",
     useMyLocation: "Mi ubicacion",
     addressSectionTitle: "Direccion",
     locationFallbackLabel: "Sin GPS",
@@ -395,7 +402,8 @@ const dictionaries: Record<Locale, Dictionary> = {
     clearRouteAction: "Quitar ruta",
     routeLoadingLabel: "Cargando ruta...",
     routeError: "No se pudo cargar la ruta ahora.",
-    activeRouteLabel: "Ruta activa"
+    activeRouteLabel: "Ruta activa",
+    cachedResultLabel: "Resultado en cache"
   }
 };
 

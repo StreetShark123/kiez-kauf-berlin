@@ -281,33 +281,6 @@ button {
   background: var(--surface-soft);
 }
 
-.search-submit.is-loading-simple {
-  color: var(--ink);
-}
-
-.search-submit.is-loading-simple::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: var(--ink);
-  transform: scaleX(0);
-  transform-origin: left center;
-  z-index: 2;
-  animation: search-fill-left-to-right 1.1s linear infinite;
-}
-
-@keyframes search-fill-left-to-right {
-  0% {
-    transform: scaleX(0);
-  }
-  100% {
-    transform: scaleX(1);
-  }
-}
-
 .btn-secondary {
   background: var(--surface);
   color: var(--ink);
@@ -487,6 +460,18 @@ button {
 .status-inline {
   font-size: 0.74rem;
   color: var(--ink-soft);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 0.16rem 0.52rem;
+  font-size: 0.65rem;
+  color: var(--ink-soft);
+  font-family: var(--font-mono), "Courier New", monospace;
+  line-height: 1.2;
 }
 
 .status-error {
@@ -894,6 +879,56 @@ button {
   animation: map-hint-in 140ms ease;
 }
 
+.map-cache-indicator {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.58rem;
+  z-index: 3;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent 6%);
+  color: var(--ink-soft);
+  font-family: var(--font-mono), "Courier New", monospace;
+  font-size: 0.64rem;
+  line-height: 1.2;
+  letter-spacing: 0.012em;
+  padding: 0.2rem 0.5rem;
+}
+
+.map-loading-overlay {
+  position: absolute;
+  inset: auto 0.6rem 0.58rem auto;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 95%, transparent 5%);
+  color: var(--ink);
+  padding: 0.2rem 0.54rem;
+}
+
+.map-loading-label {
+  font-size: 0.66rem;
+  line-height: 1.2;
+  font-family: var(--font-mono), "Courier New", monospace;
+  color: var(--ink-soft);
+}
+
+.map-loading-stroke {
+  width: 0.86rem;
+  height: 0.5rem;
+  border: 1.6px solid currentColor;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-radius: 999px;
+  display: inline-block;
+  transform-origin: center;
+  animation: map-stroke-spin 760ms linear infinite;
+  opacity: 0.88;
+}
+
 @keyframes map-hint-in {
   from {
     opacity: 0;
@@ -902,6 +937,15 @@ button {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes map-stroke-spin {
+  0% {
+    transform: rotate(0deg) scale(0.96);
+  }
+  100% {
+    transform: rotate(360deg) scale(0.96);
   }
 }
 

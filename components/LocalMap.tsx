@@ -336,6 +336,9 @@ export function LocalMap({
   activeRouteFitKey,
   selectedOfferId,
   onMarkerSelect,
+  isLoading,
+  loadingLabel,
+  cacheIndicatorLabel,
   className
 }: {
   center: { lat: number; lng: number };
@@ -349,6 +352,9 @@ export function LocalMap({
   activeRouteFitKey?: string | null;
   selectedOfferId?: string | null;
   onMarkerSelect?: (result: SearchResult) => void;
+  isLoading?: boolean;
+  loadingLabel?: string;
+  cacheIndicatorLabel?: string | null;
   className?: string;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -978,6 +984,17 @@ export function LocalMap({
       {showBerlinHint ? (
         <div className="map-inline-hint" role="status" aria-live="polite">
           {berlinOnlyHint}
+        </div>
+      ) : null}
+      {cacheIndicatorLabel && !isLoading ? (
+        <div className="map-cache-indicator" role="status" aria-live="polite">
+          {cacheIndicatorLabel}
+        </div>
+      ) : null}
+      {isLoading ? (
+        <div className="map-loading-overlay" role="status" aria-live="polite" aria-atomic="true">
+          <span className="map-loading-stroke" aria-hidden="true" />
+          <span className="map-loading-label">{loadingLabel ?? "Searching..."}</span>
         </div>
       ) : null}
     </div>

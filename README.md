@@ -24,6 +24,7 @@ MVP web responsive para buscar productos concretos y encontrar tiendas de barrio
 - `GET /api/search?q=&lat=&lng=&radius=`
 - `GET /api/stores/:id`
 - `POST /api/analytics/route-click`
+- `POST /api/analytics/search`
 
 ## Setup local
 

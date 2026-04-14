@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getBerlinCenter, searchOffers } from "@/lib/data";
+import { getBerlinCenter, searchOffersDetailed } from "@/lib/data";
 
 const DEFAULT_RADIUS_METERS = 2000;
 const MIN_RADIUS_METERS = 300;
 const MAX_RADIUS_METERS = 15000;
+const SEARCH_TIMEOUT_MS = 10000;
 
 function parseNumber(value: string | null): number | null {
   if (value === null || value === "") {
@@ -56,20 +57,43 @@ export async function GET(request: NextRequest) {
       clamp(parsedRadius ?? DEFAULT_RADIUS_METERS, MIN_RADIUS_METERS, MAX_RADIUS_METERS)
     );
 
-    const results = await searchOffers({
+    const fallbackRequested = searchParams.get("fallback") === "1";
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutHandle = setTimeout(() => {
+        reject(new Error("SEARCH_TIMEOUT"));
+      }, SEARCH_TIMEOUT_MS);
+    });
+
+    const searchPromise = searchOffersDetailed({
       query: q,
       lat,
       lng,
       radiusMeters: radius
     });
 
+    let searchResponse: Awaited<ReturnType<typeof searchOffersDetailed>>;
+    try {
+      searchResponse = await Promise.race([searchPromise, timeoutPromise]);
+    } finally {
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+      }
+    }
+
+    const { results, backendSource } = searchResponse;
+
     return NextResponse.json({
       query: q,
       origin: { lat, lng },
       radius,
-      results
+      results,
+      endpoint: `${fallbackRequested ? "search_api_fallback" : "search_api_primary"}:${backendSource}`
     });
   } catch (error) {
+    if (error instanceof Error && error.message === "SEARCH_TIMEOUT") {
+      return NextResponse.json({ error: "Search timed out." }, { status: 504 });
+    }
     console.error("Search API failed", error);
     return NextResponse.json({ error: "Search failed." }, { status: 500 });
   }

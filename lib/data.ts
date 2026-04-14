@@ -902,18 +902,21 @@ async function getStoreDetailFromDataset(id: string): Promise<StoreDetail | null
   };
 }
 
-export async function searchOffers(args: {
+export type SearchBackendSource = "supabase_dataset" | "supabase_legacy" | "mock";
+
+export async function searchOffersDetailed(args: {
   query: string;
   lat?: number;
   lng?: number;
   radiusMeters?: number;
-}): Promise<SearchResult[]> {
+}): Promise<{ results: SearchResult[]; backendSource: SearchBackendSource }> {
   const lat = typeof args.lat === "number" ? args.lat : BERLIN_CENTER.lat;
   const lng = typeof args.lng === "number" ? args.lng : BERLIN_CENTER.lng;
   const radius = typeof args.radiusMeters === "number" ? args.radiusMeters : 2000;
 
   let rows: JoinedRow[];
   let datasetStrategy: DatasetSearchStrategy | null = null;
+  let backendSource: SearchBackendSource = hasSupabase ? "supabase_legacy" : "mock";
   if (hasSupabase) {
     const datasetResponse = await searchSupabaseRowsFromDataset({
       query: args.query,
@@ -924,16 +927,22 @@ export async function searchOffers(args: {
     if (datasetResponse) {
       rows = datasetResponse.rows;
       datasetStrategy = datasetResponse.strategy;
+      backendSource = "supabase_dataset";
     } else {
       rows = await getSupabaseRowsLegacy();
+      backendSource = "supabase_legacy";
     }
   } else {
     rows = getMockRows();
+    backendSource = "mock";
   }
 
   const normalized = normalizeSearchQuery(args.query);
   if (GENERIC_QUERY_TERMS.has(normalized)) {
-    return [];
+    return {
+      results: [],
+      backendSource
+    };
   }
 
   const filtered =
@@ -953,10 +962,24 @@ export async function searchOffers(args: {
     return confidence >= MIN_CONFIDENCE_FOR_WEAK_MATCH;
   });
 
-  return dedupeRankedResults(rankResults(plausibilityFiltered, { query: args.query, lat, lng, radius })).slice(
-    0,
-    MAX_SEARCH_RESULTS
-  );
+  const results = dedupeRankedResults(
+    rankResults(plausibilityFiltered, { query: args.query, lat, lng, radius })
+  ).slice(0, MAX_SEARCH_RESULTS);
+
+  return {
+    results,
+    backendSource
+  };
+}
+
+export async function searchOffers(args: {
+  query: string;
+  lat?: number;
+  lng?: number;
+  radiusMeters?: number;
+}): Promise<SearchResult[]> {
+  const response = await searchOffersDetailed(args);
+  return response.results;
 }
 
 export async function getStoreDetail(id: string): Promise<StoreDetail | null> {
