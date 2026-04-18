@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Locale } from "@/lib/types";
 
-type AdminTab = "insights" | "catalog" | "businesses";
+type AdminTab = "insights" | "review" | "catalog" | "businesses";
+type ActiveStatus = "active" | "inactive" | "temporarily_closed" | "unknown";
+type BulkActiveStatus = "keep" | ActiveStatus;
 
 type InsightsPayload = {
   window_days: number;
@@ -66,11 +68,42 @@ type EstablishmentListItem = {
   address: string;
   district: string;
   app_categories: string[] | null;
-  active_status: "active" | "inactive" | "temporarily_closed" | "unknown";
+  active_status: ActiveStatus;
   website: string | null;
   phone: string | null;
   updated_at: string;
   product_count: number;
+};
+
+type ReviewQueuePayload = {
+  window_days: number;
+  queue_totals: {
+    businesses_flagged: number;
+    unresolved_terms: number;
+  };
+  unresolved_terms: Array<{
+    term: string;
+    count: number;
+    last_seen_at: string;
+  }>;
+  flag_totals: Array<{
+    flag: "missing_categories" | "missing_products" | "low_validation" | "missing_opening_hours" | "stale_data";
+    count: number;
+  }>;
+  establishment_queue: Array<{
+    id: number;
+    name: string;
+    district: string;
+    active_status: ActiveStatus;
+    updated_at: string;
+    app_categories: string[] | null;
+    opening_hours: string | null;
+    website: string | null;
+    product_count: number;
+    validated_product_count: number;
+    flags: Array<"missing_categories" | "missing_products" | "low_validation" | "missing_opening_hours" | "stale_data">;
+    score: number;
+  }>;
 };
 
 type EstablishmentDetailResponse = {
@@ -89,7 +122,7 @@ type EstablishmentDetailResponse = {
     phone: string | null;
     opening_hours: string | null;
     description: string | null;
-    active_status: "active" | "inactive" | "temporarily_closed" | "unknown";
+    active_status: ActiveStatus;
     updated_at: string;
   };
   products: Array<{
@@ -158,6 +191,22 @@ type AdminCopy = {
   add: string;
   loadingProducts: string;
   listSummary: string;
+  reviewQueue: string;
+  reviewQueueHint: string;
+  flaggedBusinesses: string;
+  unresolvedTermsReview: string;
+  openInEditor: string;
+  useForSearch: string;
+  markActive: string;
+  markTempClosed: string;
+  bulkEdit: string;
+  selectedCount: string;
+  selectPage: string;
+  clearSelection: string;
+  appendCategories: string;
+  applyBulk: string;
+  bulkStatusLabel: string;
+  keepStatus: string;
 };
 
 const ADMIN_KEY_STORAGE = "kiezkauf:admin-panel-key";
@@ -173,6 +222,7 @@ const COPY: Record<"en" | "de", AdminCopy> = {
     saveKey: "Remember key in this browser",
     tabs: {
       insights: "Insights",
+      review: "Review queue",
       catalog: "Catalog",
       businesses: "Businesses"
     },
@@ -204,7 +254,23 @@ const COPY: Record<"en" | "de", AdminCopy> = {
     noData: "No data yet",
     add: "Add",
     loadingProducts: "Searching products...",
-    listSummary: "Showing {shown} of {total} businesses"
+    listSummary: "Showing {shown} of {total} businesses",
+    reviewQueue: "Review queue",
+    reviewQueueHint: "Prioritize unresolved demand and low-quality records first.",
+    flaggedBusinesses: "Flagged businesses",
+    unresolvedTermsReview: "Unresolved terms",
+    openInEditor: "Open in editor",
+    useForSearch: "Use as business search",
+    markActive: "Mark active",
+    markTempClosed: "Mark temp closed",
+    bulkEdit: "Bulk edit",
+    selectedCount: "{count} selected",
+    selectPage: "Select page",
+    clearSelection: "Clear",
+    appendCategories: "Append categories",
+    applyBulk: "Apply bulk update",
+    bulkStatusLabel: "Bulk status",
+    keepStatus: "keep current"
   },
   de: {
     title: "Admin-Panel",
@@ -216,6 +282,7 @@ const COPY: Record<"en" | "de", AdminCopy> = {
     saveKey: "Key in diesem Browser merken",
     tabs: {
       insights: "Insights",
+      review: "Prüfwarteschlange",
       catalog: "Katalog",
       businesses: "Läden"
     },
@@ -247,7 +314,23 @@ const COPY: Record<"en" | "de", AdminCopy> = {
     noData: "Noch keine Daten",
     add: "Hinzufügen",
     loadingProducts: "Produkte werden gesucht...",
-    listSummary: "{shown} von {total} Läden"
+    listSummary: "{shown} von {total} Läden",
+    reviewQueue: "Prüfwarteschlange",
+    reviewQueueHint: "Zuerst offene Nachfrage und Datensätze mit schwacher Qualität bearbeiten.",
+    flaggedBusinesses: "Markierte Läden",
+    unresolvedTermsReview: "Suchbegriffe ohne Treffer",
+    openInEditor: "Im Editor öffnen",
+    useForSearch: "Als Ladensuche nutzen",
+    markActive: "Als aktiv markieren",
+    markTempClosed: "Temporär geschlossen",
+    bulkEdit: "Massenbearbeitung",
+    selectedCount: "{count} ausgewählt",
+    selectPage: "Seite wählen",
+    clearSelection: "Leeren",
+    appendCategories: "Kategorien ergänzen",
+    applyBulk: "Massenupdate anwenden",
+    bulkStatusLabel: "Status in Masse",
+    keepStatus: "unverändert lassen"
   }
 };
 
@@ -282,6 +365,23 @@ function template(value: string, replacements: Record<string, string>) {
   return output;
 }
 
+function reviewFlagLabel(flag: ReviewQueuePayload["flag_totals"][number]["flag"]) {
+  switch (flag) {
+    case "missing_categories":
+      return "missing categories";
+    case "missing_products":
+      return "no products";
+    case "low_validation":
+      return "not validated";
+    case "missing_opening_hours":
+      return "missing opening hours";
+    case "stale_data":
+      return "stale";
+    default:
+      return flag;
+  }
+}
+
 export function AdminPanel({ locale }: { locale: Locale }) {
   const copy = locale === "de" ? COPY.de : COPY.en;
   const [tab, setTab] = useState<AdminTab>("insights");
@@ -296,11 +396,17 @@ export function AdminPanel({ locale }: { locale: Locale }) {
 
   const [insights, setInsights] = useState<InsightsPayload | null>(null);
   const [catalog, setCatalog] = useState<CatalogPayload | null>(null);
+  const [reviewQueue, setReviewQueue] = useState<ReviewQueuePayload | null>(null);
+  const [isLoadingReviewQueue, setIsLoadingReviewQueue] = useState(false);
 
   const [businessQuery, setBusinessQuery] = useState("");
   const [businessOffset, setBusinessOffset] = useState(0);
   const [businessListResponse, setBusinessListResponse] = useState<EstablishmentListResponse | null>(null);
   const [isLoadingBusinesses, setIsLoadingBusinesses] = useState(false);
+  const [bulkSelectedIds, setBulkSelectedIds] = useState<number[]>([]);
+  const [bulkCategoriesInput, setBulkCategoriesInput] = useState("");
+  const [bulkActiveStatus, setBulkActiveStatus] = useState<BulkActiveStatus>("keep");
+  const [isApplyingBulk, setIsApplyingBulk] = useState(false);
 
   const [selectedBusinessId, setSelectedBusinessId] = useState<number | null>(null);
   const [businessDetail, setBusinessDetail] = useState<EstablishmentDetailResponse | null>(null);
@@ -308,9 +414,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
   const [editCategories, setEditCategories] = useState("");
-  const [editActiveStatus, setEditActiveStatus] = useState<"active" | "inactive" | "temporarily_closed" | "unknown">(
-    "active"
-  );
+  const [editActiveStatus, setEditActiveStatus] = useState<ActiveStatus>("active");
   const [editWebsite, setEditWebsite] = useState("");
   const [editPhone, setEditPhone] = useState("");
   const [editOpeningHours, setEditOpeningHours] = useState("");
@@ -422,6 +526,20 @@ export function AdminPanel({ locale }: { locale: Locale }) {
     }
   }, [adminKey, apiFetch, copy.unauthorized]);
 
+  const fetchReviewQueue = useCallback(async () => {
+    if (!adminKey) return;
+    setIsLoadingReviewQueue(true);
+    try {
+      const payload = (await apiFetch("/api/admin/review-queue")) as ReviewQueuePayload;
+      setReviewQueue(payload);
+      setAuthError(null);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : copy.unauthorized);
+    } finally {
+      setIsLoadingReviewQueue(false);
+    }
+  }, [adminKey, apiFetch, copy.unauthorized]);
+
   useEffect(() => {
     try {
       const remembered = localStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
@@ -443,7 +561,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
     (async () => {
       setIsBootstrapping(true);
       try {
-        await Promise.all([fetchInsightsAndCatalog(), fetchBusinesses({ offset: 0 })]);
+        await Promise.all([fetchInsightsAndCatalog(), fetchReviewQueue(), fetchBusinesses({ offset: 0 })]);
       } catch (error) {
         if (active) {
           setAuthError(error instanceof Error ? error.message : copy.unauthorized);
@@ -458,7 +576,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
     return () => {
       active = false;
     };
-  }, [adminKey, copy.unauthorized, fetchBusinesses, fetchInsightsAndCatalog]);
+  }, [adminKey, copy.unauthorized, fetchBusinesses, fetchInsightsAndCatalog, fetchReviewQueue]);
 
   useEffect(() => {
     if (!selectedBusinessId || !adminKey) return;
@@ -522,7 +640,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
           : prev
       );
       setSaveMessage("Saved.");
-      await fetchBusinesses({ preserveSelection: true });
+      await Promise.all([fetchBusinesses({ preserveSelection: true }), fetchReviewQueue()]);
     } catch (error) {
       setSaveMessage(error instanceof Error ? error.message : "Save failed.");
     } finally {
@@ -588,6 +706,118 @@ export function AdminPanel({ locale }: { locale: Locale }) {
     }
   };
 
+  const onRefreshPanel = async () => {
+    await Promise.all([
+      fetchInsightsAndCatalog(),
+      fetchReviewQueue(),
+      fetchBusinesses({ preserveSelection: true })
+    ]);
+  };
+
+  useEffect(() => {
+    if (!adminKey || tab !== "review" || reviewQueue || isLoadingReviewQueue) {
+      return;
+    }
+    fetchReviewQueue().catch((error) => {
+      setSaveMessage(error instanceof Error ? error.message : "Unable to load review queue.");
+    });
+  }, [adminKey, fetchReviewQueue, isLoadingReviewQueue, reviewQueue, tab]);
+
+  const selectedIdSet = useMemo(() => new Set<number>(bulkSelectedIds), [bulkSelectedIds]);
+
+  const toggleSelectBusiness = (id: number) => {
+    setBulkSelectedIds((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
+  };
+
+  const selectCurrentPage = () => {
+    setBulkSelectedIds((current) => {
+      const next = new Set(current);
+      for (const item of businesses) {
+        next.add(item.id);
+      }
+      return [...next];
+    });
+  };
+
+  const clearBulkSelection = () => {
+    setBulkSelectedIds([]);
+  };
+
+  const onApplyBulkUpdate = async () => {
+    if (bulkSelectedIds.length === 0) {
+      setSaveMessage("Select at least one business.");
+      return;
+    }
+
+    const categories = parseCommaList(bulkCategoriesInput);
+    const hasStatus = bulkActiveStatus !== "keep";
+    if (!hasStatus && categories.length === 0) {
+      setSaveMessage("Choose a status or categories for bulk update.");
+      return;
+    }
+
+    setIsApplyingBulk(true);
+    setSaveMessage(null);
+
+    try {
+      const payload = (await apiFetch("/api/admin/establishments/bulk", {
+        method: "POST",
+        body: JSON.stringify({
+          ids: bulkSelectedIds,
+          activeStatus: hasStatus ? bulkActiveStatus : undefined,
+          appendCategories: categories
+        })
+      })) as { updated_count: number; failed_ids: number[] };
+
+      const failedCount = payload.failed_ids.length;
+      if (failedCount > 0) {
+        setSaveMessage(`Bulk updated ${payload.updated_count}. Failed: ${failedCount}.`);
+      } else {
+        setSaveMessage(`Bulk updated ${payload.updated_count} businesses.`);
+      }
+
+      setBulkSelectedIds([]);
+      setBulkCategoriesInput("");
+      setBulkActiveStatus("keep");
+      await Promise.all([fetchBusinesses({ preserveSelection: true }), fetchReviewQueue()]);
+      if (selectedBusinessId) {
+        await fetchDetail(selectedBusinessId);
+      }
+    } catch (error) {
+      setSaveMessage(error instanceof Error ? error.message : "Bulk update failed.");
+    } finally {
+      setIsApplyingBulk(false);
+    }
+  };
+
+  const onQuickStatusUpdate = async (id: number, status: ActiveStatus) => {
+    setSaveMessage(null);
+    try {
+      await apiFetch(`/api/admin/establishments/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ activeStatus: status })
+      });
+      await Promise.all([fetchReviewQueue(), fetchBusinesses({ preserveSelection: true })]);
+      if (selectedBusinessId === id) {
+        await fetchDetail(id);
+      }
+      setSaveMessage(`Status updated for #${id}.`);
+    } catch (error) {
+      setSaveMessage(error instanceof Error ? error.message : "Quick status update failed.");
+    }
+  };
+
+  const onOpenReviewBusiness = (id: number) => {
+    setTab("businesses");
+    setSelectedBusinessId(id);
+  };
+
+  const onUseTermForBusinessSearch = async (term: string) => {
+    setBusinessQuery(term);
+    setTab("businesses");
+    await fetchBusinesses({ query: term, offset: 0 });
+  };
+
   return (
     <section className="surface-card p-4 md:p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 hand-divider pb-3">
@@ -596,7 +826,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
           <p className="text-sm text-[var(--ink-soft)]">{copy.subtitle}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" className="btn-secondary" onClick={fetchInsightsAndCatalog} disabled={!adminKey || isRefreshing}>
+          <button type="button" className="btn-secondary" onClick={onRefreshPanel} disabled={!adminKey || isRefreshing}>
             {isRefreshing ? copy.loading : copy.refresh}
           </button>
           <button type="button" className="btn-primary" onClick={onRefreshDataset} disabled={!adminKey || isRebuildingDataset}>
@@ -742,6 +972,121 @@ export function AdminPanel({ locale }: { locale: Locale }) {
             </div>
           )}
 
+          {!isBootstrapping && tab === "review" && (
+            <div className="space-y-4">
+              <div className="surface-card p-3">
+                <p className="note-subtitle">{copy.reviewQueue}</p>
+                <p className="text-sm text-[var(--ink-soft)]">{copy.reviewQueueHint}</p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="surface-card p-3">
+                  <p className="note-label">{copy.flaggedBusinesses}</p>
+                  <p className="text-xl font-semibold">{reviewQueue?.queue_totals.businesses_flagged ?? 0}</p>
+                </div>
+                <div className="surface-card p-3">
+                  <p className="note-label">{copy.unresolvedTermsReview}</p>
+                  <p className="text-xl font-semibold">{reviewQueue?.queue_totals.unresolved_terms ?? 0}</p>
+                </div>
+                <div className="surface-card p-3 sm:col-span-2">
+                  <p className="note-label">Quality flags</p>
+                  {reviewQueue?.flag_totals?.length ? (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {reviewQueue.flag_totals.map((item) => (
+                        <span key={item.flag} className="rounded-full border border-[var(--line)] px-2 py-1 text-xs">
+                          {reviewFlagLabel(item.flag)} ({item.count})
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid gap-4 xl:grid-cols-2">
+                <div className="surface-card p-3">
+                  <p className="note-subtitle mb-2">{copy.unresolvedTermsReview}</p>
+                  {isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.loading}</p>}
+                  {reviewQueue?.unresolved_terms?.length ? (
+                    <ul className="space-y-2">
+                      {reviewQueue.unresolved_terms.slice(0, 25).map((term) => (
+                        <li key={term.term} className="rounded-md border border-[var(--line)] p-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium">{term.term}</span>
+                            <span className="mono text-xs text-[var(--ink-soft)]">{term.count}</span>
+                          </div>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <span className="text-xs text-[var(--ink-soft)]">{formatDate(term.last_seen_at)}</span>
+                            <button
+                              type="button"
+                              className="btn-ghost text-xs"
+                              onClick={() => onUseTermForBusinessSearch(term.term)}
+                            >
+                              {copy.useForSearch}
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    !isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
+                  )}
+                </div>
+
+                <div className="surface-card p-3">
+                  <p className="note-subtitle mb-2">{copy.flaggedBusinesses}</p>
+                  {isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.loading}</p>}
+                  {reviewQueue?.establishment_queue?.length ? (
+                    <ul className="space-y-2">
+                      {reviewQueue.establishment_queue.slice(0, 28).map((item) => (
+                        <li key={item.id} className="rounded-md border border-[var(--line)] p-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <p className="text-sm font-semibold">{item.name}</p>
+                              <p className="text-xs text-[var(--ink-soft)]">
+                                {item.district} · {item.product_count} products · {item.validated_product_count} validated
+                              </p>
+                            </div>
+                            <span className="mono text-xs text-[var(--ink-soft)]">#{item.id}</span>
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {item.flags.map((flag) => (
+                              <span key={`${item.id}-${flag}`} className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px]">
+                                {reviewFlagLabel(flag)}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <button type="button" className="btn-ghost text-xs" onClick={() => onOpenReviewBusiness(item.id)}>
+                              {copy.openInEditor}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-ghost text-xs"
+                              onClick={() => onQuickStatusUpdate(item.id, "active")}
+                            >
+                              {copy.markActive}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn-ghost text-xs"
+                              onClick={() => onQuickStatusUpdate(item.id, "temporarily_closed")}
+                            >
+                              {copy.markTempClosed}
+                            </button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    !isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {!isBootstrapping && tab === "catalog" && (
             <div className="grid gap-4 xl:grid-cols-2">
               <div className="surface-card p-3">
@@ -797,6 +1142,55 @@ export function AdminPanel({ locale }: { locale: Locale }) {
                     {copy.refresh}
                   </button>
                 </div>
+
+                <div className="mb-3 rounded-md border border-[var(--line)] p-2">
+                  <p className="note-subtitle mb-1">{copy.bulkEdit}</p>
+                  <p className="mb-2 text-xs text-[var(--ink-soft)]">
+                    {template(copy.selectedCount, { count: String(bulkSelectedIds.length) })}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" className="btn-ghost text-xs" onClick={selectCurrentPage}>
+                      {copy.selectPage}
+                    </button>
+                    <button type="button" className="btn-ghost text-xs" onClick={clearBulkSelection}>
+                      {copy.clearSelection}
+                    </button>
+                  </div>
+                  <div className="mt-2 grid gap-2">
+                    <label className="text-xs text-[var(--ink-soft)]">
+                      {copy.bulkStatusLabel}
+                      <select
+                        className="field-input mt-1"
+                        value={bulkActiveStatus}
+                        onChange={(event) => setBulkActiveStatus(event.target.value as BulkActiveStatus)}
+                      >
+                        <option value="keep">{copy.keepStatus}</option>
+                        <option value="active">active</option>
+                        <option value="temporarily_closed">temporarily_closed</option>
+                        <option value="inactive">inactive</option>
+                        <option value="unknown">unknown</option>
+                      </select>
+                    </label>
+                    <label className="text-xs text-[var(--ink-soft)]">
+                      {copy.appendCategories}
+                      <input
+                        className="field-input mt-1"
+                        value={bulkCategoriesInput}
+                        onChange={(event) => setBulkCategoriesInput(event.target.value)}
+                        placeholder="pharmacy, hardware-store"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      disabled={bulkSelectedIds.length === 0 || isApplyingBulk}
+                      onClick={onApplyBulkUpdate}
+                    >
+                      <span className="btn-label">{isApplyingBulk ? copy.loading : copy.applyBulk}</span>
+                    </button>
+                  </div>
+                </div>
+
                 <p className="mb-2 text-xs text-[var(--ink-soft)]">
                   {template(copy.listSummary, {
                     shown: String(shownBusinesses),
@@ -806,20 +1200,28 @@ export function AdminPanel({ locale }: { locale: Locale }) {
                 <div className="space-y-2">
                   {isLoadingBusinesses && <p className="text-sm text-[var(--ink-soft)]">{copy.loading}</p>}
                   {businesses.map((item) => (
-                    <button
+                    <div
                       key={item.id}
-                      type="button"
                       className={`w-full rounded-md border p-2 text-left ${
                         selectedBusinessId === item.id ? "border-[var(--ink)]" : "border-[var(--line)]"
                       }`}
-                      onClick={() => setSelectedBusinessId(item.id)}
                     >
-                      <p className="text-sm font-semibold">{item.name}</p>
-                      <p className="text-xs text-[var(--ink-soft)]">{item.district}</p>
-                      <p className="text-xs text-[var(--ink-soft)]">
-                        {toCommaList(item.app_categories) || "no categories"} · {item.product_count} products
-                      </p>
-                    </button>
+                      <div className="mb-1 flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedIdSet.has(item.id)}
+                          onChange={() => toggleSelectBusiness(item.id)}
+                          aria-label={`Select ${item.name}`}
+                        />
+                        <button type="button" className="min-w-0 flex-1 text-left" onClick={() => setSelectedBusinessId(item.id)}>
+                          <p className="truncate text-sm font-semibold">{item.name}</p>
+                          <p className="text-xs text-[var(--ink-soft)]">{item.district}</p>
+                          <p className="text-xs text-[var(--ink-soft)]">
+                            {toCommaList(item.app_categories) || "no categories"} · {item.product_count} products
+                          </p>
+                        </button>
+                      </div>
+                    </div>
                   ))}
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-2">
@@ -1001,4 +1403,3 @@ export function AdminPanel({ locale }: { locale: Locale }) {
     </section>
   );
 }
-
