@@ -65,6 +65,7 @@ const BERLIN_FALLBACK_CENTER = { lat: 52.5208, lng: 13.4094 };
 const MIN_RADIUS_KM = 0.5;
 const MAX_RADIUS_KM = 15;
 const RADIUS_STEP_KM = 0.5;
+const RADIUS_PICKER_OPTIONS = [0.5, 1, 1.5, 2, 3, 5, 8, 12, 15] as const;
 const COLLAPSED_RESULTS_LIMIT = 3;
 const SEARCH_CACHE_TTL_MS = 1000 * 60 * 10;
 const ROUTE_CACHE_TTL_MS = 1000 * 60 * 5;
@@ -285,14 +286,6 @@ function formatRelativeCheckedAt(
     return dictionary.checkedYesterday;
   }
   return applyTemplate(dictionary.checkedDaysAgoTemplate, { days: String(deltaDays) });
-}
-
-function formatSourceType(sourceType: SearchResult["sourceType"]) {
-  if (!sourceType) {
-    return "n/a";
-  }
-  const humanized = sourceType.replace(/_/g, " ");
-  return `${humanized.charAt(0).toUpperCase()}${humanized.slice(1)}`;
 }
 
 function validationToneClass(status: SearchResult["validationStatus"]) {
@@ -549,6 +542,7 @@ export function SearchExperience({
   const [isResultsExpanded, setIsResultsExpanded] = useState(false);
   const [openNowOnly, setOpenNowOnly] = useState(false);
   const [savedOnly, setSavedOnly] = useState(false);
+  const [independentOnly, setIndependentOnly] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [savedStoreIds, setSavedStoreIds] = useState<string[]>([]);
   const [activeRoute, setActiveRoute] = useState<ActiveRoute | null>(null);
@@ -561,7 +555,6 @@ export function SearchExperience({
   const [lastSearchEndpoint, setLastSearchEndpoint] = useState<string | null>(null);
   const lastHapticAtRef = useRef(0);
   const searchAbortRef = useRef<AbortController | null>(null);
-  const radiusAutoSearchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchRequestIdRef = useRef(0);
   const routeRequestIdRef = useRef(0);
   const loggedMalformedResultKeysRef = useRef<Set<string>>(new Set());
@@ -602,10 +595,6 @@ export function SearchExperience({
   const resetSearchForLocationChange = useCallback((nextLocationMessage: string) => {
     searchRequestIdRef.current += 1;
     searchAbortRef.current?.abort();
-    if (radiusAutoSearchTimeoutRef.current) {
-      clearTimeout(radiusAutoSearchTimeoutRef.current);
-      radiusAutoSearchTimeoutRef.current = null;
-    }
     setIsLoading(false);
     setResults([]);
     setHasSearched(false);
@@ -873,9 +862,12 @@ export function SearchExperience({
       if (savedOnly && !savedStoreIdSet.has(result.store.id)) {
         return count;
       }
+      if (independentOnly && result.store.ownershipType !== "independent") {
+        return count;
+      }
       return count + 1;
     }, 0);
-  }, [openNowOnly, results, savedOnly, savedStoreIdSet]);
+  }, [independentOnly, openNowOnly, results, savedOnly, savedStoreIdSet]);
   const statusFiltersHideAllResults = hasSearched && results.length > 0 && statusFilteredCount === 0;
 
   const resultSummary = useMemo(() => {
@@ -886,7 +878,7 @@ export function SearchExperience({
       return dictionary.mapEmptyState;
     }
     if (statusFiltersHideAllResults) {
-      return dictionary.noOpenResultsLabel;
+      return dictionary.noFilteredResultsLabel;
     }
     if (results.length === 0 && noResultsGuidance?.type === "nearby") {
       return applyTemplate(dictionary.noResultsNearbyTemplate, {
@@ -898,7 +890,7 @@ export function SearchExperience({
     }
     return `${statusFilteredCount} ${dictionary.resultsCountLabel}`;
   }, [
-    dictionary.noOpenResultsLabel,
+    dictionary.noFilteredResultsLabel,
     dictionary.mapEmptyState,
     dictionary.noResultsCatalogHint,
     dictionary.noResultsNearbyTemplate,
@@ -929,7 +921,7 @@ export function SearchExperience({
       return dictionary.mapEmptyState;
     }
     if (statusFiltersHideAllResults) {
-      return dictionary.noOpenResultsLabel;
+      return dictionary.noFilteredResultsLabel;
     }
     if (results.length === 0 && noResultsGuidance?.type === "nearby") {
       return applyTemplate(dictionary.noResultsNearbyTemplate, {
@@ -942,7 +934,7 @@ export function SearchExperience({
     return `${statusFilteredCount} ${dictionary.resultsCountLabel}`;
   }, [
     dictionary.mapEmptyState,
-    dictionary.noOpenResultsLabel,
+    dictionary.noFilteredResultsLabel,
     dictionary.noResultsCatalogHint,
     dictionary.noResultsNearbyTemplate,
     dictionary.resultsCountLabel,
@@ -960,7 +952,7 @@ export function SearchExperience({
 
   const noResultsMessage = useMemo(() => {
     if (statusFiltersHideAllResults) {
-      return dictionary.noOpenResultsLabel;
+      return dictionary.noFilteredResultsLabel;
     }
     if (noResultsGuidance?.type === "nearby") {
       return applyTemplate(dictionary.noResultsNearbyTemplate, {
@@ -972,7 +964,7 @@ export function SearchExperience({
     }
     return dictionary.noResults;
   }, [
-    dictionary.noOpenResultsLabel,
+    dictionary.noFilteredResultsLabel,
     dictionary.noResults,
     dictionary.noResultsCatalogHint,
     dictionary.noResultsNearbyTemplate,
@@ -1071,9 +1063,12 @@ export function SearchExperience({
       if (savedOnly && !savedStoreIdSet.has(entry.result.store.id)) {
         return false;
       }
+      if (independentOnly && entry.result.store.ownershipType !== "independent") {
+        return false;
+      }
       return true;
     });
-  }, [openNowOnly, prioritizedListResults, savedOnly, savedStoreIdSet]);
+  }, [independentOnly, openNowOnly, prioritizedListResults, savedOnly, savedStoreIdSet]);
 
   const visibleListResults = useMemo(() => {
     if (isResultsExpanded) {
@@ -1182,10 +1177,6 @@ export function SearchExperience({
     return () => {
       searchRequestIdRef.current += 1;
       searchAbortRef.current?.abort();
-      if (radiusAutoSearchTimeoutRef.current) {
-        clearTimeout(radiusAutoSearchTimeoutRef.current);
-        radiusAutoSearchTimeoutRef.current = null;
-      }
       searchCache.clear();
       routeCache.clear();
     };
@@ -1382,6 +1373,19 @@ export function SearchExperience({
     pulse(7);
   }
 
+  function setRadiusFromPicker(nextRadiusKm: number) {
+    const clampedRadius = clampRadiusKm(nextRadiusKm);
+    setRadiusKm(clampedRadius);
+    pulse(7);
+    trackEvent("radius_picker_change", {
+      from_km: Number(radiusKm.toFixed(1)),
+      to_km: Number(clampedRadius.toFixed(1))
+    });
+    if (hasSearched && query.trim()) {
+      void runSearch({ overrideRadiusKm: clampedRadius });
+    }
+  }
+
   async function runSearch(options?: { overrideRadiusKm?: number; overrideQuery?: string; category?: string | null }) {
     const effectiveQuery = (options?.overrideQuery ?? query).trim();
     if (!effectiveQuery) {
@@ -1401,11 +1405,6 @@ export function SearchExperience({
     }
     if (!options?.category && activeQuickIntent && effectiveCategory !== activeQuickIntent) {
       setActiveQuickIntent(null);
-    }
-
-    if (radiusAutoSearchTimeoutRef.current) {
-      clearTimeout(radiusAutoSearchTimeoutRef.current);
-      radiusAutoSearchTimeoutRef.current = null;
     }
 
     const effectiveRadiusKm = clampRadiusKm(options?.overrideRadiusKm ?? radiusKm);
@@ -1687,10 +1686,6 @@ export function SearchExperience({
   function expandSearchTo(radiusToUse: number, source: "no_results" | "results_list") {
     const nextRadiusKm = clampRadiusKm(radiusToUse);
     setRadiusKm(nextRadiusKm);
-    if (radiusAutoSearchTimeoutRef.current) {
-      clearTimeout(radiusAutoSearchTimeoutRef.current);
-      radiusAutoSearchTimeoutRef.current = null;
-    }
     pulse(8);
     trackEvent("search_expand_radius_click", {
       from_km: Number(radiusKm.toFixed(1)),
@@ -1946,75 +1941,59 @@ export function SearchExperience({
                 ))}
               </div>
             ) : null}
-          </div>
-        </div>
-
-        <div className="tool-row hand-divider px-2.5 pb-2.5 pt-1.5 md:px-3 md:pb-3">
-          <div className="mb-1.5 flex items-center justify-between gap-2">
-            <label htmlFor="radius-km-slider" className="note-label note-mark">
-              {dictionary.radiusLabel}
-            </label>
-            <div className="flex items-center gap-1.5">
-              <label className="inline-flex items-center gap-1.5 text-[0.68rem] text-[var(--ink-soft)]">
-                <input
-                  type="checkbox"
-                  checked={openNowOnly}
-                  onChange={(event) => {
-                    setOpenNowOnly(event.target.checked);
-                    pulse(6);
-                  }}
-                />
+            <div className="search-compact-controls md:col-span-3">
+              <label htmlFor="radius-km-picker" className="note-label">
+                {dictionary.radiusLabel}
+              </label>
+              <select
+                id="radius-km-picker"
+                value={formatRadiusValue(radiusKm)}
+                onChange={(event) => {
+                  const next = Number(event.target.value);
+                  if (!Number.isNaN(next)) {
+                    setRadiusFromPicker(next);
+                  }
+                }}
+                className="field-input radius-picker"
+              >
+                {RADIUS_PICKER_OPTIONS.map((option) => (
+                  <option key={`radius-${option}`} value={formatRadiusValue(option)}>
+                    {formatRadiusKm(option)}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className={`btn-ghost compact-toggle ${openNowOnly ? "is-active" : ""}`}
+                onClick={() => {
+                  setOpenNowOnly((current) => !current);
+                  pulse(6);
+                }}
+              >
                 {dictionary.openNowOnlyLabel}
-              </label>
-              <label className="inline-flex items-center gap-1.5 text-[0.68rem] text-[var(--ink-soft)]">
-                <input
-                  type="checkbox"
-                  checked={savedOnly}
-                  onChange={(event) => {
-                    setSavedOnly(event.target.checked);
-                    pulse(6);
-                  }}
-                />
+              </button>
+              <button
+                type="button"
+                className={`btn-ghost compact-toggle ${savedOnly ? "is-active" : ""}`}
+                onClick={() => {
+                  setSavedOnly((current) => !current);
+                  pulse(6);
+                }}
+              >
                 {dictionary.savedOnlyLabel}
-              </label>
-              <span className="mono status-inline">{formatRadiusKm(radiusKm)}</span>
+              </button>
+              <button
+                type="button"
+                className={`btn-ghost compact-toggle ${independentOnly ? "is-active" : ""}`}
+                onClick={() => {
+                  setIndependentOnly((current) => !current);
+                  pulse(6);
+                }}
+              >
+                {dictionary.independentOnlyLabel}
+              </button>
             </div>
           </div>
-          <input
-            id="radius-km-slider"
-            type="range"
-            min={MIN_RADIUS_KM}
-            max={MAX_RADIUS_KM}
-            step={RADIUS_STEP_KM}
-            value={radiusKm}
-            onChange={(event) => {
-              const next = Number(event.target.value);
-              if (!Number.isNaN(next)) {
-                setRadiusKm(next);
-                if (radiusAutoSearchTimeoutRef.current) {
-                  clearTimeout(radiusAutoSearchTimeoutRef.current);
-                  radiusAutoSearchTimeoutRef.current = null;
-                }
-                if (hasSearched && query.trim()) {
-                  radiusAutoSearchTimeoutRef.current = setTimeout(() => {
-                    void runSearch({ overrideRadiusKm: next });
-                  }, 420);
-                }
-              }
-            }}
-            onPointerUp={() => pulse(7)}
-            onKeyUp={(event) => {
-              if (
-                event.key === "ArrowLeft" ||
-                event.key === "ArrowRight" ||
-                event.key === "ArrowUp" ||
-                event.key === "ArrowDown"
-              ) {
-                pulse(7);
-              }
-            }}
-            className="range-input"
-          />
         </div>
 
         {(locationMessage || errorMessage) && (
@@ -2184,9 +2163,6 @@ export function SearchExperience({
                     >
                       {formatOpeningStatusWithDetails(dictionary, selectedResultEntry.openingInfo)}
                     </span>
-                    <span className="store-summary-badge">
-                      {formatStoreOwnership(dictionary, selectedResultEntry.result.store.ownershipType)}
-                    </span>
                     {selectedResultEntry.result.validationStatus ? (
                       <span
                         className={`store-summary-badge ${validationToneClass(
@@ -2219,13 +2195,6 @@ export function SearchExperience({
                     </span>
                   </p>
                   <p className="store-detail-line">
-                    <UiIcon kind="validation" className="store-detail-icon" />
-                    <span>
-                      {dictionary.openingStatusLabel}:{" "}
-                      {formatOpeningStatusWithDetails(dictionary, selectedResultEntry.openingInfo)}
-                    </span>
-                  </p>
-                  <p className="store-detail-line">
                     <UiIcon kind="category" className="store-detail-icon" />
                     <span>
                       {dictionary.ownershipLabel}:{" "}
@@ -2240,14 +2209,6 @@ export function SearchExperience({
                       </span>
                     </p>
                   ) : null}
-                  <p className="store-detail-line">
-                    <UiIcon kind="walk" className="store-detail-icon" />
-                    <span>
-                      {dictionary.walkTimeLabel}:{" "}
-                      {selectedTravel?.walkLabel ?? formatEtaLabel(dictionary.etaApproxLabel, 0)} · {dictionary.bikeTimeLabel}:{" "}
-                      {selectedTravel?.bikeLabel ?? formatEtaLabel(dictionary.etaApproxLabel, 0)}
-                    </span>
-                  </p>
                   <div className="store-meta-wrap">
                     <span className="store-meta-chip">
                       {dictionary.confidenceLabel}:{" "}
@@ -2255,9 +2216,6 @@ export function SearchExperience({
                         selectedResultEntry.result.confidence,
                         dictionary.unknownConfidence
                       )}
-                    </span>
-                    <span className="store-meta-chip">
-                      {dictionary.sourceLabel}: {formatSourceType(selectedResultEntry.result.sourceType)}
                     </span>
                     <span className="store-meta-chip">
                       {dictionary.checkedLabel}:{" "}
@@ -2268,11 +2226,6 @@ export function SearchExperience({
                         checkedDaysAgoTemplate: dictionary.checkedDaysAgoTemplate
                       })}
                     </span>
-                    {selectedResultEntry.result.validationStatus ? (
-                      <span className={`store-meta-chip ${validationToneClass(selectedResultEntry.result.validationStatus)}`}>
-                        {dictionary.validationLabel}: {formatValidation(dictionary, selectedResultEntry.result.validationStatus)}
-                      </span>
-                    ) : null}
                     {savedStoreIdSet.has(selectedResultEntry.result.store.id) ? (
                       <span className="store-meta-chip">{dictionary.savedStoreLabel}</span>
                     ) : null}
@@ -2358,13 +2311,14 @@ export function SearchExperience({
             <div className="results-toolbar mb-1.5 md:mb-2">
               <h3 className="note-subtitle note-mark">{dictionary.resultsTitle}</h3>
               <div className="results-toolbar-actions">
-                {openNowOnly || savedOnly ? (
+                {openNowOnly || savedOnly || independentOnly ? (
                   <button
                     type="button"
                     className="btn-ghost text-[0.72rem] px-2.5 py-1.5"
                     onClick={() => {
                       setOpenNowOnly(false);
                       setSavedOnly(false);
+                      setIndependentOnly(false);
                       pulse(7);
                     }}
                     disabled={isLoading}
@@ -2412,7 +2366,10 @@ export function SearchExperience({
                 const travel = estimateTravel(result.distanceMeters);
                 const isSelected = selectedOfferId === result.offer.id;
                 const phoneHref = sanitizePhoneHref(result.store.phone);
-                const isSavedStore = savedStoreIdSet.has(result.store.id);
+                const rowWalkRouteKey = `${result.offer.id}:walk`;
+                const rowWalkRouteActive =
+                  activeRoute?.offerId === result.offer.id && activeRoute.mode === "walk";
+                const rowWalkRouteLoading = routeLoadingKey === rowWalkRouteKey;
 
                 return (
                   <div
@@ -2445,7 +2402,7 @@ export function SearchExperience({
                           <span className={`store-summary-badge ${openingStatusToneClass(openingStatus)}`}>
                             {formatOpeningStatusWithDetails(dictionary, openingInfo)}
                           </span>
-                          <span className="store-summary-badge">
+                          <span className="store-summary-inline-meta">
                             {formatStoreOwnership(dictionary, result.store.ownershipType)}
                           </span>
                           <span
@@ -2462,15 +2419,28 @@ export function SearchExperience({
                             <UiIcon kind="bike" className="store-summary-icon" />
                             {travel.bikeMin}m
                           </span>
-                          {result.validationStatus ? (
+                          {result.validationStatus === "validated" ? (
                             <span className={`store-summary-badge store-summary-desktop-meta ${validationToneClass(result.validationStatus)}`}>
                               {formatValidation(dictionary, result.validationStatus)}
                             </span>
                           ) : null}
-                          {isSavedStore ? <span className="store-summary-badge">{dictionary.savedStoreLabel}</span> : null}
                         </span>
                       </button>
                       <div className="store-row-actions">
+                        <button
+                          type="button"
+                          className={`btn-ghost px-2 py-1 text-[0.66rem] ${rowWalkRouteActive ? "is-active" : ""}`}
+                          disabled={rowWalkRouteLoading}
+                          onClick={() => {
+                            void drawRouteOnMap(result, "walk");
+                          }}
+                        >
+                          {rowWalkRouteLoading
+                            ? dictionary.routeLoadingLabel
+                            : rowWalkRouteActive
+                              ? dictionary.clearRouteAction
+                              : dictionary.routeAction}
+                        </button>
                         {phoneHref ? (
                           <a
                             href={phoneHref}
@@ -2484,15 +2454,6 @@ export function SearchExperience({
                             {dictionary.callStoreAction}
                           </a>
                         ) : null}
-                        <button
-                          type="button"
-                          className={`btn-ghost px-2 py-1 text-[0.66rem] ${isSavedStore ? "is-active" : ""}`}
-                          onClick={() => {
-                            toggleSavedStore(result.store.id);
-                          }}
-                        >
-                          {isSavedStore ? dictionary.unsaveStoreAction : dictionary.saveStoreAction}
-                        </button>
                       </div>
                     </div>
                   </div>

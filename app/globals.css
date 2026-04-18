@@ -113,6 +113,11 @@ button {
   opacity: 1;
 }
 
+/* Keep checkbox checks in the same monochrome system (avoid browser blue). */
+input[type="checkbox"] {
+  accent-color: var(--ink);
+}
+
 .hand-divider {
   position: relative;
 }
@@ -399,6 +404,32 @@ button {
 
 .quick-intents-recent {
   row-gap: 0.28rem;
+}
+
+.search-compact-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.42rem;
+  margin-top: 0.1rem;
+}
+
+.search-compact-controls .note-label {
+  margin-right: 0.08rem;
+}
+
+.radius-picker {
+  width: 100px;
+  min-height: 32px;
+  padding: 0.24rem 1.58rem 0.24rem 0.58rem;
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.compact-toggle {
+  min-height: 32px;
+  padding: 0.22rem 0.58rem;
+  font-size: 0.69rem;
 }
 
 .quick-intent-chip {
@@ -1090,6 +1121,13 @@ button {
   gap: 0.34rem;
 }
 
+.store-summary-inline-meta {
+  font-size: 0.66rem;
+  line-height: 1.2;
+  color: var(--ink-muted);
+  letter-spacing: 0.008em;
+}
+
 .store-summary-desktop-meta {
   display: inline-flex;
 }
@@ -1117,13 +1155,14 @@ button {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.14rem 0.44rem;
-  font-size: 0.63rem;
+  border-radius: 0.42rem;
+  padding: 0.15rem 0.42rem;
+  font-size: 0.62rem;
   letter-spacing: 0.01em;
-  text-transform: uppercase;
+  font-family: var(--font-mono), "Courier New", monospace;
   color: var(--ink-muted);
   line-height: 1.1;
+  background: var(--surface-soft);
 }
 
 .store-summary-badge.is-validated,
@@ -1260,12 +1299,13 @@ button {
   display: inline-flex;
   align-items: center;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.14rem 0.46rem;
-  font-size: 0.65rem;
+  border-radius: 0.42rem;
+  padding: 0.14rem 0.44rem;
+  font-size: 0.63rem;
   color: var(--ink-soft);
   font-family: var(--font-mono), "Courier New", monospace;
   line-height: 1.2;
+  background: var(--surface-soft);
 }
 
 .result-enter {
@@ -1589,6 +1629,29 @@ button {
     min-height: 36px;
   }
 
+  .search-compact-controls {
+    gap: 0.34rem;
+    margin-top: 0.08rem;
+  }
+
+  .search-compact-controls .note-label {
+    flex: 0 0 100%;
+    margin-bottom: 0.03rem;
+  }
+
+  .radius-picker {
+    flex: 1 1 108px;
+    min-height: 36px;
+    width: auto;
+    font-size: 0.72rem;
+  }
+
+  .compact-toggle {
+    min-height: 36px;
+    font-size: 0.66rem;
+    padding-inline: 0.52rem;
+  }
+
   .quick-intents {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -1680,7 +1743,7 @@ button {
 
   .store-summary-badge {
     font-size: 0.62rem;
-    padding: 0.14rem 0.42rem;
+    padding: 0.14rem 0.38rem;
   }
 
   .store-summary-icon {
@@ -1732,7 +1795,7 @@ button {
 
   .store-meta-chip {
     font-size: 0.61rem;
-    padding: 0.12rem 0.4rem;
+    padding: 0.12rem 0.36rem;
   }
 
   .map-popup {

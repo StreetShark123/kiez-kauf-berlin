@@ -106,7 +106,9 @@ export type Dictionary = {
   savedStoreLabel: string;
   savedOnlyLabel: string;
   openNowOnlyLabel: string;
+  independentOnlyLabel: string;
   noOpenResultsLabel: string;
+  noFilteredResultsLabel: string;
   clearFiltersAction: string;
   relatedTermsLabel: string;
   districtContextTemplate: string;
@@ -225,7 +227,9 @@ const dictionaries: Record<Locale, Dictionary> = {
     savedStoreLabel: "Gemerkt",
     savedOnlyLabel: "Nur gemerkte",
     openNowOnlyLabel: "Nur offen",
+    independentOnlyLabel: "Nur unabhaengig",
     noOpenResultsLabel: "Keine offenen Treffer im aktuellen Ergebnis.",
+    noFilteredResultsLabel: "Keine Treffer mit den aktiven Filtern.",
     clearFiltersAction: "Filter zuruecksetzen",
     relatedTermsLabel: "Aehnliche Begriffe",
     districtContextTemplate: "Naechster guter Treffer in {district}",
@@ -342,7 +346,9 @@ const dictionaries: Record<Locale, Dictionary> = {
     savedStoreLabel: "Saved",
     savedOnlyLabel: "Saved only",
     openNowOnlyLabel: "Open now only",
+    independentOnlyLabel: "Independent only",
     noOpenResultsLabel: "No open stores in the current results.",
+    noFilteredResultsLabel: "No matches with the active filters.",
     clearFiltersAction: "Clear filters",
     relatedTermsLabel: "Try related terms",
     districtContextTemplate: "Best nearby in {district}",
@@ -459,7 +465,9 @@ const dictionaries: Record<Locale, Dictionary> = {
     savedStoreLabel: "Guardada",
     savedOnlyLabel: "Solo guardadas",
     openNowOnlyLabel: "Solo abiertas ahora",
+    independentOnlyLabel: "Solo independientes",
     noOpenResultsLabel: "No hay tiendas abiertas en estos resultados.",
+    noFilteredResultsLabel: "No hay resultados con los filtros activos.",
     clearFiltersAction: "Quitar filtros",
     relatedTermsLabel: "Prueba terminos relacionados",
     districtContextTemplate: "Mejor opcion cercana en {district}",
