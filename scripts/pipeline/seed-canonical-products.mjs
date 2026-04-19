@@ -13,16 +13,42 @@ import {
 
 const PRODUCTS_FILE = path.join(DATA_DIR, "canonical-products.seed.json");
 
+function toFamilySlug(value) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function buildUpsertSql(rows) {
   const values = rows
     .map((row) => {
+      const normalizedName = String(row.normalized_name).trim().toLowerCase();
+      const groupKey = String(row.group_key ?? row.product_group ?? "uncategorized")
+        .trim()
+        .toLowerCase();
+      const familySlug =
+        toFamilySlug(row.family_slug ?? normalizedName) || toFamilySlug(`product-${normalizedName}`);
+      const coverageTier = String(row.coverage_tier ?? "core")
+        .trim()
+        .toLowerCase();
+      const rawPriority = Number.isFinite(Number(row.priority)) ? Number(row.priority) : 50;
+      const priority = Math.max(0, Math.min(100, Math.round(rawPriority)));
+      const isActive = typeof row.is_active === "boolean" ? row.is_active : true;
+
       return `(${[
-        sqlLiteral(String(row.normalized_name).trim().toLowerCase()),
+        sqlLiteral(normalizedName),
         sqlLiteral(row.display_name_es),
         sqlLiteral(row.display_name_en),
         sqlLiteral(row.display_name_de),
         sqlArray(row.synonyms ?? []),
-        sqlLiteral(row.product_group)
+        sqlLiteral(groupKey),
+        sqlLiteral(groupKey),
+        sqlLiteral(familySlug),
+        sqlLiteral(isActive),
+        sqlLiteral(priority),
+        sqlLiteral(coverageTier)
       ].join(",")})`;
     })
     .join(",\n");
@@ -34,7 +60,12 @@ insert into canonical_products (
   display_name_en,
   display_name_de,
   synonyms,
-  product_group
+  product_group,
+  group_key,
+  family_slug,
+  is_active,
+  priority,
+  coverage_tier
 )
 values
 ${values}
@@ -45,6 +76,11 @@ do update set
   display_name_de = excluded.display_name_de,
   synonyms = excluded.synonyms,
   product_group = excluded.product_group,
+  group_key = excluded.group_key,
+  family_slug = excluded.family_slug,
+  is_active = excluded.is_active,
+  priority = excluded.priority,
+  coverage_tier = excluded.coverage_tier,
   updated_at = now();
 `;
 }

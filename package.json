@@ -13,6 +13,7 @@
     "import:berlin": "node scripts/pipeline/import-berlin.mjs",
     "classify:establishments": "node scripts/pipeline/classify-establishments.mjs",
     "seed:canonical-products": "node scripts/pipeline/seed-canonical-products.mjs",
+    "seed:lean-catalog-v1": "node scripts/pipeline/seed-lean-catalog-v1.mjs",
     "enrich:websites": "node scripts/pipeline/enrich-websites.mjs",
     "cleanup:legacy-ai": "node scripts/pipeline/cleanup-legacy-ai-labels.mjs",
     "generate:rule-candidates": "node scripts/pipeline/generate-rule-candidates.mjs",

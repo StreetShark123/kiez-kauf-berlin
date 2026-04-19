@@ -1,0 +1,1441 @@
+[
+  {
+    "normalized_name": "hafermilch 1l",
+    "family_slug": "hafermilch-1l",
+    "group_key": "beverages",
+    "display_name_en": "Oat milk 1L",
+    "display_name_de": "Hafermilch 1L",
+    "display_name_es": "Leche de avena 1L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "oat milk",
+      "hafer drink",
+      "oat mjlk"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "vollmilch 1l",
+    "family_slug": "vollmilch-1l",
+    "group_key": "beverages",
+    "display_name_en": "Whole milk 1L",
+    "display_name_de": "Vollmilch 1L",
+    "display_name_es": "Leche entera 1L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "milk 1l",
+      "milk",
+      "whole milk",
+      "mjlk"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "wasser still 1.5l",
+    "family_slug": "wasser-still-1-5l",
+    "group_key": "beverages",
+    "display_name_en": "Still water 1.5L",
+    "display_name_de": "Wasser still 1.5L",
+    "display_name_es": "Agua sin gas 1.5L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "still water"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "wasser classic 1.5l",
+    "family_slug": "wasser-classic-1-5l",
+    "group_key": "beverages",
+    "display_name_en": "Sparkling water 1.5L",
+    "display_name_de": "Wasser classic 1.5L",
+    "display_name_es": "Agua con gas 1.5L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "sparkling water"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "cola 1l",
+    "family_slug": "cola-1l",
+    "group_key": "beverages",
+    "display_name_en": "Cola 1L",
+    "display_name_de": "Cola 1L",
+    "display_name_es": "Cola 1L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "soft drink cola"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "orangen saft 1l",
+    "family_slug": "orangen-saft-1l",
+    "group_key": "beverages",
+    "display_name_en": "Orange juice 1L",
+    "display_name_de": "Orangensaft 1L",
+    "display_name_es": "Zumo de naranja 1L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "orange juice"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "apfelsaft 1l",
+    "family_slug": "apfelsaft-1l",
+    "group_key": "beverages",
+    "display_name_en": "Apple juice 1L",
+    "display_name_de": "Apfelsaft 1L",
+    "display_name_es": "Zumo de manzana 1L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "apple juice"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "kaffee gemahlen 500g",
+    "family_slug": "kaffee-gemahlen-500g",
+    "group_key": "beverages",
+    "display_name_en": "Ground coffee 500g",
+    "display_name_de": "Kaffee gemahlen 500g",
+    "display_name_es": "Cafe molido 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "ground coffee"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "espresso bohnen 1kg",
+    "family_slug": "espresso-bohnen-1kg",
+    "group_key": "beverages",
+    "display_name_en": "Espresso beans 1kg",
+    "display_name_de": "Espresso Bohnen 1kg",
+    "display_name_es": "Cafe en grano 1kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "coffee beans"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "tee schwarz 25 beutel",
+    "family_slug": "tee-schwarz-25-beutel",
+    "group_key": "beverages",
+    "display_name_en": "Black tea 25 bags",
+    "display_name_de": "Schwarzer Tee 25 Beutel",
+    "display_name_es": "Te negro 25 bolsitas",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "black tea"
+    ],
+    "facets": [
+      "beverages"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "reis basmati 1kg",
+    "family_slug": "reis-basmati-1kg",
+    "group_key": "groceries",
+    "display_name_en": "Basmati rice 1kg",
+    "display_name_de": "Basmati Reis 1kg",
+    "display_name_es": "Arroz basmati 1kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "basmati rice"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "pasta fusilli 500g",
+    "family_slug": "pasta-fusilli-500g",
+    "group_key": "groceries",
+    "display_name_en": "Fusilli pasta 500g",
+    "display_name_de": "Fusilli 500g",
+    "display_name_es": "Pasta fusilli 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "fusilli"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "spaghetti 500g",
+    "family_slug": "spaghetti-500g",
+    "group_key": "groceries",
+    "display_name_en": "Spaghetti 500g",
+    "display_name_de": "Spaghetti 500g",
+    "display_name_es": "Espaguetis 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "spaghetti"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "tomatensauce 500g",
+    "family_slug": "tomatensauce-500g",
+    "group_key": "groceries",
+    "display_name_en": "Tomato sauce 500g",
+    "display_name_de": "Tomatensauce 500g",
+    "display_name_es": "Salsa de tomate 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "tomato sauce"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "passierte tomaten 500g",
+    "family_slug": "passierte-tomaten-500g",
+    "group_key": "groceries",
+    "display_name_en": "Passata 500g",
+    "display_name_de": "Passierte Tomaten 500g",
+    "display_name_es": "Tomate triturado 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "passata"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "olivenoel 1l",
+    "family_slug": "olivenoel-1l",
+    "group_key": "groceries",
+    "display_name_en": "Olive oil 1L",
+    "display_name_de": "Olivenoel 1L",
+    "display_name_es": "Aceite de oliva 1L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "olive oil"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "sonnenblumenoel 1l",
+    "family_slug": "sonnenblumenoel-1l",
+    "group_key": "groceries",
+    "display_name_en": "Sunflower oil 1L",
+    "display_name_de": "Sonnenblumenoel 1L",
+    "display_name_es": "Aceite de girasol 1L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "sunflower oil"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "eier 10 stueck",
+    "family_slug": "eier-10-stueck",
+    "group_key": "groceries",
+    "display_name_en": "Eggs 10 pack",
+    "display_name_de": "Eier 10 Stueck",
+    "display_name_es": "Huevos 10 unidades",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "eggs 10"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "mehl weizen 1kg",
+    "family_slug": "mehl-weizen-1kg",
+    "group_key": "groceries",
+    "display_name_en": "Wheat flour 1kg",
+    "display_name_de": "Weizenmehl 1kg",
+    "display_name_es": "Harina de trigo 1kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "wheat flour"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "zucker 1kg",
+    "family_slug": "zucker-1kg",
+    "group_key": "groceries",
+    "display_name_en": "Sugar 1kg",
+    "display_name_de": "Zucker 1kg",
+    "display_name_es": "Azucar 1kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "sugar"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "salz fein 500g",
+    "family_slug": "salz-fein-500g",
+    "group_key": "groceries",
+    "display_name_en": "Fine salt 500g",
+    "display_name_de": "Feines Salz 500g",
+    "display_name_es": "Sal fino 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "salt"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "bio haferflocken 500g",
+    "family_slug": "bio-haferflocken-500g",
+    "group_key": "groceries",
+    "display_name_en": "Organic oats 500g",
+    "display_name_de": "Bio Haferflocken 500g",
+    "display_name_es": "Copos de avena bio 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "oat flakes"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "tortilla maiz 500g",
+    "family_slug": "tortilla-maiz-500g",
+    "group_key": "groceries",
+    "display_name_en": "Corn tortilla 500g",
+    "display_name_de": "Mais Tortilla 500g",
+    "display_name_es": "Tortilla de maiz 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "tortilla",
+      "tortillas",
+      "corn tortilla",
+      "mexican tortilla"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "tortilla trigo 8 stueck",
+    "family_slug": "tortilla-trigo-8-stueck",
+    "group_key": "groceries",
+    "display_name_en": "Wheat tortilla 8 pack",
+    "display_name_de": "Weizen Tortilla 8 Stueck",
+    "display_name_es": "Tortilla de trigo 8 unidades",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "wheat tortilla",
+      "wrap tortilla"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "frijoles negros 500g",
+    "family_slug": "frijoles-negros-500g",
+    "group_key": "groceries",
+    "display_name_en": "Black beans 500g",
+    "display_name_de": "Schwarze Bohnen 500g",
+    "display_name_es": "Frijoles negros 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "black beans",
+      "frijol negro",
+      "frijoles"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "masa harina 1kg",
+    "family_slug": "masa-harina-1kg",
+    "group_key": "groceries",
+    "display_name_en": "Masa harina 1kg",
+    "display_name_de": "Maismehl 1kg",
+    "display_name_es": "Harina de maiz 1kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "corn flour",
+      "harina de maiz"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "salsa picante 150ml",
+    "family_slug": "salsa-picante-150ml",
+    "group_key": "groceries",
+    "display_name_en": "Hot sauce 150ml",
+    "display_name_de": "Scharfe Sauce 150ml",
+    "display_name_es": "Salsa picante 150ml",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "hot sauce",
+      "chili sauce",
+      "salsa"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "chipotle adobo 200g",
+    "family_slug": "chipotle-adobo-200g",
+    "group_key": "groceries",
+    "display_name_en": "Chipotle in adobo 200g",
+    "display_name_de": "Chipotle in Adobo 200g",
+    "display_name_es": "Chipotle en adobo 200g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "chipotle",
+      "adobo chili"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "nori blaetter 10",
+    "family_slug": "nori-blaetter-10",
+    "group_key": "groceries",
+    "display_name_en": "Nori sheets 10",
+    "display_name_de": "Nori Blaetter 10",
+    "display_name_es": "Nori hojas 10",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "nori",
+      "nori seaweed",
+      "sushi nori",
+      "norita"
+    ],
+    "facets": [
+      "groceries"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "aepfel 1kg",
+    "family_slug": "aepfel-1kg",
+    "group_key": "fresh_produce",
+    "display_name_en": "Apples 1kg",
+    "display_name_de": "Aepfel 1kg",
+    "display_name_es": "Manzanas 1kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "apples"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "bananen 1kg",
+    "family_slug": "bananen-1kg",
+    "group_key": "fresh_produce",
+    "display_name_en": "Bananas 1kg",
+    "display_name_de": "Bananen 1kg",
+    "display_name_es": "Bananas 1kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "bananas"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "kartoffeln 2kg",
+    "family_slug": "kartoffeln-2kg",
+    "group_key": "fresh_produce",
+    "display_name_en": "Potatoes 2kg",
+    "display_name_de": "Kartoffeln 2kg",
+    "display_name_es": "Patatas 2kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "potatoes"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "zwiebeln 1kg",
+    "family_slug": "zwiebeln-1kg",
+    "group_key": "fresh_produce",
+    "display_name_en": "Onions 1kg",
+    "display_name_de": "Zwiebeln 1kg",
+    "display_name_es": "Cebollas 1kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "onions"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "tomaten 1kg",
+    "family_slug": "tomaten-1kg",
+    "group_key": "fresh_produce",
+    "display_name_en": "Tomatoes 1kg",
+    "display_name_de": "Tomaten 1kg",
+    "display_name_es": "Tomates 1kg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "tomatoes"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "gurke stueck",
+    "family_slug": "gurke-stueck",
+    "group_key": "fresh_produce",
+    "display_name_en": "Cucumber",
+    "display_name_de": "Gurke",
+    "display_name_es": "Pepino unidad",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "cucumber"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "paprika mix 500g",
+    "family_slug": "paprika-mix-500g",
+    "group_key": "fresh_produce",
+    "display_name_en": "Bell pepper mix 500g",
+    "display_name_de": "Paprika Mix 500g",
+    "display_name_es": "Pimiento mix 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "bell pepper"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "chile serrano 100g",
+    "family_slug": "chile-serrano-100g",
+    "group_key": "fresh_produce",
+    "display_name_en": "Serrano chili 100g",
+    "display_name_de": "Serrano Chili 100g",
+    "display_name_es": "Chile serrano 100g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "chile",
+      "chili pepper",
+      "serrano chili"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "jalapeno 100g",
+    "family_slug": "jalapeno-100g",
+    "group_key": "fresh_produce",
+    "display_name_en": "Jalapeno 100g",
+    "display_name_de": "Jalapeno 100g",
+    "display_name_es": "Jalapeno 100g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "jalapeno",
+      "green chili"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "zitronen 500g",
+    "family_slug": "zitronen-500g",
+    "group_key": "fresh_produce",
+    "display_name_en": "Lemons 500g",
+    "display_name_de": "Zitronen 500g",
+    "display_name_es": "Limones 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "lemons"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "apricot 500g",
+    "family_slug": "apricot-500g",
+    "group_key": "fresh_produce",
+    "display_name_en": "Apricot 500g",
+    "display_name_de": "Aprikose 500g",
+    "display_name_es": "Albaricoque 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "apricot",
+      "apricots"
+    ],
+    "facets": [
+      "fresh_produce"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "brot weizen",
+    "family_slug": "brot-weizen",
+    "group_key": "bakery",
+    "display_name_en": "Wheat bread",
+    "display_name_de": "Weizenbrot",
+    "display_name_es": "Pan de trigo",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "wheat bread"
+    ],
+    "facets": [
+      "bakery"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "brot roggen",
+    "family_slug": "brot-roggen",
+    "group_key": "bakery",
+    "display_name_en": "Rye bread",
+    "display_name_de": "Roggenbrot",
+    "display_name_es": "Pan de centeno",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "rye bread"
+    ],
+    "facets": [
+      "bakery"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "croissant butter",
+    "family_slug": "croissant-butter",
+    "group_key": "bakery",
+    "display_name_en": "Butter croissant",
+    "display_name_de": "Buttercroissant",
+    "display_name_es": "Croissant mantequilla",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "croissant"
+    ],
+    "facets": [
+      "bakery"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "brezel stueck",
+    "family_slug": "brezel-stueck",
+    "group_key": "bakery",
+    "display_name_en": "Pretzel",
+    "display_name_de": "Brezel",
+    "display_name_es": "Pretzel unidad",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "pretzel"
+    ],
+    "facets": [
+      "bakery"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "kuchen stueck",
+    "family_slug": "kuchen-stueck",
+    "group_key": "bakery",
+    "display_name_en": "Cake slice",
+    "display_name_de": "Kuchenstueck",
+    "display_name_es": "Porcion de tarta",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "cake slice"
+    ],
+    "facets": [
+      "bakery"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "rinderhack 500g",
+    "family_slug": "rinderhack-500g",
+    "group_key": "meat",
+    "display_name_en": "Ground beef 500g",
+    "display_name_de": "Rinderhack 500g",
+    "display_name_es": "Carne picada de ternera 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "ground beef"
+    ],
+    "facets": [
+      "meat"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "huhn brust 500g",
+    "family_slug": "huhn-brust-500g",
+    "group_key": "meat",
+    "display_name_en": "Chicken breast 500g",
+    "display_name_de": "Huhn Brust 500g",
+    "display_name_es": "Pechuga de pollo 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "chicken breast"
+    ],
+    "facets": [
+      "meat"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "lamm kotelett 500g",
+    "family_slug": "lamm-kotelett-500g",
+    "group_key": "meat",
+    "display_name_en": "Lamb chops 500g",
+    "display_name_de": "Lammkotelett 500g",
+    "display_name_es": "Chuletas de cordero 500g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "lamb chops"
+    ],
+    "facets": [
+      "meat"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "wurst gemischt 300g",
+    "family_slug": "wurst-gemischt-300g",
+    "group_key": "meat",
+    "display_name_en": "Mixed sausage 300g",
+    "display_name_de": "Gemischte Wurst 300g",
+    "display_name_es": "Embutido mixto 300g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "sausage"
+    ],
+    "facets": [
+      "meat"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "zahnpasta sensitive",
+    "family_slug": "zahnpasta-sensitive",
+    "group_key": "personal_care",
+    "display_name_en": "Sensitive toothpaste",
+    "display_name_de": "Zahnpasta Sensitive",
+    "display_name_es": "Pasta dental sensitive",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "toothpaste"
+    ],
+    "facets": [
+      "personal_care"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "zahnbuerste medium",
+    "family_slug": "zahnbuerste-medium",
+    "group_key": "personal_care",
+    "display_name_en": "Toothbrush medium",
+    "display_name_de": "Zahnbuerste Mittel",
+    "display_name_es": "Cepillo dental medio",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "toothbrush"
+    ],
+    "facets": [
+      "personal_care"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "shampoo 300ml",
+    "family_slug": "shampoo-300ml",
+    "group_key": "personal_care",
+    "display_name_en": "Shampoo 300ml",
+    "display_name_de": "Shampoo 300ml",
+    "display_name_es": "Champu 300ml",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "shampoo"
+    ],
+    "facets": [
+      "personal_care"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "duschgel 250ml",
+    "family_slug": "duschgel-250ml",
+    "group_key": "personal_care",
+    "display_name_en": "Shower gel 250ml",
+    "display_name_de": "Duschgel 250ml",
+    "display_name_es": "Gel de ducha 250ml",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "shower gel"
+    ],
+    "facets": [
+      "personal_care"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "deodorant roll on",
+    "family_slug": "deodorant-roll-on",
+    "group_key": "personal_care",
+    "display_name_en": "Roll-on deodorant",
+    "display_name_de": "Deo Roll-On",
+    "display_name_es": "Desodorante roll-on",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "deodorant"
+    ],
+    "facets": [
+      "personal_care"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "tampons 32",
+    "family_slug": "tampons-32",
+    "group_key": "personal_care",
+    "display_name_en": "Tampons 32",
+    "display_name_de": "Tampons 32",
+    "display_name_es": "Tampones 32 unidades",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "tampons"
+    ],
+    "facets": [
+      "personal_care"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "diapers pack m",
+    "family_slug": "diapers-pack-m",
+    "group_key": "personal_care",
+    "display_name_en": "Diapers pack M",
+    "display_name_de": "Windeln Pack M",
+    "display_name_es": "Pañales talla M",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "diaper",
+      "diapers",
+      "nappy",
+      "nappies"
+    ],
+    "facets": [
+      "personal_care"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "toilettenpapier 8 rollen",
+    "family_slug": "toilettenpapier-8-rollen",
+    "group_key": "household",
+    "display_name_en": "Toilet paper 8 rolls",
+    "display_name_de": "Toilettenpapier 8 Rollen",
+    "display_name_es": "Papel higienico 8 rollos",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "toilet paper"
+    ],
+    "facets": [
+      "household"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "kuechenpapier 4 rollen",
+    "family_slug": "kuechenpapier-4-rollen",
+    "group_key": "household",
+    "display_name_en": "Kitchen paper 4 rolls",
+    "display_name_de": "Kuechenpapier 4 Rollen",
+    "display_name_es": "Papel de cocina 4 rollos",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "paper towels"
+    ],
+    "facets": [
+      "household"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "waschmittel 20 wl",
+    "family_slug": "waschmittel-20-wl",
+    "group_key": "household",
+    "display_name_en": "Laundry detergent 20 washes",
+    "display_name_de": "Waschmittel 20 WL",
+    "display_name_es": "Detergente 20 lavados",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "laundry detergent"
+    ],
+    "facets": [
+      "household"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "spuelmittel 500ml",
+    "family_slug": "spuelmittel-500ml",
+    "group_key": "household",
+    "display_name_en": "Dish soap 500ml",
+    "display_name_de": "Spuelmittel 500ml",
+    "display_name_es": "Lavavajillas 500ml",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "dish soap"
+    ],
+    "facets": [
+      "household"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "allzweckreiniger 1l",
+    "family_slug": "allzweckreiniger-1l",
+    "group_key": "household",
+    "display_name_en": "All-purpose cleaner 1L",
+    "display_name_de": "Allzweckreiniger 1L",
+    "display_name_es": "Limpiador multiusos 1L",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "all purpose cleaner"
+    ],
+    "facets": [
+      "household"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "muellbeutel 35l 20",
+    "family_slug": "muellbeutel-35l-20",
+    "group_key": "household",
+    "display_name_en": "Trash bags 35L 20",
+    "display_name_de": "Muellbeutel 35L 20",
+    "display_name_es": "Bolsas basura 35L 20u",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "trash bags"
+    ],
+    "facets": [
+      "household"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "allzweckkleber 50ml",
+    "family_slug": "allzweckkleber-50ml",
+    "group_key": "household",
+    "display_name_en": "All-purpose glue 50ml",
+    "display_name_de": "Allzweckkleber 50ml",
+    "display_name_es": "Pegamento multiuso 50ml",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "glue",
+      "super glue",
+      "adhesive",
+      "glu"
+    ],
+    "facets": [
+      "household"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "hammer standard",
+    "family_slug": "hammer-standard",
+    "group_key": "household",
+    "display_name_en": "Hammer standard",
+    "display_name_de": "Hammer Standard",
+    "display_name_es": "Martillo estandar",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "hammer",
+      "hammr",
+      "claw hammer"
+    ],
+    "facets": [
+      "household"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "ibuprofen 400mg",
+    "family_slug": "ibuprofen-400mg",
+    "group_key": "pharmacy",
+    "display_name_en": "Ibuprofen 400mg",
+    "display_name_de": "Ibuprofen 400mg",
+    "display_name_es": "Ibuprofeno 400mg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "pain relief",
+      "painkiller"
+    ],
+    "facets": [
+      "pharmacy"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "paracetamol 500mg",
+    "family_slug": "paracetamol-500mg",
+    "group_key": "pharmacy",
+    "display_name_en": "Paracetamol 500mg",
+    "display_name_de": "Paracetamol 500mg",
+    "display_name_es": "Paracetamol 500mg",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "acetaminophen"
+    ],
+    "facets": [
+      "pharmacy"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "husten sirup",
+    "family_slug": "husten-sirup",
+    "group_key": "pharmacy",
+    "display_name_en": "Cough syrup",
+    "display_name_de": "Hustensaft",
+    "display_name_es": "Jarabe para la tos",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "cough syrup"
+    ],
+    "facets": [
+      "pharmacy"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "vitamin c brausetabletten",
+    "family_slug": "vitamin-c-brausetabletten",
+    "group_key": "pharmacy",
+    "display_name_en": "Vitamin C effervescent",
+    "display_name_de": "Vitamin C Brausetabletten",
+    "display_name_es": "Vitamina C efervescente",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "vitamin c"
+    ],
+    "facets": [
+      "pharmacy"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "pflaster set",
+    "family_slug": "pflaster-set",
+    "group_key": "pharmacy",
+    "display_name_en": "Bandage set",
+    "display_name_de": "Pflaster Set",
+    "display_name_es": "Set de tiritas",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "bandages"
+    ],
+    "facets": [
+      "pharmacy"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "condoms pack 12",
+    "family_slug": "condoms-pack-12",
+    "group_key": "pharmacy",
+    "display_name_en": "Condoms pack 12",
+    "display_name_de": "Kondome 12er Pack",
+    "display_name_es": "Preservativos 12 unidades",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "condom",
+      "condoms",
+      "safe sex"
+    ],
+    "facets": [
+      "pharmacy"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "chips paprika 150g",
+    "family_slug": "chips-paprika-150g",
+    "group_key": "snacks",
+    "display_name_en": "Paprika chips 150g",
+    "display_name_de": "Paprika Chips 150g",
+    "display_name_es": "Patatas chips paprika 150g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "chips"
+    ],
+    "facets": [
+      "snacks"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "schokolade dunkel 100g",
+    "family_slug": "schokolade-dunkel-100g",
+    "group_key": "snacks",
+    "display_name_en": "Dark chocolate 100g",
+    "display_name_de": "Dunkle Schokolade 100g",
+    "display_name_es": "Chocolate negro 100g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "dark chocolate"
+    ],
+    "facets": [
+      "snacks"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "kekse butter 200g",
+    "family_slug": "kekse-butter-200g",
+    "group_key": "snacks",
+    "display_name_en": "Butter cookies 200g",
+    "display_name_de": "Butterkekse 200g",
+    "display_name_es": "Galletas mantequilla 200g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "cookies"
+    ],
+    "facets": [
+      "snacks"
+    ],
+    "aliases": [],
+    "use_cases": []
+  },
+  {
+    "normalized_name": "nuesse mix 200g",
+    "family_slug": "nuesse-mix-200g",
+    "group_key": "snacks",
+    "display_name_en": "Mixed nuts 200g",
+    "display_name_de": "Nussmix 200g",
+    "display_name_es": "Mix de frutos secos 200g",
+    "is_active": true,
+    "priority": 60,
+    "coverage_tier": "core",
+    "synonyms": [
+      "mixed nuts"
+    ],
+    "facets": [
+      "snacks"
+    ],
+    "aliases": [],
+    "use_cases": []
+  }
+]

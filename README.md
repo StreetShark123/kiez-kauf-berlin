@@ -154,6 +154,7 @@ npm run import:berlin
 npm run classify:establishments
 npm run enrich:websites
 npm run seed:canonical-products
+npm run seed:lean-catalog-v1
 npm run generate:rule-candidates
 npm run generate:ai-candidates
 npm run cleanup:legacy-ai
@@ -212,6 +213,7 @@ Pack lean-v1:
 
 - Guia operativa: `docs/lean-v1.md`
 - Migracion guardrails: `supabase/migrations/20260419092218_lean_v1_guardrails.sql`
+- Modelo de catalogo Phase A (core + tablas hijas): `docs/db/catalog-model-phase-a.md`
 
 ## Admin panel
 
