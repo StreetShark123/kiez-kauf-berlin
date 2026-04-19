@@ -68,7 +68,7 @@ expanded as (
 scored as (
   select
     ex.establishment_id,
-    p.id as canonical_product_id,
+    cp.canonical_product_id,
     ex.app_category,
     cm.product_group,
     least(
@@ -79,9 +79,31 @@ scored as (
     cm.reason
   from expanded ex
   join category_map cm on cm.app_category = ex.app_category
-  join canonical_products p
-    on coalesce(p.group_key, p.product_group) = cm.product_group
-   and coalesce(p.is_active, true) = true
+  join (
+    select distinct
+      cm2.app_category,
+      cm2.product_group,
+      p.id as canonical_product_id
+    from category_map cm2
+    join canonical_products p
+      on coalesce(p.group_key, p.product_group) = cm2.product_group
+     and coalesce(p.is_active, true) = true
+
+    union
+
+    select distinct
+      cm2.app_category,
+      cm2.product_group,
+      p.id as canonical_product_id
+    from category_map cm2
+    join canonical_product_facets f
+      on f.facet_normalized = cm2.product_group
+    join canonical_products p
+      on p.id = f.canonical_product_id
+     and coalesce(p.is_active, true) = true
+  ) cp
+    on cp.app_category = cm.app_category
+   and cp.product_group = cm.product_group
 ),
 dedup as (
   select distinct on (establishment_id, canonical_product_id)

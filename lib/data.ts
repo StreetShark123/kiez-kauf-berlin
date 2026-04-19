@@ -238,6 +238,11 @@ type SupabaseCanonicalProductAliasRow = {
   is_active: boolean | null;
 };
 
+type SupabaseCanonicalProductFacetRow = {
+  canonical_product_id: number;
+  facet_normalized: string;
+};
+
 type DatasetSearchStrategy =
   | "product_name"
   | "canonical_multilingual"
@@ -1093,6 +1098,38 @@ async function searchSupabaseRowsFromDataset(args: {
   let strategy: DatasetSearchStrategy = "product_name";
   let hasPrimaryStrategy = false;
 
+  const resolveFacetCanonicalIds = async (facets: string[]): Promise<number[] | null> => {
+    if (facets.length === 0) {
+      return [];
+    }
+
+    const { data, error } = await db
+      .from("canonical_product_facets")
+      .select("canonical_product_id, facet_normalized")
+      .in("facet_normalized", facets)
+      .limit(8000);
+
+    if (error) {
+      if (isSchemaCompatibilityError(error.message)) {
+        if (DEV_DEBUG) {
+          console.warn("[catalog-compat] canonical_product_facets not available, fallback to product_group");
+        }
+        return null;
+      }
+      throw new Error(`Supabase facet lookup failed: ${error.message}`);
+    }
+
+    const rows = (data ?? []) as SupabaseCanonicalProductFacetRow[];
+    const ids = new Set<number>();
+    for (const row of rows) {
+      const id = Number(row.canonical_product_id);
+      if (Number.isFinite(id)) {
+        ids.add(id);
+      }
+    }
+    return [...ids];
+  };
+
   if (categoryIntents.length > 0) {
     for (const category of categoryIntents) {
       const allowedOsmCategories = APP_CATEGORY_INTENT_OSM_ALLOWLIST[category] ?? [];
@@ -1131,12 +1168,29 @@ async function searchSupabaseRowsFromDataset(args: {
   }
 
   if (!hasPrimaryStrategy && inferredGroups.length > 0) {
-    const groupRows = await executeQuery("group_keyword", (queryBuilder) =>
-      queryBuilder.in("product_group", inferredGroups)
-    );
-    if (groupRows === null) {
-      return null;
+    const facetCanonicalIds = await resolveFacetCanonicalIds(inferredGroups);
+    let groupRows: SupabaseSearchDatasetRow[] = [];
+
+    if (facetCanonicalIds && facetCanonicalIds.length > 0) {
+      const byFacetRows = await executeQuery("group_keyword", (queryBuilder) =>
+        queryBuilder.in("canonical_product_id", facetCanonicalIds)
+      );
+      if (byFacetRows === null) {
+        return null;
+      }
+      groupRows = byFacetRows;
     }
+
+    if (groupRows.length === 0) {
+      const legacyGroupRows = await executeQuery("group_keyword", (queryBuilder) =>
+        queryBuilder.in("product_group", inferredGroups)
+      );
+      if (legacyGroupRows === null) {
+        return null;
+      }
+      groupRows = legacyGroupRows;
+    }
+
     if (groupRows.length > 0) {
       const shouldAugment = !hasPrimaryStrategy || mergedRows.size < STRATEGY_AUGMENT_THRESHOLD;
       if (shouldAugment) {

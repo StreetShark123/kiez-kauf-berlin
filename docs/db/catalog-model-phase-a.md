@@ -161,3 +161,17 @@ npm run seed:lean-catalog-v1
 Fuente por defecto:
 
 - `data/berlin/lean-catalog-v1.seed.json`
+
+## Phase C y D (estado actual)
+
+Avance ya aplicado:
+
+- **Phase C**: matching y generadores usan `group_key` + `canonical_product_aliases` con fallback legacy.
+- **Phase D**: estrategia `group_keyword` y reglas pasan a modo **facet-first**:
+  - Search intenta primero `canonical_product_facets` -> `canonical_product_id`.
+  - Si no hay facets o no aplica, fallback a `product_group`.
+  - Regla por categoria usa union de:
+    - match por `group_key`
+    - match por `canonical_product_facets.facet_normalized`
+
+Resultado: el catalogo queda listo para familias multi-contexto (una familia puede vivir en varias facets) sin romper compatibilidad.
