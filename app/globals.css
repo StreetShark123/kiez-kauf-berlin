@@ -4,44 +4,50 @@
 
 :root {
   color-scheme: light;
-  --bg: #ffffff;
+  --bg: #f5f3ee;
   --surface: #ffffff;
-  --surface-soft: #f7f7f7;
+  --surface-soft: #f0ede7;
   --ink: #111111;
-  --ink-soft: #5a5a5a;
-  --ink-muted: #777777;
-  --line: #d4d4d4;
-  --line-strong: #aaaaaa;
-  --rule-ink: #b9b9b9;
-  --rule-ink-strong: #8f8f8f;
-  --focus: #111111;
-  --danger-ink: #8d1d1d;
+  --ink-soft: #6f6a61;
+  --ink-muted: #8a847a;
+  --line: #cfcbc2;
+  --line-strong: #b8b2a8;
+  --rule-ink: #beb8ae;
+  --rule-ink-strong: #9e978c;
+  --focus: #ebcb4c;
+  --danger-ink: #d45b5b;
+  --accent-open: #4fae7a;
+  --accent-route: #4c8bf5;
+  --accent-warn: #f0a43a;
   --motion-fast: 140ms;
   --motion-medium: 220ms;
-  --note-label: #4e4e4e;
-  --note-mark: #9a9a9a;
-  --note-empty: #c2c2c2;
+  --note-label: #5d574d;
+  --note-mark: #9b9488;
+  --note-empty: #c8c2b7;
   --map-filter: grayscale(0.94) contrast(1.06) brightness(1.02);
   --map-edge-glow: rgba(180, 180, 180, 0.32);
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0c0c0c;
-  --surface: #1a1a1a;
-  --surface-soft: #232323;
-  --ink: #f1f1f1;
-  --ink-soft: #cecece;
-  --ink-muted: #bbbbbb;
-  --line: #4b4b4b;
-  --line-strong: #666666;
-  --rule-ink: #737373;
-  --rule-ink-strong: #9a9a9a;
-  --focus: #f1f1f1;
-  --danger-ink: #ff9d9d;
-  --note-label: #c4c4c4;
-  --note-mark: #a8a8a8;
-  --note-empty: #7a7a7a;
+  --bg: #11110f;
+  --surface: #1b1a17;
+  --surface-soft: #25231f;
+  --ink: #f3f2ed;
+  --ink-soft: #d8d2c7;
+  --ink-muted: #b4ad9f;
+  --line: #4e4a43;
+  --line-strong: #686359;
+  --rule-ink: #757064;
+  --rule-ink-strong: #9a9387;
+  --focus: #e7c44a;
+  --danger-ink: #ff8f8f;
+  --accent-open: #63a880;
+  --accent-route: #6f98e9;
+  --accent-warn: #d39a46;
+  --note-label: #cbc5b9;
+  --note-mark: #aea79a;
+  --note-empty: #7e786d;
   --map-filter: grayscale(1) contrast(1.12) brightness(0.84);
   --map-edge-glow: rgba(255, 255, 255, 0.12);
 }
@@ -595,14 +601,15 @@ input[type="checkbox"] {
 }
 
 .route-status-chip.is-loading {
-  border-color: var(--line-strong);
-  color: var(--ink);
+  border-color: color-mix(in srgb, var(--accent-warn) 58%, var(--line) 42%);
+  color: color-mix(in srgb, var(--accent-warn) 80%, var(--ink) 20%);
+  background: color-mix(in srgb, var(--accent-warn) 10%, var(--surface) 90%);
 }
 
 .route-status-chip.is-active {
-  border-color: var(--line-strong);
-  color: var(--ink);
-  background: color-mix(in srgb, var(--surface-soft) 88%, var(--ink) 12%);
+  border-color: color-mix(in srgb, var(--accent-route) 56%, var(--line) 44%);
+  color: color-mix(in srgb, var(--accent-route) 80%, var(--ink) 20%);
+  background: color-mix(in srgb, var(--accent-route) 12%, var(--surface) 88%);
   max-width: min(100%, 24rem);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -618,6 +625,12 @@ input[type="checkbox"] {
   min-height: 30px;
   border-color: var(--line-strong);
   flex: 0 0 auto;
+}
+
+.route-action-btn.is-active {
+  border-color: color-mix(in srgb, var(--accent-route) 56%, var(--line) 44%);
+  color: color-mix(in srgb, var(--accent-route) 82%, var(--ink) 18%);
+  background: color-mix(in srgb, var(--accent-route) 12%, var(--surface) 88%);
 }
 
 .ink-rule {
@@ -898,7 +911,8 @@ input[type="checkbox"] {
 }
 
 .map-pin-open {
-  background: var(--ink);
+  background: var(--accent-open);
+  border-color: color-mix(in srgb, var(--accent-open) 62%, var(--ink) 38%);
 }
 
 .map-pin-closed {
@@ -932,7 +946,8 @@ input[type="checkbox"] {
 .map-pin-selected {
   z-index: 2;
   transform: scale(1.12);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface) 15%, transparent 85%), 0 0 0 4px var(--ink);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface) 15%, transparent 85%),
+    0 0 0 4px color-mix(in srgb, var(--accent-route) 65%, var(--ink) 35%);
 }
 
 .map-pin-user {
@@ -1117,7 +1132,7 @@ input[type="checkbox"] {
 }
 
 .store-item.is-open-now {
-  border-color: var(--line-strong);
+  border-color: color-mix(in srgb, var(--accent-open) 46%, var(--line) 54%);
 }
 
 .store-item.is-closed-now {
@@ -1262,8 +1277,8 @@ input[type="checkbox"] {
 
 .store-summary-badge.is-likely,
 .store-meta-chip.is-likely {
-  border-color: var(--line-strong);
-  color: var(--ink-soft);
+  border-color: color-mix(in srgb, var(--accent-warn) 52%, var(--line) 48%);
+  color: color-mix(in srgb, var(--accent-warn) 82%, var(--ink) 18%);
 }
 
 .store-summary-badge.is-rejected,
@@ -1279,9 +1294,9 @@ input[type="checkbox"] {
 }
 
 .store-summary-badge.is-open-now {
-  border-color: color-mix(in srgb, var(--ink) 58%, var(--line) 42%);
-  color: var(--ink);
-  background: color-mix(in srgb, var(--surface) 82%, var(--ink) 18%);
+  border-color: color-mix(in srgb, var(--accent-open) 58%, var(--line) 42%);
+  color: color-mix(in srgb, var(--accent-open) 82%, var(--ink) 18%);
+  background: color-mix(in srgb, var(--accent-open) 11%, var(--surface) 89%);
 }
 
 .store-summary-badge.is-closed-now {

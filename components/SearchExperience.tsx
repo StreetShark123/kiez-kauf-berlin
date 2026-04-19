@@ -2257,7 +2257,7 @@ export function SearchExperience({
                         <>
                           <button
                             type="button"
-                            className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
+                            className={`btn-ghost route-action-btn inline-flex text-[0.72rem] px-2.5 py-1.5 ${
                               walkRouteActive ? "is-active" : ""
                             }`}
                             disabled={walkRouteLoading}
@@ -2273,7 +2273,7 @@ export function SearchExperience({
                           </button>
                           <button
                             type="button"
-                            className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
+                            className={`btn-ghost route-action-btn inline-flex text-[0.72rem] px-2.5 py-1.5 ${
                               bikeRouteActive ? "is-active" : ""
                             }`}
                             disabled={bikeRouteLoading}
@@ -2414,7 +2414,7 @@ export function SearchExperience({
                       <div className="store-row-actions">
                         <button
                           type="button"
-                          className={`btn-ghost px-2 py-1 text-[0.66rem] ${rowWalkRouteActive ? "is-active" : ""}`}
+                          className={`btn-ghost route-action-btn px-2 py-1 text-[0.66rem] ${rowWalkRouteActive ? "is-active" : ""}`}
                           disabled={rowWalkRouteLoading}
                           onClick={() => {
                             void drawRouteOnMap(result, "walk");

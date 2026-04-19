@@ -43,8 +43,8 @@ const RADIUS_STYLE = {
   light: { lineWidth: 1.62, lineOpacity: 0.72, fillOpacity: 0.1, lineColor: "#111111", fillColor: "#111111" }
 } as const;
 const ROUTE_STYLE = {
-  dark: { lineWidth: 2.75, lineOpacity: 0.96, lineColor: "#ffffff" },
-  light: { lineWidth: 2.55, lineOpacity: 0.86, lineColor: "#111111" }
+  dark: { lineWidth: 2.75, lineOpacity: 0.96, lineColor: "#6f98e9" },
+  light: { lineWidth: 2.55, lineOpacity: 0.9, lineColor: "#4c8bf5" }
 } as const;
 const ROUTE_ANIMATION_MIN_DURATION_MS = 520;
 const ROUTE_ANIMATION_MAX_DURATION_MS = 1780;
