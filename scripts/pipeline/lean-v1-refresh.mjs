@@ -35,7 +35,7 @@ async function main() {
   const mergeArgs = [
     "scripts/pipeline/merge-candidates.mjs",
     ...commonResumeArgs,
-    "--max-products-per-establishment=8"
+    "--max-products-per-establishment=12"
   ];
 
   const steps = [
@@ -63,7 +63,7 @@ async function main() {
     forceHeuristic,
     pruneKeepLatest,
     maxRecommendations: 5,
-    maxProductsPerEstablishment: 8
+    maxProductsPerEstablishment: 12
   });
 
   for (const [command, commandArgs] of steps) {

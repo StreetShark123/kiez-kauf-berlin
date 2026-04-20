@@ -1041,7 +1041,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
         method: "POST",
         body: JSON.stringify({
           district: cleanDistrict,
-          maxProductsPerEstablishment: 8
+          maxProductsPerEstablishment: 12
         })
       })) as {
         stats?: {

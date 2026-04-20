@@ -102,8 +102,6 @@ const CATEGORY_GROUP_RULES: Array<{
   { appCategory: "pharmacy", productGroup: "pharmacy", baseConfidence: 0.93, reason: "pharmacies map to medicine products" },
   { appCategory: "pharmacy", productGroup: "personal_care", baseConfidence: 0.82, reason: "pharmacies stock personal care products" },
   { appCategory: "personal-care", productGroup: "personal_care", baseConfidence: 0.86, reason: "personal care category maps directly" },
-  { appCategory: "beauty", productGroup: "personal_care", baseConfidence: 0.92, reason: "beauty stores strongly map to personal care" },
-  { appCategory: "beauty", productGroup: "pharmacy", baseConfidence: 0.58, reason: "beauty stores can carry wellbeing and care products" },
   { appCategory: "medical-supplies", productGroup: "pharmacy", baseConfidence: 0.93, reason: "medical supply stores map to pharmacy essentials" },
   { appCategory: "medical-supplies", productGroup: "personal_care", baseConfidence: 0.72, reason: "medical supply stores may include care products" },
   { appCategory: "household", productGroup: "household", baseConfidence: 0.88, reason: "household category maps directly" },
@@ -166,7 +164,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "District is required." }, { status: 400 });
     }
 
-    const maxProductsPerEstablishment = clamp(Number(body.maxProductsPerEstablishment ?? 8), 3, 20);
+    const maxProductsPerEstablishment = clamp(Number(body.maxProductsPerEstablishment ?? 12), 3, 20);
     const supabase = getSupabaseAdminClient();
 
     const { data: establishmentsData, error: establishmentsError } = await supabase
@@ -515,4 +513,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-

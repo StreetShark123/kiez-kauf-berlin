@@ -242,7 +242,7 @@ select
 async function main() {
   const args = parseArgs(process.argv);
   const batchSize = Number(args["batch-size"] ?? 500);
-  const maxProductsPerEstablishment = Number(args["max-products-per-establishment"] ?? 8);
+  const maxProductsPerEstablishment = Number(args["max-products-per-establishment"] ?? 12);
   const resume = Boolean(args.resume);
 
   const checkpoint = await loadCheckpoint();

@@ -10,9 +10,13 @@ describe("keyword intent helpers", () => {
     expect(__private.inferProductGroupsFromKeyword("mjlk")).toContain("beverages");
     expect(__private.inferProductGroupsFromKeyword("garlic")).toContain("fresh_produce");
     expect(__private.inferProductGroupsFromKeyword("apricot")).toContain("fresh_produce");
+    expect(__private.inferProductGroupsFromKeyword("strawberries")).toContain("fresh_produce");
+    expect(__private.inferProductGroupsFromKeyword("mango")).toContain("fresh_produce");
+    expect(__private.inferProductGroupsFromKeyword("sesame seeds")).toContain("groceries");
     expect(__private.inferProductGroupsFromKeyword("pliers")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("hammr")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("glu")).toContain("household");
+    expect(__private.inferProductGroupsFromKeyword("scissors")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("lightbulb")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("cassette")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("casete")).toContain("household");
@@ -31,6 +35,7 @@ describe("keyword intent helpers", () => {
     expect(__private.inferProductGroupsFromKeyword("bier")).toContain("beverages");
     expect(__private.inferProductGroupsFromKeyword("panales")).toContain("personal_care");
     expect(__private.inferProductGroupsFromKeyword("hundefutter")).toContain("groceries");
+    expect(__private.inferProductGroupsFromKeyword("pharmacies")).toContain("pharmacy");
     expect(__private.inferProductGroupsFromKeyword("detergente")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("sarten")).toContain("household");
     expect(__private.inferProductGroupsFromKeyword("pflanzerde")).toContain("household");
@@ -136,6 +141,30 @@ describe("keyword intent helpers", () => {
         normalizedQuery: "jalapeno",
         productNameNormalized: "bananen 1kg",
         confidence: 0.93,
+        sourceType: "rules_generated",
+        validationStatus: "likely"
+      })
+    ).toBe(false);
+
+    expect(
+      __private.shouldKeepGroupFallbackRow({
+        normalizedQuery: "strawberry",
+        productNameNormalized: "aepfel 1kg",
+        productGroup: "fresh_produce",
+        osmCategory: "supermarket",
+        confidence: 0.84,
+        sourceType: "rules_generated",
+        validationStatus: "likely"
+      })
+    ).toBe(true);
+
+    expect(
+      __private.shouldKeepGroupFallbackRow({
+        normalizedQuery: "brush",
+        productNameNormalized: "tampons 32",
+        productGroup: "personal_care",
+        osmCategory: "beauty",
+        confidence: 0.92,
         sourceType: "rules_generated",
         validationStatus: "likely"
       })

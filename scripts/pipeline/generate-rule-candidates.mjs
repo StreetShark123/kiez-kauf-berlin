@@ -28,8 +28,6 @@ const CATEGORY_GROUP_RULES = [
   ["pharmacy", "pharmacy", 0.93, "pharmacies map to medicine products"],
   ["pharmacy", "personal_care", 0.82, "pharmacies stock personal care products"],
   ["personal-care", "personal_care", 0.86, "personal care category maps directly"],
-  ["beauty", "personal_care", 0.92, "beauty stores strongly map to personal care"],
-  ["beauty", "pharmacy", 0.58, "beauty stores can carry wellbeing and care products"],
   ["medical-supplies", "pharmacy", 0.93, "medical supply stores map to pharmacy essentials"],
   ["medical-supplies", "personal_care", 0.72, "medical supply stores may include care products"],
   ["household", "household", 0.88, "household category maps directly"],

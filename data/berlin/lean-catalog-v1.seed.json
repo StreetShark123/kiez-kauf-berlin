@@ -982,7 +982,8 @@
     "priority": 60,
     "coverage_tier": "core",
     "synonyms": [
-      "toothbrush"
+      "toothbrush",
+      "tooth brush"
     ],
     "facets": [
       "personal_care"

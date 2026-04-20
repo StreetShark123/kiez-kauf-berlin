@@ -34,6 +34,37 @@ const CHAIN_NAME_HINTS = [
   "fressnapf",
   "muller"
 ];
+const SERVICE_ONLY_OSM_CATEGORIES = new Set(["beauty", "cosmetics", "perfumery", "hairdresser"]);
+const SERVICE_ONLY_APP_CATEGORIES = new Set(["beauty"]);
+const SERVICE_BEAUTY_NAME_HINTS = [
+  "depil",
+  "laser",
+  "wax",
+  "kosmetikstudio",
+  "kosmetik",
+  "beauty salon",
+  "beautybar",
+  "nail",
+  "lashes",
+  "brow",
+  "friseur",
+  "hair",
+  "barber",
+  "spa",
+  "sun tower",
+  "sun studio",
+  "massage"
+];
+const GROUP_FALLBACK_OSM_ALLOWLIST: Record<string, string[]> = {
+  groceries: ["supermarket", "convenience", "deli", "kiosk", "department_store", "mall", "health_food"],
+  fresh_produce: ["supermarket", "greengrocer", "convenience", "health_food", "deli", "marketplace"],
+  beverages: ["supermarket", "convenience", "beverages", "kiosk", "department_store", "deli"],
+  household: ["doityourself", "hardware", "department_store", "supermarket", "mall", "convenience"],
+  pharmacy: ["pharmacy", "chemist", "medical_supply", "department_store", "mall"],
+  personal_care: ["pharmacy", "chemist", "medical_supply", "department_store", "mall"],
+  pet_care: ["pet", "supermarket", "department_store", "mall", "convenience"],
+  snacks: ["supermarket", "convenience", "kiosk", "beverages", "department_store", "deli"]
+};
 const STRATEGY_AUGMENT_THRESHOLD = 110;
 
 function isSchemaCompatibilityError(message: string | undefined): boolean {
@@ -273,6 +304,13 @@ const APP_CATEGORY_INTENT_MAP: Array<{ category: string; terms: string[] }> = [
       "art",
       "arts",
       "art supplies",
+      "watercolor",
+      "watercolour",
+      "watercolor paint",
+      "paint brush",
+      "paintbrush",
+      "brushes",
+      "sketchbook",
       "craft",
       "crafts",
       "stationery",
@@ -458,11 +496,21 @@ function isSpecificProductQuery(normalizedQuery: string): boolean {
 function shouldKeepGroupFallbackRow(args: {
   normalizedQuery: string;
   productNameNormalized: string;
+  productGroup?: string | null;
+  osmCategory?: string | null;
   confidence: number;
   sourceType: SearchResult["sourceType"] | null | undefined;
   validationStatus: SearchResult["validationStatus"] | null | undefined;
 }): boolean {
-  const { normalizedQuery, productNameNormalized, confidence, sourceType, validationStatus } = args;
+  const {
+    normalizedQuery,
+    productNameNormalized,
+    productGroup,
+    osmCategory,
+    confidence,
+    sourceType,
+    validationStatus
+  } = args;
 
   if (!isSpecificProductQuery(normalizedQuery)) {
     return true;
@@ -475,6 +523,17 @@ function shouldKeepGroupFallbackRow(args: {
     hasMeaningfulTokenMatch(productNameNormalized, normalizedQuery);
 
   if (hasStrongTextMatch) {
+    return true;
+  }
+
+  const normalizedGroup = normalizeQuery(String(productGroup ?? "")).replace(/\s+/g, "_");
+  const normalizedOsmCategory = normalizeQuery(String(osmCategory ?? ""));
+  const allowedStoreCategories = GROUP_FALLBACK_OSM_ALLOWLIST[normalizedGroup] ?? [];
+  const hasStoreGroupFit =
+    normalizedGroup.length > 0 &&
+    normalizedOsmCategory.length > 0 &&
+    allowedStoreCategories.includes(normalizedOsmCategory);
+  if (hasStoreGroupFit && confidence >= 0.82 && validationStatus !== "rejected") {
     return true;
   }
 
@@ -592,6 +651,37 @@ function sourceRank(sourceType: SearchResult["sourceType"] | null | undefined): 
   if (sourceType === "rules_generated") return 2;
   if (sourceType === "imported") return 1;
   return 0;
+}
+
+function isLikelyServiceOnlyBeautyStore(store: Store): boolean {
+  const osmCategory = String(store.osmCategory ?? "").trim().toLowerCase();
+  const appCategories = Array.isArray(store.appCategories)
+    ? store.appCategories.map((category) => normalizeQuery(category))
+    : [];
+  const matchesServiceOsmCategory = SERVICE_ONLY_OSM_CATEGORIES.has(osmCategory);
+  const matchesServiceAppCategory = appCategories.some((category) => SERVICE_ONLY_APP_CATEGORIES.has(category));
+
+  if (!matchesServiceOsmCategory && !matchesServiceAppCategory) {
+    return false;
+  }
+
+  const normalizedName = normalizeQuery(store.name ?? "");
+  if (!normalizedName && matchesServiceOsmCategory) {
+    return true;
+  }
+  if (!normalizedName) {
+    return false;
+  }
+
+  if (CHAIN_NAME_HINTS.some((hint) => normalizedName.includes(hint))) {
+    return false;
+  }
+
+  if (SERVICE_BEAUTY_NAME_HINTS.some((hint) => normalizedName.includes(hint))) {
+    return true;
+  }
+
+  return false;
 }
 
 function strategyRank(strategy: DatasetSearchStrategy): number {
@@ -1491,6 +1581,17 @@ export async function searchOffersDetailed(args: {
           return productName === normalized || productName.includes(normalized);
         });
   const plausibilityFiltered = filtered.filter((row) => {
+    const isServiceBeautyStore = isLikelyServiceOnlyBeautyStore(row.store);
+    if (
+      isSpecificProductQuery(normalized) &&
+      isServiceBeautyStore &&
+      row.validationStatus !== "validated" &&
+      row.sourceType !== "merchant_added" &&
+      row.sourceType !== "user_validated"
+    ) {
+      return false;
+    }
+
     const productName = normalizeQuery(row.product.normalizedName);
     const hasStrongTextMatch =
       productName === normalized ||
@@ -1502,6 +1603,8 @@ export async function searchOffersDetailed(args: {
       const keepByGroupGuard = shouldKeepGroupFallbackRow({
         normalizedQuery: normalized,
         productNameNormalized: productName,
+        productGroup: row.product.category,
+        osmCategory: row.store.osmCategory ?? null,
         confidence,
         sourceType: row.sourceType,
         validationStatus: row.validationStatus
