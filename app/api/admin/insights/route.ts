@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureAdminAccess } from "@/lib/admin-auth";
+import { adminInternalError } from "@/lib/admin-api-error";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 type SearchRow = {
@@ -380,7 +381,6 @@ export async function GET(request: Request) {
       rule_suggestions: suggestionRows.slice(0, 30)
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected admin insights error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }

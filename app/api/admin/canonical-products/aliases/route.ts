@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureAdminAccess } from "@/lib/admin-auth";
+import { adminInternalError } from "@/lib/admin-api-error";
 import { recordCurationEvent } from "@/lib/admin-curation";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
@@ -171,7 +172,6 @@ export async function POST(request: Request) {
       canonical_product: canonicalProduct
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected alias upsert error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureAdminAccess } from "@/lib/admin-auth";
+import { adminInternalError } from "@/lib/admin-api-error";
 import { recordCurationEvent } from "@/lib/admin-curation";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
@@ -360,8 +361,7 @@ export async function POST(
       merged
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected admin add product error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }
 
@@ -475,8 +475,7 @@ export async function PATCH(
       merged
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected admin product update error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }
 
@@ -581,7 +580,6 @@ export async function DELETE(
       merged
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected admin product remove error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureAdminAccess } from "@/lib/admin-auth";
+import { adminInternalError } from "@/lib/admin-api-error";
 import { recordCurationEvent } from "@/lib/admin-curation";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
@@ -272,8 +273,7 @@ export async function GET(
       }))
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected admin establishment detail error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }
 
@@ -416,7 +416,6 @@ export async function PATCH(
       establishment: data
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected admin establishment update error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }

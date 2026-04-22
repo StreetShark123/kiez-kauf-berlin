@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureAdminAccess } from "@/lib/admin-auth";
+import { adminInternalError } from "@/lib/admin-api-error";
 import { recordCurationEvent } from "@/lib/admin-curation";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
@@ -78,8 +79,7 @@ export async function GET(request: Request) {
       rows: (data ?? []) as SuggestionRow[]
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected suggestions fetch error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }
 
@@ -331,7 +331,6 @@ export async function POST(request: Request) {
       applied
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected curation suggestions error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }

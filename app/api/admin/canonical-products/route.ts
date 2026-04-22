@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureAdminAccess } from "@/lib/admin-auth";
+import { adminInternalError } from "@/lib/admin-api-error";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 function parseLimit(value: string | null) {
@@ -113,7 +114,6 @@ export async function GET(request: Request) {
       }))
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected canonical products admin error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }

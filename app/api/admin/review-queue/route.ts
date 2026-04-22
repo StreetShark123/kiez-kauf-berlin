@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureAdminAccess } from "@/lib/admin-auth";
+import { adminInternalError } from "@/lib/admin-api-error";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 type SearchRow = {
@@ -213,7 +214,6 @@ export async function GET(request: Request) {
       establishment_queue: queue
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected admin review queue error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }

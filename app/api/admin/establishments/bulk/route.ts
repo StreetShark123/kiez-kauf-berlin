@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ensureAdminAccess } from "@/lib/admin-auth";
+import { adminInternalError } from "@/lib/admin-api-error";
 import { getSupabaseAdminClient } from "@/lib/supabase-admin";
 
 type ActiveStatus = "active" | "inactive" | "temporarily_closed" | "unknown";
@@ -163,7 +164,6 @@ export async function POST(request: Request) {
       failed_ids: failedIds
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unexpected admin bulk update error.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return adminInternalError(error);
   }
 }
