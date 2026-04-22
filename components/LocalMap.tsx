@@ -375,6 +375,8 @@ export function LocalMap({
   const maplibreRef = useRef<typeof import("maplibre-gl") | null>(null);
   const userMarkerRef = useRef<MapLibreMarker | null>(null);
   const resultMarkersRef = useRef<Map<string, MapLibreMarker>>(new Map());
+  const onMarkerSelectRef = useRef<typeof onMarkerSelect>(onMarkerSelect);
+  const selectedOfferIdRef = useRef(selectedOfferId);
   const lastBoundsKeyRef = useRef<string>("");
   const activeRouteAnimationFrameRef = useRef<number | null>(null);
   const lastAnimatedRouteKeyRef = useRef<string>("");
@@ -392,6 +394,28 @@ export function LocalMap({
     () => sanitizeRouteGeometry(activeRouteGeometry),
     [activeRouteGeometry]
   );
+  const visibleRenderableResults = useMemo(() => {
+    const valid: RenderableMapResult[] = [];
+    const malformed: Array<{ index: number; item: unknown; maybeOfferId: unknown }> = [];
+
+    for (let index = 0; index < results.length; index += 1) {
+      const item = results[index];
+      const renderable = toRenderableMapResult(item);
+      if (renderable) {
+        valid.push(renderable);
+        continue;
+      }
+
+      const maybeOfferId =
+        (item as { offer?: { id?: unknown } } | null | undefined)?.offer?.id;
+      malformed.push({ index, item, maybeOfferId });
+    }
+
+    return {
+      valid: valid.slice(0, MAX_PIN_RESULTS),
+      malformed
+    };
+  }, [results]);
 
   function markUserMapInteraction() {
     lastUserInteractionAtRef.current = Date.now();
@@ -416,6 +440,14 @@ export function LocalMap({
   }
 
   useEffect(() => {
+    onMarkerSelectRef.current = onMarkerSelect;
+  }, [onMarkerSelect]);
+
+  useEffect(() => {
+    selectedOfferIdRef.current = selectedOfferId;
+  }, [selectedOfferId]);
+
+  useEffect(() => {
     if (!DEV_DEBUG || isValidCenterPoint(center) || loggedInvalidCenterRef.current) {
       return;
     }
@@ -423,6 +455,28 @@ export function LocalMap({
     loggedInvalidCenterRef.current = true;
     console.warn("[map-data-guard] Invalid map center received, using Berlin fallback", center);
   }, [center]);
+
+  useEffect(() => {
+    if (!DEV_DEBUG || visibleRenderableResults.malformed.length === 0) {
+      return;
+    }
+
+    for (const malformed of visibleRenderableResults.malformed) {
+      const malformedKey =
+        typeof malformed.maybeOfferId === "string"
+          ? `offer:${malformed.maybeOfferId}`
+          : `idx:${malformed.index}`;
+      if (loggedMalformedResultKeysRef.current.has(malformedKey)) {
+        continue;
+      }
+      loggedMalformedResultKeysRef.current.add(malformedKey);
+      console.warn("[map-data-guard] Dropping malformed map result before pin rendering", {
+        index: malformed.index,
+        malformedKey,
+        item: malformed.item
+      });
+    }
+  }, [visibleRenderableResults]);
 
   useEffect(() => {
     let mounted = true;
@@ -855,36 +909,8 @@ export function LocalMap({
     }
 
     try {
-      const validResults: RenderableMapResult[] = [];
-      for (let index = 0; index < results.length; index += 1) {
-        const item = results[index];
-        const renderable = toRenderableMapResult(item);
-        if (renderable) {
-          validResults.push(renderable);
-          continue;
-        }
-
-        if (DEV_DEBUG) {
-          const maybeOfferId =
-            (item as { offer?: { id?: unknown } } | null | undefined)?.offer?.id;
-          const malformedKey = typeof maybeOfferId === "string" ? `offer:${maybeOfferId}` : `idx:${index}`;
-          if (!loggedMalformedResultKeysRef.current.has(malformedKey)) {
-            loggedMalformedResultKeysRef.current.add(malformedKey);
-            console.warn("[map-data-guard] Dropping malformed map result before pin rendering", {
-              index,
-              malformedKey,
-              item
-            });
-          }
-        }
-      }
-
-      const visibleResults = validResults.slice(0, MAX_PIN_RESULTS);
+      const visibleResults = visibleRenderableResults.valid;
       const nextVisibleIds = new Set<string>();
-      const radiusGeoJSON = buildRadiusPolygon(
-        { lat: safeCenter.lat, lng: safeCenter.lng },
-        Math.max(100, radiusMeters)
-      );
 
       visibleResults.forEach((entry, index) => {
         const { item, lat, lng } = entry;
@@ -898,14 +924,20 @@ export function LocalMap({
             markerElement.classList.toggle("map-pin-top", index === 0);
             markerElement.classList.remove("map-pin-open", "map-pin-closed", "map-pin-unknown");
             markerElement.classList.add(`map-pin-${openingStatus}`);
-            markerElement.classList.toggle("map-pin-selected", selectedOfferId === markerId);
+            markerElement.classList.toggle(
+              "map-pin-selected",
+              selectedOfferIdRef.current === markerId
+            );
           } else {
             const markerElement = createPinElement("result", index, openingStatus);
-            markerElement.classList.toggle("map-pin-selected", selectedOfferId === markerId);
+            markerElement.classList.toggle(
+              "map-pin-selected",
+              selectedOfferIdRef.current === markerId
+            );
             markerElement.addEventListener("click", () => {
               triggerHaptic(7);
               markUserMapInteraction();
-              onMarkerSelect?.(item);
+              onMarkerSelectRef.current?.(item);
               map.easeTo({
                 center: [lng, lat],
                 duration: 220
@@ -937,63 +969,87 @@ export function LocalMap({
         marker.remove();
         resultMarkersRef.current.delete(markerId);
       }
-
-      const circleCoordinates = radiusGeoJSON.features[0]?.geometry.coordinates[0] ?? [];
-      const boundsFromCircle = circleCoordinates.reduce(
-        (acc, coord) => acc.extend(coord as [number, number]),
-        new maplibregl.LngLatBounds([safeCenter.lng, safeCenter.lat], [safeCenter.lng, safeCenter.lat])
-      );
-      const boundsWithResults = visibleResults.reduce(
-        (acc, entry) => acc.extend([entry.lng, entry.lat]),
-        boundsFromCircle
-      );
-      const bounds = safeRouteGeometry.reduce(
-        (acc, coord) => acc.extend(coord),
-        boundsWithResults
-      );
-
-      const boundsKey = [
-        safeCenter.lat.toFixed(5),
-        safeCenter.lng.toFixed(5),
-        String(Math.round(radiusMeters)),
-        ...safeRouteGeometry.map((coord) => `${coord[1].toFixed(5)}:${coord[0].toFixed(5)}`),
-        ...visibleResults.map(
-          (entry) =>
-            `${entry.item.offer.id}:${entry.lat.toFixed(5)}:${entry.lng.toFixed(5)}`
-        )
-      ].join("|");
-
-      const interactedRecently =
-        Date.now() - lastUserInteractionAtRef.current < USER_MAP_INTERACTION_AUTO_FIT_COOLDOWN_MS;
-      const routeIsFocused = Boolean(activeRouteFitKey) && safeRouteGeometry.length >= 2;
-      const shouldSkipAutoFit = routeIsFocused || (interactedRecently && safeRouteGeometry.length === 0);
-
-      if (boundsKey !== lastBoundsKeyRef.current && !shouldSkipAutoFit) {
-        map.fitBounds(bounds, {
-          padding: 56,
-          maxZoom: 14.5,
-          duration: 260
-        });
-        lastBoundsKeyRef.current = boundsKey;
-      }
     } catch (mapCycleError) {
       if (DEV_DEBUG) {
         console.error("[map-data-guard] Map render cycle failed; preserving map state", {
           mapCycleError,
-          resultsCount: results.length
+          resultsCount: visibleRenderableResults.valid.length
         });
       }
     }
+  }, [mapReady, visibleRenderableResults.valid]);
+
+  useEffect(() => {
+    if (!mapReady) {
+      return;
+    }
+
+    for (const [markerId, marker] of resultMarkersRef.current.entries()) {
+      marker
+        .getElement()
+        .classList.toggle("map-pin-selected", selectedOfferId === markerId);
+    }
+  }, [mapReady, selectedOfferId]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const maplibregl = maplibreRef.current;
+    if (!map || !maplibregl || !mapReady) {
+      return;
+    }
+
+    const visibleResults = visibleRenderableResults.valid;
+    const radiusGeoJSON = buildRadiusPolygon(
+      { lat: safeCenter.lat, lng: safeCenter.lng },
+      Math.max(100, radiusMeters)
+    );
+
+    const circleCoordinates = radiusGeoJSON.features[0]?.geometry.coordinates[0] ?? [];
+    const boundsFromCircle = circleCoordinates.reduce(
+      (acc, coord) => acc.extend(coord as [number, number]),
+      new maplibregl.LngLatBounds(
+        [safeCenter.lng, safeCenter.lat],
+        [safeCenter.lng, safeCenter.lat]
+      )
+    );
+    const boundsWithResults = visibleResults.reduce(
+      (acc, entry) => acc.extend([entry.lng, entry.lat]),
+      boundsFromCircle
+    );
+    const bounds = safeRouteGeometry.reduce((acc, coord) => acc.extend(coord), boundsWithResults);
+
+    const boundsKey = [
+      safeCenter.lat.toFixed(5),
+      safeCenter.lng.toFixed(5),
+      String(Math.round(radiusMeters)),
+      ...safeRouteGeometry.map((coord) => `${coord[1].toFixed(5)}:${coord[0].toFixed(5)}`),
+      ...visibleResults.map(
+        (entry) => `${entry.item.offer.id}:${entry.lat.toFixed(5)}:${entry.lng.toFixed(5)}`
+      )
+    ].join("|");
+
+    const interactedRecently =
+      Date.now() - lastUserInteractionAtRef.current < USER_MAP_INTERACTION_AUTO_FIT_COOLDOWN_MS;
+    const routeIsFocused = Boolean(activeRouteFitKey) && safeRouteGeometry.length >= 2;
+    const shouldSkipAutoFit =
+      routeIsFocused || (interactedRecently && safeRouteGeometry.length === 0);
+
+    if (boundsKey !== lastBoundsKeyRef.current && !shouldSkipAutoFit) {
+      map.fitBounds(bounds, {
+        padding: 56,
+        maxZoom: 14.5,
+        duration: 260
+      });
+      lastBoundsKeyRef.current = boundsKey;
+    }
   }, [
+    mapReady,
     safeCenter.lat,
     safeCenter.lng,
     radiusMeters,
-    results,
     safeRouteGeometry,
     activeRouteFitKey,
-    selectedOfferId,
-    mapReady,
-    onMarkerSelect
+    visibleRenderableResults.valid
   ]);
 
   useEffect(() => {

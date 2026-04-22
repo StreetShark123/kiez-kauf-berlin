@@ -562,6 +562,7 @@ export function SearchExperience({
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
   const lastHapticAtRef = useRef(0);
   const searchAbortRef = useRef<AbortController | null>(null);
+  const routeAbortRef = useRef<AbortController | null>(null);
   const searchRequestIdRef = useRef(0);
   const routeRequestIdRef = useRef(0);
   const loggedMalformedResultKeysRef = useRef<Set<string>>(new Set());
@@ -603,6 +604,8 @@ export function SearchExperience({
   const resetSearchForLocationChange = useCallback((nextLocationMessage: string) => {
     searchRequestIdRef.current += 1;
     searchAbortRef.current?.abort();
+    routeRequestIdRef.current += 1;
+    routeAbortRef.current?.abort();
     setIsLoading(false);
     setResults([]);
     setHasSearched(false);
@@ -871,20 +874,30 @@ export function SearchExperience({
   }, []);
 
   const savedStoreIdSet = useMemo(() => new Set(savedStoreIds), [savedStoreIds]);
+  const resultsWithOpeningInfo = useMemo(() => {
+    return results.map((result) => {
+      const openingInfo = evaluateOpeningInfo(result.store.openingHours);
+      return {
+        result,
+        openingInfo,
+        openingStatus: openingInfo.status
+      };
+    });
+  }, [results]);
   const statusFilteredCount = useMemo(() => {
-    return results.reduce((count, result) => {
-      if (openNowOnly && evaluateOpeningInfo(result.store.openingHours).status !== "open") {
+    return resultsWithOpeningInfo.reduce((count, entry) => {
+      if (openNowOnly && entry.openingStatus !== "open") {
         return count;
       }
-      if (savedOnly && !savedStoreIdSet.has(result.store.id)) {
+      if (savedOnly && !savedStoreIdSet.has(entry.result.store.id)) {
         return count;
       }
-      if (independentOnly && result.store.ownershipType !== "independent") {
+      if (independentOnly && entry.result.store.ownershipType !== "independent") {
         return count;
       }
       return count + 1;
     }, 0);
-  }, [independentOnly, openNowOnly, results, savedOnly, savedStoreIdSet]);
+  }, [independentOnly, openNowOnly, resultsWithOpeningInfo, savedOnly, savedStoreIdSet]);
   const statusFiltersHideAllResults = hasSearched && results.length > 0 && statusFilteredCount === 0;
 
   const resultSummary = useMemo(() => {
@@ -1047,17 +1060,7 @@ export function SearchExperience({
   ]);
 
   const prioritizedListResults = useMemo(() => {
-    return results
-      .map((result) => ({
-        result,
-        openingInfo: evaluateOpeningInfo(result.store.openingHours)
-      }))
-      .map((entry) => ({
-        ...entry,
-        openingStatus: entry.openingInfo.status,
-        ownershipType: entry.result.store.ownershipType ?? "unknown"
-      }))
-      .sort((a, b) => {
+    return [...resultsWithOpeningInfo].sort((a, b) => {
         const statusDelta = openingStatusSortRank(a.openingStatus) - openingStatusSortRank(b.openingStatus);
         if (statusDelta !== 0) {
           return statusDelta;
@@ -1070,7 +1073,7 @@ export function SearchExperience({
 
         return b.result.rank - a.result.rank;
       });
-  }, [results]);
+  }, [resultsWithOpeningInfo]);
 
   const filteredListResults = useMemo(() => {
     return prioritizedListResults.filter((entry) => {
@@ -1211,6 +1214,8 @@ export function SearchExperience({
     return () => {
       searchRequestIdRef.current += 1;
       searchAbortRef.current?.abort();
+      routeRequestIdRef.current += 1;
+      routeAbortRef.current?.abort();
       searchCache.clear();
       routeCache.clear();
     };
@@ -1466,6 +1471,8 @@ export function SearchExperience({
 
     const effectiveRadiusKm = clampRadiusKm(options?.overrideRadiusKm ?? radiusKm);
     searchAbortRef.current?.abort();
+    routeRequestIdRef.current += 1;
+    routeAbortRef.current?.abort();
     const requestId = searchRequestIdRef.current + 1;
     searchRequestIdRef.current = requestId;
     const abortController = new AbortController();
@@ -1760,6 +1767,8 @@ export function SearchExperience({
     scrollToMapSection(true);
 
     if (isActiveSameRoute) {
+      routeRequestIdRef.current += 1;
+      routeAbortRef.current?.abort();
       setActiveRoute(null);
       setRouteErrorMessage(null);
       trackEvent("route_clear_on_map", {
@@ -1774,6 +1783,9 @@ export function SearchExperience({
 
     routeRequestIdRef.current += 1;
     const requestId = routeRequestIdRef.current;
+    routeAbortRef.current?.abort();
+    const routeAbortController = new AbortController();
+    routeAbortRef.current = routeAbortController;
     setRouteLoadingKey(routeKey);
     setErrorMessage(null);
     setRouteErrorMessage(null);
@@ -1805,6 +1817,9 @@ export function SearchExperience({
           scrollToMapSection(true);
         });
         setRouteLoadingKey((current) => (current === routeKey ? null : current));
+        if (routeAbortRef.current === routeAbortController) {
+          routeAbortRef.current = null;
+        }
         return;
       }
 
@@ -1816,7 +1831,9 @@ export function SearchExperience({
         destinationLng: String(result.store.lng)
       });
 
-      const response = await fetch(`/api/route?${params.toString()}`);
+      const response = await fetch(`/api/route?${params.toString()}`, {
+        signal: routeAbortController.signal
+      });
       if (!response.ok) {
         throw new Error(`Route request failed with status ${response.status}`);
       }
@@ -1860,6 +1877,9 @@ export function SearchExperience({
       });
       pulse([8, 18, 8]);
     } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
       if (requestId !== routeRequestIdRef.current) {
         return;
       }
@@ -1876,8 +1896,23 @@ export function SearchExperience({
       if (requestId === routeRequestIdRef.current) {
         setRouteLoadingKey((current) => (current === routeKey ? null : current));
       }
+      if (routeAbortRef.current === routeAbortController) {
+        routeAbortRef.current = null;
+      }
     }
   }
+
+  const onMapMarkerSelect = useCallback((result: SearchResult) => {
+    setSelectedOfferId(result.offer.id);
+  }, []);
+
+  const onMapManualCenterChange = useCallback(
+    (nextCenter: { lat: number; lng: number }) => {
+      setCenter(nextCenter);
+      resetSearchForLocationChange(dictionary.manualPinHint);
+    },
+    [dictionary.manualPinHint, resetSearchForLocationChange]
+  );
 
   return (
     <section className="space-y-3 md:space-y-3.5">
@@ -2079,10 +2114,7 @@ export function SearchExperience({
             requestBrowserLocation();
           }}
           manualCenterEnabled={manualCenterEnabled}
-          onManualCenterChange={(nextCenter) => {
-            setCenter(nextCenter);
-            resetSearchForLocationChange(dictionary.manualPinHint);
-          }}
+          onManualCenterChange={onMapManualCenterChange}
           radiusMeters={Math.round(radiusKm * 1000)}
           activeRouteGeometry={activeRoute?.geometry ?? null}
           activeRouteFitKey={
@@ -2091,9 +2123,7 @@ export function SearchExperience({
               : null
           }
           selectedOfferId={selectedOfferId}
-          onMarkerSelect={(result) => {
-            setSelectedOfferId(result.offer.id);
-          }}
+          onMarkerSelect={onMapMarkerSelect}
           isLoading={isLoading}
           loadingLabel={dictionary.searchingLabel}
           cacheIndicatorLabel={showCachedResultBadge && !isLoading ? dictionary.cachedResultLabel : null}
