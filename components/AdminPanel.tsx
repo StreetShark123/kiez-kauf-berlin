@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Locale } from "@/lib/types";
 import { AdminCoverageMap } from "@/components/AdminCoverageMap";
 
-type AdminTab = "insights" | "review" | "catalog" | "businesses" | "districts";
+type AdminTab = "today" | "insights" | "review" | "catalog" | "businesses" | "districts";
 type ActiveStatus = "active" | "inactive" | "temporarily_closed" | "unknown";
 type BulkActiveStatus = "keep" | ActiveStatus;
 
@@ -266,6 +266,13 @@ type AdminCopy = {
   unlock: string;
   saveKey: string;
   tabs: Record<AdminTab, string>;
+  todayTitle: string;
+  todayHint: string;
+  quickActionsTitle: string;
+  loadDistrictMap: string;
+  loadingDistrictMap: string;
+  showMore: string;
+  showLess: string;
   loading: string;
   refresh: string;
   rebuildDataset: string;
@@ -360,12 +367,20 @@ const COPY: Record<"en" | "de", AdminCopy> = {
     unlock: "Unlock panel",
     saveKey: "Remember key in this browser",
     tabs: {
+      today: "Today",
       insights: "Insights",
       review: "Review queue",
       catalog: "Catalog",
       businesses: "Businesses",
       districts: "Districts"
     },
+    todayTitle: "Today",
+    todayHint: "Daily operations: unresolved demand first, then fast curation actions.",
+    quickActionsTitle: "Quick actions",
+    loadDistrictMap: "Load map points",
+    loadingDistrictMap: "Loading map...",
+    showMore: "Show more",
+    showLess: "Show less",
     loading: "Loading...",
     refresh: "Refresh",
     rebuildDataset: "Refresh search dataset",
@@ -456,12 +471,20 @@ const COPY: Record<"en" | "de", AdminCopy> = {
     unlock: "Panel entsperren",
     saveKey: "Key in diesem Browser merken",
     tabs: {
+      today: "Heute",
       insights: "Insights",
       review: "Prüfwarteschlange",
       catalog: "Katalog",
       businesses: "Läden",
       districts: "Bezirke"
     },
+    todayTitle: "Heute",
+    todayHint: "Tagesbetrieb: erst offene Nachfrage, dann schnelle Kuration.",
+    quickActionsTitle: "Schnellaktionen",
+    loadDistrictMap: "Kartenpunkte laden",
+    loadingDistrictMap: "Lade Karte...",
+    showMore: "Mehr zeigen",
+    showLess: "Weniger zeigen",
     loading: "Lädt...",
     refresh: "Aktualisieren",
     rebuildDataset: "Such-Dataset neu bauen",
@@ -595,7 +618,7 @@ function reviewFlagLabel(flag: ReviewQueuePayload["flag_totals"][number]["flag"]
 
 export function AdminPanel({ locale }: { locale: Locale }) {
   const copy = locale === "de" ? COPY.de : COPY.en;
-  const [tab, setTab] = useState<AdminTab>("insights");
+  const [tab, setTab] = useState<AdminTab>("today");
   const [adminKeyInput, setAdminKeyInput] = useState("");
   const [adminKey, setAdminKey] = useState("");
   const [rememberKey, setRememberKey] = useState(true);
@@ -611,6 +634,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
   const [isLoadingReviewQueue, setIsLoadingReviewQueue] = useState(false);
   const [districtOverview, setDistrictOverview] = useState<DistrictOverviewPayload | null>(null);
   const [districtMapPoints, setDistrictMapPoints] = useState<DistrictMapPointsPayload | null>(null);
+  const [hasLoadedDistrictMap, setHasLoadedDistrictMap] = useState(false);
   const [isLoadingDistrictOverview, setIsLoadingDistrictOverview] = useState(false);
   const [isLoadingDistrictMap, setIsLoadingDistrictMap] = useState(false);
   const [districtFilter, setDistrictFilter] = useState("");
@@ -661,6 +685,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
   const [isSearchingAliasCanonical, setIsSearchingAliasCanonical] = useState(false);
   const [isSavingAliasMapping, setIsSavingAliasMapping] = useState(false);
   const [isPreparingAlias, setIsPreparingAlias] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   const pageSize = 30;
 
@@ -805,6 +830,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
 
         const payload = (await apiFetch(`/api/admin/districts/map-points?${params.toString()}`)) as DistrictMapPointsPayload;
         setDistrictMapPoints(payload);
+        setHasLoadedDistrictMap(true);
         setAuthError(null);
       } catch (error) {
         setAuthError(error instanceof Error ? error.message : copy.unauthorized);
@@ -836,13 +862,7 @@ export function AdminPanel({ locale }: { locale: Locale }) {
     (async () => {
       setIsBootstrapping(true);
       try {
-        await Promise.all([
-          fetchInsightsAndCatalog(),
-          fetchReviewQueue(),
-          fetchBusinesses({ offset: 0 }),
-          fetchDistrictOverview(),
-          fetchDistrictMapPoints()
-        ]);
+        await Promise.all([fetchInsightsAndCatalog(), fetchReviewQueue()]);
       } catch (error) {
         if (active) {
           setAuthError(error instanceof Error ? error.message : copy.unauthorized);
@@ -860,11 +880,61 @@ export function AdminPanel({ locale }: { locale: Locale }) {
   }, [
     adminKey,
     copy.unauthorized,
-    fetchBusinesses,
-    fetchDistrictMapPoints,
-    fetchDistrictOverview,
     fetchInsightsAndCatalog,
     fetchReviewQueue
+  ]);
+
+  useEffect(() => {
+    if (!adminKey) return;
+    if (tab === "today" || tab === "insights" || tab === "catalog") {
+      if (!insights || !catalog) {
+        fetchInsightsAndCatalog().catch((error) => {
+          setSaveMessage(error instanceof Error ? error.message : "Unable to load insights.");
+        });
+      }
+      return;
+    }
+
+    if (tab === "review") {
+      if (!reviewQueue && !isLoadingReviewQueue) {
+        fetchReviewQueue().catch((error) => {
+          setSaveMessage(error instanceof Error ? error.message : "Unable to load review queue.");
+        });
+      }
+      return;
+    }
+
+    if (tab === "districts") {
+      if (!districtOverview && !isLoadingDistrictOverview) {
+        fetchDistrictOverview().catch((error) => {
+          setSaveMessage(error instanceof Error ? error.message : "Unable to load district overview.");
+        });
+      }
+      return;
+    }
+
+    if (tab === "businesses") {
+      if (!businessListResponse && !isLoadingBusinesses) {
+        fetchBusinesses({ offset: 0 }).catch((error) => {
+          setSaveMessage(error instanceof Error ? error.message : "Unable to load businesses.");
+        });
+      }
+    }
+  }, [
+    adminKey,
+    businessListResponse,
+    catalog,
+    districtOverview,
+    fetchBusinesses,
+    fetchDistrictOverview,
+    fetchInsightsAndCatalog,
+    fetchReviewQueue,
+    insights,
+    isLoadingBusinesses,
+    isLoadingDistrictOverview,
+    isLoadingReviewQueue,
+    reviewQueue,
+    tab
   ]);
 
   useEffect(() => {
@@ -1241,51 +1311,42 @@ export function AdminPanel({ locale }: { locale: Locale }) {
   };
 
   const onRefreshPanel = async () => {
-    await Promise.all([
-      fetchInsightsAndCatalog(),
-      fetchReviewQueue(),
-      fetchBusinesses({ preserveSelection: true }),
-      fetchDistrictOverview(),
-      fetchDistrictMapPoints()
-    ]);
+    if (!adminKey) return;
+    setIsRefreshing(true);
+    try {
+      if (tab === "today" || tab === "insights" || tab === "catalog") {
+        await fetchInsightsAndCatalog();
+        if (tab === "today") {
+          await fetchReviewQueue();
+        }
+        return;
+      }
+
+      if (tab === "review") {
+        await fetchReviewQueue();
+        return;
+      }
+
+      if (tab === "districts") {
+        await fetchDistrictOverview();
+        if (hasLoadedDistrictMap) {
+          await fetchDistrictMapPoints();
+        }
+        return;
+      }
+
+      if (tab === "businesses") {
+        await fetchBusinesses({ preserveSelection: true });
+        if (selectedBusinessId) {
+          await fetchDetail(selectedBusinessId);
+        }
+      }
+    } catch (error) {
+      setSaveMessage(error instanceof Error ? error.message : "Refresh failed.");
+    } finally {
+      setIsRefreshing(false);
+    }
   };
-
-  useEffect(() => {
-    if (!adminKey || tab !== "review" || reviewQueue || isLoadingReviewQueue) {
-      return;
-    }
-    fetchReviewQueue().catch((error) => {
-      setSaveMessage(error instanceof Error ? error.message : "Unable to load review queue.");
-    });
-  }, [adminKey, fetchReviewQueue, isLoadingReviewQueue, reviewQueue, tab]);
-
-  useEffect(() => {
-    if (!adminKey || tab !== "districts") {
-      return;
-    }
-
-    const needsOverview = !districtOverview && !isLoadingDistrictOverview;
-    const needsMap = !districtMapPoints && !isLoadingDistrictMap;
-    if (!needsOverview && !needsMap) {
-      return;
-    }
-
-    const tasks: Array<Promise<void>> = [];
-    if (needsOverview) tasks.push(fetchDistrictOverview());
-    if (needsMap) tasks.push(fetchDistrictMapPoints());
-    Promise.all(tasks).catch((error) => {
-      setSaveMessage(error instanceof Error ? error.message : "Unable to load district data.");
-    });
-  }, [
-    adminKey,
-    districtMapPoints,
-    districtOverview,
-    fetchDistrictMapPoints,
-    fetchDistrictOverview,
-    isLoadingDistrictMap,
-    isLoadingDistrictOverview,
-    tab
-  ]);
 
   const selectedIdSet = useMemo(() => new Set<number>(bulkSelectedIds), [bulkSelectedIds]);
 
@@ -1412,7 +1473,11 @@ export function AdminPanel({ locale }: { locale: Locale }) {
         setSaveMessage(`District refreshed (${cleanDistrict}).`);
       }
 
-      await Promise.all([fetchDistrictOverview(), fetchDistrictMapPoints({ district: cleanDistrict })]);
+      if (hasLoadedDistrictMap) {
+        await Promise.all([fetchDistrictOverview(), fetchDistrictMapPoints({ district: cleanDistrict })]);
+      } else {
+        await fetchDistrictOverview();
+      }
       setDistrictFilter(cleanDistrict);
     } catch (error) {
       setSaveMessage(error instanceof Error ? error.message : "District refresh failed.");
@@ -1439,6 +1504,15 @@ export function AdminPanel({ locale }: { locale: Locale }) {
       category: categoryFilter,
       activeOnly: activeOnlyFilter
     });
+  };
+
+  const toggleExpanded = (key: string) => {
+    setExpandedSections((current) => ({ ...current, [key]: !current[key] }));
+  };
+
+  const listLimit = (key: string, compactLimit: number, total: number) => {
+    if (expandedSections[key]) return total;
+    return compactLimit;
   };
 
   return (
@@ -1503,6 +1577,176 @@ export function AdminPanel({ locale }: { locale: Locale }) {
 
           {isBootstrapping && <p className="text-sm text-[var(--ink-soft)]">{copy.loading}</p>}
           {authError && <p className="text-sm text-[var(--danger-ink)]">{authError}</p>}
+
+          {!isBootstrapping && tab === "today" && (
+            <div className="space-y-4">
+              <div className="surface-card p-3">
+                <p className="note-subtitle">{copy.todayTitle}</p>
+                <p className="text-sm text-[var(--ink-soft)]">{copy.todayHint}</p>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="surface-card p-3">
+                  <p className="note-label">Searches (30d)</p>
+                  <p className="text-xl font-semibold">{insights?.totals.searches ?? 0}</p>
+                </div>
+                <div className="surface-card p-3">
+                  <p className="note-label">Unresolved terms</p>
+                  <p className="text-xl font-semibold">{reviewQueue?.queue_totals.unresolved_terms ?? 0}</p>
+                </div>
+                <div className="surface-card p-3">
+                  <p className="note-label">Flagged businesses</p>
+                  <p className="text-xl font-semibold">{reviewQueue?.queue_totals.businesses_flagged ?? 0}</p>
+                </div>
+                <div className="surface-card p-3">
+                  <p className="note-label">Unresolved rate</p>
+                  <p className="text-xl font-semibold">
+                    {insights ? `${Math.round(insights.totals.unresolved_rate * 100)}%` : "0%"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="surface-card p-3">
+                <p className="note-subtitle mb-2">{copy.quickActionsTitle}</p>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="btn-ghost text-xs"
+                    onClick={() => {
+                      setTab("review");
+                    }}
+                  >
+                    {copy.reviewQueue}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-ghost text-xs"
+                    onClick={() => {
+                      setTab("businesses");
+                    }}
+                  >
+                    {copy.tabs.businesses}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-ghost text-xs"
+                    onClick={() => {
+                      setTab("districts");
+                    }}
+                  >
+                    {copy.tabs.districts}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-ghost text-xs"
+                    onClick={() => {
+                      void onGenerateRuleSuggestions();
+                    }}
+                    disabled={isGeneratingRuleSuggestions}
+                  >
+                    {isGeneratingRuleSuggestions ? copy.runningRuleSuggestion : copy.runRuleSuggestion}
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid gap-4 xl:grid-cols-2">
+                <div className="surface-card p-3">
+                  <p className="note-subtitle mb-2">{copy.unresolvedTermsReview}</p>
+                  {isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.loading}</p>}
+                  {reviewQueue?.unresolved_terms?.length ? (
+                    <>
+                      <ul className="space-y-2">
+                        {reviewQueue.unresolved_terms
+                          .slice(0, listLimit("today:unresolved", 8, reviewQueue.unresolved_terms.length))
+                          .map((term) => (
+                            <li key={term.term} className="rounded-md border border-[var(--line)] p-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-medium">{term.term}</span>
+                                <span className="mono text-xs text-[var(--ink-soft)]">{term.count}</span>
+                              </div>
+                              <div className="mt-2 flex flex-wrap items-center gap-2">
+                                <button
+                                  type="button"
+                                  className="btn-ghost text-xs"
+                                  onClick={() => onUseTermForBusinessSearch(term.term)}
+                                >
+                                  {copy.useForSearch}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-ghost text-xs"
+                                  onClick={() => {
+                                    void onPrepareAliasFix(term.term);
+                                  }}
+                                  disabled={isPreparingAlias}
+                                >
+                                  {isPreparingAlias ? copy.preparingAlias : copy.prepareAliasFix}
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                      </ul>
+                      {reviewQueue.unresolved_terms.length > 8 && (
+                        <button
+                          type="button"
+                          className="btn-ghost mt-2 text-xs"
+                          onClick={() => toggleExpanded("today:unresolved")}
+                        >
+                          {expandedSections["today:unresolved"] ? copy.showLess : copy.showMore}
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    !isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
+                  )}
+                </div>
+
+                <div className="surface-card p-3">
+                  <p className="note-subtitle mb-2">{copy.flaggedBusinesses}</p>
+                  {isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.loading}</p>}
+                  {reviewQueue?.establishment_queue?.length ? (
+                    <>
+                      <ul className="space-y-2">
+                        {reviewQueue.establishment_queue
+                          .slice(0, listLimit("today:flags", 8, reviewQueue.establishment_queue.length))
+                          .map((item) => (
+                            <li key={item.id} className="rounded-md border border-[var(--line)] p-2">
+                              <p className="text-sm font-semibold">{item.name}</p>
+                              <p className="text-xs text-[var(--ink-soft)]">
+                                {item.district} · {item.product_count} products
+                              </p>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                <button type="button" className="btn-ghost text-xs" onClick={() => onOpenReviewBusiness(item.id)}>
+                                  {copy.openInEditor}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-ghost text-xs"
+                                  onClick={() => onQuickStatusUpdate(item.id, "active")}
+                                >
+                                  {copy.markActive}
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                      </ul>
+                      {reviewQueue.establishment_queue.length > 8 && (
+                        <button
+                          type="button"
+                          className="btn-ghost mt-2 text-xs"
+                          onClick={() => toggleExpanded("today:flags")}
+                        >
+                          {expandedSections["today:flags"] ? copy.showLess : copy.showMore}
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    !isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {!isBootstrapping && tab === "insights" && (
             <div className="space-y-4">
@@ -1589,16 +1833,29 @@ export function AdminPanel({ locale }: { locale: Locale }) {
                 <div className="surface-card p-3 xl:col-span-2">
                   <p className="note-subtitle mb-2">{copy.topSearches}</p>
                   {insights?.top_terms?.length ? (
-                    <ul className="space-y-1 text-sm">
-                      {insights.top_terms.slice(0, 15).map((item) => (
-                        <li key={item.term} className="flex items-center justify-between gap-2">
-                          <span>{item.term}</span>
-                          <span className="mono text-[var(--ink-soft)]">
-                            {item.total} · no result {item.unresolved}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="space-y-1 text-sm">
+                        {insights.top_terms
+                          .slice(0, listLimit("insights:top-terms", 15, insights.top_terms.length))
+                          .map((item) => (
+                            <li key={item.term} className="flex items-center justify-between gap-2">
+                              <span>{item.term}</span>
+                              <span className="mono text-[var(--ink-soft)]">
+                                {item.total} · no result {item.unresolved}
+                              </span>
+                            </li>
+                          ))}
+                      </ul>
+                      {insights.top_terms.length > 15 && (
+                        <button
+                          type="button"
+                          className="btn-ghost mt-2 text-xs"
+                          onClick={() => toggleExpanded("insights:top-terms")}
+                        >
+                          {expandedSections["insights:top-terms"] ? copy.showLess : copy.showMore}
+                        </button>
+                      )}
+                    </>
                   ) : (
                     <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
                   )}
@@ -1641,31 +1898,44 @@ export function AdminPanel({ locale }: { locale: Locale }) {
                 <div className="surface-card p-3">
                   <p className="note-subtitle mb-2">{copy.suspiciousExamples}</p>
                   {insights?.suspicious_examples?.length ? (
-                    <ul className="space-y-2 text-sm">
-                      {insights.suspicious_examples.slice(0, 14).map((row) => (
-                        <li
-                          key={`${row.establishment_id}-${row.product_group}-${row.confidence}`}
-                          className="flex flex-wrap items-center justify-between gap-2"
+                    <>
+                      <ul className="space-y-2 text-sm">
+                        {insights.suspicious_examples
+                          .slice(0, listLimit("insights:suspicious", 14, insights.suspicious_examples.length))
+                          .map((row) => (
+                            <li
+                              key={`${row.establishment_id}-${row.product_group}-${row.confidence}`}
+                              className="flex flex-wrap items-center justify-between gap-2"
+                            >
+                              <div className="min-w-0">
+                                <p className="font-medium">{row.establishment_name}</p>
+                                <p className="text-[var(--ink-soft)]">
+                                  {row.product_group} · {Math.round(row.confidence * 100)}% · {row.district}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                className="btn-ghost text-xs"
+                                onClick={() => {
+                                  void onPrepareSuspiciousExampleFix(row);
+                                }}
+                                disabled={isPreparingAlias}
+                              >
+                                {isPreparingAlias ? copy.preparingAlias : copy.prepareSuspiciousFix}
+                              </button>
+                            </li>
+                          ))}
+                      </ul>
+                      {insights.suspicious_examples.length > 14 && (
+                        <button
+                          type="button"
+                          className="btn-ghost mt-2 text-xs"
+                          onClick={() => toggleExpanded("insights:suspicious")}
                         >
-                          <div className="min-w-0">
-                            <p className="font-medium">{row.establishment_name}</p>
-                            <p className="text-[var(--ink-soft)]">
-                              {row.product_group} · {Math.round(row.confidence * 100)}% · {row.district}
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            className="btn-ghost text-xs"
-                            onClick={() => {
-                              void onPrepareSuspiciousExampleFix(row);
-                            }}
-                            disabled={isPreparingAlias}
-                          >
-                            {isPreparingAlias ? copy.preparingAlias : copy.prepareSuspiciousFix}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                          {expandedSections["insights:suspicious"] ? copy.showLess : copy.showMore}
+                        </button>
+                      )}
+                    </>
                   ) : (
                     <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
                   )}
@@ -1675,16 +1945,29 @@ export function AdminPanel({ locale }: { locale: Locale }) {
               <div className="surface-card p-3">
                 <p className="note-subtitle mb-2">{copy.unresolvedSearches}</p>
                 {insights?.unresolved_recent?.length ? (
-                  <ul className="space-y-2 text-sm">
-                    {insights.unresolved_recent.slice(0, 20).map((row) => (
-                      <li key={`${row.search_term}-${row.timestamp}`} className="flex flex-wrap items-center justify-between gap-2">
-                        <span className="font-medium">{row.search_term}</span>
-                        <span className="text-[var(--ink-soft)]">
-                          {row.district ?? "Berlin"} · {row.radius_km ?? "?"}km · {formatDate(row.timestamp)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <>
+                    <ul className="space-y-2 text-sm">
+                      {insights.unresolved_recent
+                        .slice(0, listLimit("insights:unresolved-recent", 20, insights.unresolved_recent.length))
+                        .map((row) => (
+                          <li key={`${row.search_term}-${row.timestamp}`} className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="font-medium">{row.search_term}</span>
+                            <span className="text-[var(--ink-soft)]">
+                              {row.district ?? "Berlin"} · {row.radius_km ?? "?"}km · {formatDate(row.timestamp)}
+                            </span>
+                          </li>
+                        ))}
+                    </ul>
+                    {insights.unresolved_recent.length > 20 && (
+                      <button
+                        type="button"
+                        className="btn-ghost mt-2 text-xs"
+                        onClick={() => toggleExpanded("insights:unresolved-recent")}
+                      >
+                        {expandedSections["insights:unresolved-recent"] ? copy.showLess : copy.showMore}
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
                 )}
@@ -1844,36 +2127,49 @@ export function AdminPanel({ locale }: { locale: Locale }) {
                   <p className="note-subtitle mb-2">{copy.unresolvedTermsReview}</p>
                   {isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.loading}</p>}
                   {reviewQueue?.unresolved_terms?.length ? (
-                    <ul className="space-y-2">
-                      {reviewQueue.unresolved_terms.slice(0, 25).map((term) => (
-                        <li key={term.term} className="rounded-md border border-[var(--line)] p-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-medium">{term.term}</span>
-                            <span className="mono text-xs text-[var(--ink-soft)]">{term.count}</span>
-                          </div>
-                          <div className="mt-2 flex flex-wrap items-center gap-2">
-                            <span className="text-xs text-[var(--ink-soft)]">{formatDate(term.last_seen_at)}</span>
-                            <button
-                              type="button"
-                              className="btn-ghost text-xs"
-                              onClick={() => onUseTermForBusinessSearch(term.term)}
-                            >
-                              {copy.useForSearch}
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-ghost text-xs"
-                              onClick={() => {
-                                void onPrepareAliasFix(term.term);
-                              }}
-                              disabled={isPreparingAlias}
-                            >
-                              {isPreparingAlias ? copy.preparingAlias : copy.prepareAliasFix}
-                            </button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="space-y-2">
+                        {reviewQueue.unresolved_terms
+                          .slice(0, listLimit("review:unresolved", 25, reviewQueue.unresolved_terms.length))
+                          .map((term) => (
+                            <li key={term.term} className="rounded-md border border-[var(--line)] p-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-medium">{term.term}</span>
+                                <span className="mono text-xs text-[var(--ink-soft)]">{term.count}</span>
+                              </div>
+                              <div className="mt-2 flex flex-wrap items-center gap-2">
+                                <span className="text-xs text-[var(--ink-soft)]">{formatDate(term.last_seen_at)}</span>
+                                <button
+                                  type="button"
+                                  className="btn-ghost text-xs"
+                                  onClick={() => onUseTermForBusinessSearch(term.term)}
+                                >
+                                  {copy.useForSearch}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-ghost text-xs"
+                                  onClick={() => {
+                                    void onPrepareAliasFix(term.term);
+                                  }}
+                                  disabled={isPreparingAlias}
+                                >
+                                  {isPreparingAlias ? copy.preparingAlias : copy.prepareAliasFix}
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                      </ul>
+                      {reviewQueue.unresolved_terms.length > 25 && (
+                        <button
+                          type="button"
+                          className="btn-ghost mt-2 text-xs"
+                          onClick={() => toggleExpanded("review:unresolved")}
+                        >
+                          {expandedSections["review:unresolved"] ? copy.showLess : copy.showMore}
+                        </button>
+                      )}
+                    </>
                   ) : (
                     !isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
                   )}
@@ -1883,47 +2179,60 @@ export function AdminPanel({ locale }: { locale: Locale }) {
                   <p className="note-subtitle mb-2">{copy.flaggedBusinesses}</p>
                   {isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.loading}</p>}
                   {reviewQueue?.establishment_queue?.length ? (
-                    <ul className="space-y-2">
-                      {reviewQueue.establishment_queue.slice(0, 28).map((item) => (
-                        <li key={item.id} className="rounded-md border border-[var(--line)] p-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <p className="text-sm font-semibold">{item.name}</p>
-                              <p className="text-xs text-[var(--ink-soft)]">
-                                {item.district} · {item.product_count} products · {item.validated_product_count} validated
-                              </p>
-                            </div>
-                            <span className="mono text-xs text-[var(--ink-soft)]">#{item.id}</span>
-                          </div>
-                          <div className="mt-2 flex flex-wrap gap-1">
-                            {item.flags.map((flag) => (
-                              <span key={`${item.id}-${flag}`} className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px]">
-                                {reviewFlagLabel(flag)}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            <button type="button" className="btn-ghost text-xs" onClick={() => onOpenReviewBusiness(item.id)}>
-                              {copy.openInEditor}
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-ghost text-xs"
-                              onClick={() => onQuickStatusUpdate(item.id, "active")}
-                            >
-                              {copy.markActive}
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-ghost text-xs"
-                              onClick={() => onQuickStatusUpdate(item.id, "temporarily_closed")}
-                            >
-                              {copy.markTempClosed}
-                            </button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="space-y-2">
+                        {reviewQueue.establishment_queue
+                          .slice(0, listLimit("review:flags", 28, reviewQueue.establishment_queue.length))
+                          .map((item) => (
+                            <li key={item.id} className="rounded-md border border-[var(--line)] p-2">
+                              <div className="flex items-start justify-between gap-2">
+                                <div>
+                                  <p className="text-sm font-semibold">{item.name}</p>
+                                  <p className="text-xs text-[var(--ink-soft)]">
+                                    {item.district} · {item.product_count} products · {item.validated_product_count} validated
+                                  </p>
+                                </div>
+                                <span className="mono text-xs text-[var(--ink-soft)]">#{item.id}</span>
+                              </div>
+                              <div className="mt-2 flex flex-wrap gap-1">
+                                {item.flags.map((flag) => (
+                                  <span key={`${item.id}-${flag}`} className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px]">
+                                    {reviewFlagLabel(flag)}
+                                  </span>
+                                ))}
+                              </div>
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                <button type="button" className="btn-ghost text-xs" onClick={() => onOpenReviewBusiness(item.id)}>
+                                  {copy.openInEditor}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-ghost text-xs"
+                                  onClick={() => onQuickStatusUpdate(item.id, "active")}
+                                >
+                                  {copy.markActive}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-ghost text-xs"
+                                  onClick={() => onQuickStatusUpdate(item.id, "temporarily_closed")}
+                                >
+                                  {copy.markTempClosed}
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                      </ul>
+                      {reviewQueue.establishment_queue.length > 28 && (
+                        <button
+                          type="button"
+                          className="btn-ghost mt-2 text-xs"
+                          onClick={() => toggleExpanded("review:flags")}
+                        >
+                          {expandedSections["review:flags"] ? copy.showLess : copy.showMore}
+                        </button>
+                      )}
+                    </>
                   ) : (
                     !isLoadingReviewQueue && <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
                   )}
@@ -1961,14 +2270,27 @@ export function AdminPanel({ locale }: { locale: Locale }) {
                 <div className="surface-card p-3">
                   <p className="note-subtitle mb-2">{copy.categories}</p>
                   {catalog?.categories?.length ? (
-                    <ul className="space-y-1 text-sm">
-                      {catalog.categories.slice(0, 80).map((item) => (
-                        <li key={item.slug} className="flex items-center justify-between gap-2">
-                          <span className="truncate">{item.slug}</span>
-                          <span className="mono text-[var(--ink-soft)]">{item.establishment_count}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="space-y-1 text-sm">
+                        {catalog.categories
+                          .slice(0, listLimit("catalog:categories", 80, catalog.categories.length))
+                          .map((item) => (
+                            <li key={item.slug} className="flex items-center justify-between gap-2">
+                              <span className="truncate">{item.slug}</span>
+                              <span className="mono text-[var(--ink-soft)]">{item.establishment_count}</span>
+                            </li>
+                          ))}
+                      </ul>
+                      {catalog.categories.length > 80 && (
+                        <button
+                          type="button"
+                          className="btn-ghost mt-2 text-xs"
+                          onClick={() => toggleExpanded("catalog:categories")}
+                        >
+                          {expandedSections["catalog:categories"] ? copy.showLess : copy.showMore}
+                        </button>
+                      )}
+                    </>
                   ) : (
                     <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
                   )}
@@ -1977,19 +2299,32 @@ export function AdminPanel({ locale }: { locale: Locale }) {
                 <div className="surface-card p-3">
                   <p className="note-subtitle mb-2">{copy.productGroups}</p>
                   {catalog?.products_by_group?.length ? (
-                    <ul className="space-y-2 text-sm">
-                      {catalog.products_by_group.slice(0, 60).map((group) => (
-                        <li key={group.group} className="rounded-md border border-[var(--line)] p-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-medium">{group.group}</span>
-                            <span className="mono text-[var(--ink-soft)]">{group.count}</span>
-                          </div>
-                          {group.sample.length > 0 && (
-                            <p className="mt-1 text-xs text-[var(--ink-soft)]">{group.sample.join(", ")}</p>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
+                    <>
+                      <ul className="space-y-2 text-sm">
+                        {catalog.products_by_group
+                          .slice(0, listLimit("catalog:groups", 60, catalog.products_by_group.length))
+                          .map((group) => (
+                            <li key={group.group} className="rounded-md border border-[var(--line)] p-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-medium">{group.group}</span>
+                                <span className="mono text-[var(--ink-soft)]">{group.count}</span>
+                              </div>
+                              {group.sample.length > 0 && (
+                                <p className="mt-1 text-xs text-[var(--ink-soft)]">{group.sample.join(", ")}</p>
+                              )}
+                            </li>
+                          ))}
+                      </ul>
+                      {catalog.products_by_group.length > 60 && (
+                        <button
+                          type="button"
+                          className="btn-ghost mt-2 text-xs"
+                          onClick={() => toggleExpanded("catalog:groups")}
+                        >
+                          {expandedSections["catalog:groups"] ? copy.showLess : copy.showMore}
+                        </button>
+                      )}
+                    </>
                   ) : (
                     <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
                   )}
@@ -1999,38 +2334,51 @@ export function AdminPanel({ locale }: { locale: Locale }) {
               <div className="surface-card p-3">
                 <p className="note-subtitle mb-2">Family connections (core → aliases/facets/use cases)</p>
                 {catalog?.product_families?.length ? (
-                  <ul className="space-y-2 text-sm">
-                    {catalog.product_families.slice(0, 120).map((family) => (
-                      <li key={family.id} className="rounded-md border border-[var(--line)] p-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-semibold">{family.display_name_en}</span>
-                          <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px]">{family.group}</span>
-                          <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px]">{family.coverage_tier}</span>
-                          <span className="mono text-xs text-[var(--ink-soft)]">
-                            p{family.priority} · stores {family.store_count}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-xs text-[var(--ink-soft)]">
-                          family_slug: {family.family_slug} · id: {family.id}
-                        </p>
-                        {family.aliases_sample.length > 0 && (
-                          <p className="mt-1 text-xs text-[var(--ink-soft)]">
-                            aliases ({family.alias_count}): {family.aliases_sample.join(", ")}
-                          </p>
-                        )}
-                        {family.facets_sample.length > 0 && (
-                          <p className="mt-1 text-xs text-[var(--ink-soft)]">
-                            facets ({family.facet_count}): {family.facets_sample.join(", ")}
-                          </p>
-                        )}
-                        {family.use_cases_sample.length > 0 && (
-                          <p className="mt-1 text-xs text-[var(--ink-soft)]">
-                            use cases ({family.use_case_count}): {family.use_cases_sample.join(", ")}
-                          </p>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                  <>
+                    <ul className="space-y-2 text-sm">
+                      {catalog.product_families
+                        .slice(0, listLimit("catalog:families", 120, catalog.product_families.length))
+                        .map((family) => (
+                          <li key={family.id} className="rounded-md border border-[var(--line)] p-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="font-semibold">{family.display_name_en}</span>
+                              <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px]">{family.group}</span>
+                              <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px]">{family.coverage_tier}</span>
+                              <span className="mono text-xs text-[var(--ink-soft)]">
+                                p{family.priority} · stores {family.store_count}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs text-[var(--ink-soft)]">
+                              family_slug: {family.family_slug} · id: {family.id}
+                            </p>
+                            {family.aliases_sample.length > 0 && (
+                              <p className="mt-1 text-xs text-[var(--ink-soft)]">
+                                aliases ({family.alias_count}): {family.aliases_sample.join(", ")}
+                              </p>
+                            )}
+                            {family.facets_sample.length > 0 && (
+                              <p className="mt-1 text-xs text-[var(--ink-soft)]">
+                                facets ({family.facet_count}): {family.facets_sample.join(", ")}
+                              </p>
+                            )}
+                            {family.use_cases_sample.length > 0 && (
+                              <p className="mt-1 text-xs text-[var(--ink-soft)]">
+                                use cases ({family.use_case_count}): {family.use_cases_sample.join(", ")}
+                              </p>
+                            )}
+                          </li>
+                        ))}
+                    </ul>
+                    {catalog.product_families.length > 120 && (
+                      <button
+                        type="button"
+                        className="btn-ghost mt-2 text-xs"
+                        onClick={() => toggleExpanded("catalog:families")}
+                      >
+                        {expandedSections["catalog:families"] ? copy.showLess : copy.showMore}
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <p className="text-sm text-[var(--ink-soft)]">{copy.noData}</p>
                 )}
@@ -2115,13 +2463,21 @@ export function AdminPanel({ locale }: { locale: Locale }) {
                     onClick={onApplyDistrictMapFilters}
                     disabled={isLoadingDistrictMap}
                   >
-                    {isLoadingDistrictMap ? copy.loading : copy.refresh}
+                    {isLoadingDistrictMap
+                      ? copy.loadingDistrictMap
+                      : hasLoadedDistrictMap
+                        ? copy.refresh
+                        : copy.loadDistrictMap}
                   </button>
                 </div>
                 <p className="text-xs text-[var(--ink-soft)]">
-                  {districtMapPoints?.total ?? 0} points on map · filter by district/category to inspect data quality.
+                  {hasLoadedDistrictMap
+                    ? `${districtMapPoints?.total ?? 0} points on map · filter by district/category to inspect data quality.`
+                    : "Map points are loaded on demand to keep admin fast."}
                 </p>
-                <AdminCoverageMap points={districtMapPoints?.points ?? []} selectedDistrict={districtFilter} />
+                {hasLoadedDistrictMap ? (
+                  <AdminCoverageMap points={districtMapPoints?.points ?? []} selectedDistrict={districtFilter} />
+                ) : null}
               </div>
 
               <div className="surface-card p-3">

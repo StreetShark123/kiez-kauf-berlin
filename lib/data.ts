@@ -352,6 +352,14 @@ type SupabaseServiceSearchRow = {
         display_name_es: string | null;
         group_key: string | null;
       }
+    | Array<{
+        id: number;
+        slug: string;
+        display_name_en: string | null;
+        display_name_de: string | null;
+        display_name_es: string | null;
+        group_key: string | null;
+      }>
     | null;
   establishments:
     | {
@@ -367,6 +375,19 @@ type SupabaseServiceSearchRow = {
         osm_category: string | null;
         app_categories: string[] | null;
       }
+    | Array<{
+        id: number;
+        name: string | null;
+        address: string | null;
+        district: string | null;
+        lat: number | null;
+        lon: number | null;
+        opening_hours: string | null;
+        website: string | null;
+        phone: string | null;
+        osm_category: string | null;
+        app_categories: string[] | null;
+      }>
     | null;
 };
 
@@ -1446,8 +1467,10 @@ async function searchServiceFallbackResults(args: {
   let malformedRows = 0;
 
   for (const row of rows) {
-    const store = row.establishments;
-    const service = row.canonical_services;
+    const store = Array.isArray(row.establishments) ? row.establishments[0] : row.establishments;
+    const service = Array.isArray(row.canonical_services)
+      ? row.canonical_services[0]
+      : row.canonical_services;
     if (!store || !service || !hasValidStoreCoordinates({ lat: store.lat, lng: store.lon })) {
       malformedRows += 1;
       if (malformedRows <= 5) {
@@ -1466,7 +1489,13 @@ async function searchServiceFallbackResults(args: {
       continue;
     }
 
-    const distanceMeters = haversineMeters(args.lat, args.lng, store.lat, store.lon);
+    const storeLat = Number(store.lat);
+    const storeLon = Number(store.lon);
+    if (!Number.isFinite(storeLat) || !Number.isFinite(storeLon)) {
+      continue;
+    }
+
+    const distanceMeters = haversineMeters(args.lat, args.lng, storeLat, storeLon);
     if (distanceMeters > args.radiusMeters) {
       continue;
     }
@@ -1521,8 +1550,8 @@ async function searchServiceFallbackResults(args: {
         address: String(store.address ?? ""),
         district: String(store.district ?? "Berlin"),
         openingHours: String(store.opening_hours ?? ""),
-        lat: store.lat,
-        lng: store.lon,
+        lat: storeLat,
+        lng: storeLon,
         website: store.website ?? row.source_url ?? null,
         phone: store.phone ?? null,
         ownershipType: inferOwnershipTypeFromStoreName(store.name),
@@ -1628,7 +1657,13 @@ async function searchCategoryIntentStoreFallback(args: {
       continue;
     }
 
-    const distanceMeters = haversineMeters(args.lat, args.lng, row.lat, row.lon);
+    const rowLat = Number(row.lat);
+    const rowLon = Number(row.lon);
+    if (!Number.isFinite(rowLat) || !Number.isFinite(rowLon)) {
+      continue;
+    }
+
+    const distanceMeters = haversineMeters(args.lat, args.lng, rowLat, rowLon);
     if (distanceMeters > args.radiusMeters) {
       continue;
     }
@@ -1659,8 +1694,8 @@ async function searchCategoryIntentStoreFallback(args: {
         address: String(row.address ?? ""),
         district: String(row.district ?? "Berlin"),
         openingHours: String(row.opening_hours ?? ""),
-        lat: row.lat,
-        lng: row.lon,
+        lat: rowLat,
+        lng: rowLon,
         website: row.website ?? null,
         phone: row.phone ?? null,
         ownershipType: inferOwnershipTypeFromStoreName(row.name),
@@ -1765,7 +1800,7 @@ function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng:
         distanceMeters -
         freshnessHours * 2;
 
-      return {
+      const rankedResult: SearchResult = {
         offer: row.offer,
         product: row.product,
         store: row.store,
@@ -1780,6 +1815,8 @@ function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng:
         resultKind: "product",
         availabilityStatus: null
       };
+
+      return rankedResult;
     })
     .filter((row) => row.distanceMeters <= args.radius)
     .sort((a, b) => b.rank - a.rank);
