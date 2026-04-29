@@ -24,6 +24,8 @@
     "merge:service-candidates": "node scripts/pipeline/merge-service-candidates.mjs",
     "generate:curation-rule-suggestions": "node scripts/pipeline/generate-curation-rule-suggestions.mjs",
     "apply:curation-rules": "node scripts/pipeline/apply-curation-rules.mjs",
+    "benchmark:personas": "node scripts/pipeline/benchmark-persona-suite.mjs",
+    "report:zero-results-demand": "node scripts/pipeline/report-zero-results-demand.mjs",
     "generate:ai-candidates": "node scripts/pipeline/generate-ai-candidates.mjs",
     "profile:stores:llm": "node scripts/pipeline/profile-stores-llm.mjs",
     "repair:merged-candidates": "node scripts/pipeline/repair-merged-candidate-coherence.mjs",

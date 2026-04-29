@@ -42,6 +42,19 @@ async function main() {
   const requireWebsiteSignals = parseBoolean(args["require-website-signals"], true);
   const onlyAmbiguous = parseBoolean(args["only-ambiguous"], true);
   const pruneKeepLatest = Number(args["prune-keep-latest"] ?? 2);
+  const runBenchmarkGate = parseBoolean(args["run-benchmark-gate"], true);
+  const benchmarkMinHitRate = Number(args["benchmark-min-hit-rate"] ?? 0.42);
+  const benchmarkFailOnBelowThreshold = parseBoolean(
+    args["benchmark-fail-on-below-threshold"],
+    true
+  );
+  const runDemandReport = parseBoolean(args["run-demand-report"], true);
+  const runCurationLearning = parseBoolean(args["run-curation-learning"], true);
+  const curationWindowDays = Number(args["curation-window-days"] ?? 120);
+  const curationMinSupport = Number(args["curation-min-support"] ?? 30);
+  const curationMinPositive = Number(args["curation-min-positive"] ?? 18);
+  const curationMinPrecision = Number(args["curation-min-precision"] ?? 0.92);
+  const curationMaxApply = Number(args["curation-max-apply"] ?? 40);
 
   const commonScopeArgs = [
     `--district-scope=${districtScope}`,
@@ -112,7 +125,53 @@ async function main() {
         ...commonScopeArgs,
         "--keep-latest-per-establishment=2"
       ]
-    ]
+    ],
+    ...(runDemandReport
+      ? [[
+          "node",
+          [
+            "scripts/pipeline/report-zero-results-demand.mjs",
+            `--window-days=${Math.max(7, curationWindowDays)}`,
+            `--district-scope=${districtScope}`
+          ]
+        ]]
+      : []),
+    ...(runCurationLearning
+      ? [
+          [
+            "node",
+            [
+              "scripts/pipeline/generate-curation-rule-suggestions.mjs",
+              `--window-days=${curationWindowDays}`,
+              `--min-support=${curationMinSupport}`,
+              `--min-positive=${curationMinPositive}`,
+              `--min-precision=${curationMinPrecision}`
+            ]
+          ],
+          [
+            "node",
+            [
+              "scripts/pipeline/apply-curation-rules.mjs",
+              `--window-days=${curationWindowDays}`,
+              `--min-support=${curationMinSupport}`,
+              `--min-positive=${curationMinPositive}`,
+              `--min-precision=${curationMinPrecision}`,
+              `--max-apply=${curationMaxApply}`
+            ]
+          ]
+        ]
+      : []),
+    ...(runBenchmarkGate
+      ? [[
+          "node",
+          [
+            "scripts/pipeline/benchmark-persona-suite.mjs",
+            "--output=r0-persona-benchmark-gated.json",
+            `--min-hit-rate=${benchmarkMinHitRate}`,
+            `--fail-on-below-threshold=${benchmarkFailOnBelowThreshold}`
+          ]
+        ]]
+      : [])
   ];
 
   logInfo("Moabit 10553 progressive curation run started", {
@@ -126,7 +185,17 @@ async function main() {
     requireWebsiteSignals,
     onlyAmbiguous,
     pruneKeepLatest,
-    resume
+    resume,
+    runBenchmarkGate,
+    benchmarkMinHitRate,
+    benchmarkFailOnBelowThreshold,
+    runDemandReport,
+    runCurationLearning,
+    curationWindowDays,
+    curationMinSupport,
+    curationMinPositive,
+    curationMinPrecision,
+    curationMaxApply
   });
 
   for (const [command, commandArgs] of steps) {

@@ -41,6 +41,19 @@ async function main() {
   const maxCostUsdPerDay = Number(args["max-cost-usd-per-day"] ?? 2);
   const maxAiEstablishments = Number(args["max-ai-establishments"] ?? 250);
   const repairCoherence = parseBoolean(args["repair-coherence"], false);
+  const runBenchmarkGate = parseBoolean(args["run-benchmark-gate"], true);
+  const benchmarkMinHitRate = Number(args["benchmark-min-hit-rate"] ?? 0.4);
+  const benchmarkFailOnBelowThreshold = parseBoolean(
+    args["benchmark-fail-on-below-threshold"],
+    false
+  );
+  const runDemandReport = parseBoolean(args["run-demand-report"], true);
+  const runCurationLearning = parseBoolean(args["run-curation-learning"], true);
+  const curationWindowDays = Number(args["curation-window-days"] ?? 120);
+  const curationMinSupport = Number(args["curation-min-support"] ?? 30);
+  const curationMinPositive = Number(args["curation-min-positive"] ?? 18);
+  const curationMinPrecision = Number(args["curation-min-precision"] ?? 0.92);
+  const curationMaxApply = Number(args["curation-max-apply"] ?? 60);
 
   const commonResumeArgs = resume ? ["--resume"] : [];
   const aiArgs = [
@@ -90,6 +103,52 @@ async function main() {
       : []),
     ["node", ["scripts/pipeline/prune-nonserving-candidates.mjs"]],
     ["node", ["scripts/pipeline/build-search-dataset.mjs"]],
+    ...(runDemandReport
+      ? [[
+          "node",
+          [
+            "scripts/pipeline/report-zero-results-demand.mjs",
+            `--window-days=${Math.max(14, curationWindowDays)}`,
+            ...(districtScope ? [`--district-scope=${districtScope}`] : [])
+          ]
+        ]]
+      : []),
+    ...(runCurationLearning
+      ? [
+          [
+            "node",
+            [
+              "scripts/pipeline/generate-curation-rule-suggestions.mjs",
+              `--window-days=${curationWindowDays}`,
+              `--min-support=${curationMinSupport}`,
+              `--min-positive=${curationMinPositive}`,
+              `--min-precision=${curationMinPrecision}`
+            ]
+          ],
+          [
+            "node",
+            [
+              "scripts/pipeline/apply-curation-rules.mjs",
+              `--window-days=${curationWindowDays}`,
+              `--min-support=${curationMinSupport}`,
+              `--min-positive=${curationMinPositive}`,
+              `--min-precision=${curationMinPrecision}`,
+              `--max-apply=${curationMaxApply}`
+            ]
+          ]
+        ]
+      : []),
+    ...(runBenchmarkGate
+      ? [[
+          "node",
+          [
+            "scripts/pipeline/benchmark-persona-suite.mjs",
+            "--output=r0-persona-benchmark-gated.json",
+            `--min-hit-rate=${benchmarkMinHitRate}`,
+            `--fail-on-below-threshold=${benchmarkFailOnBelowThreshold}`
+          ]
+        ]]
+      : []),
     [
       "node",
       [
@@ -110,6 +169,16 @@ async function main() {
     maxCostUsdPerDay,
     maxAiEstablishments,
     repairCoherence,
+    runBenchmarkGate,
+    benchmarkMinHitRate,
+    benchmarkFailOnBelowThreshold,
+    runDemandReport,
+    runCurationLearning,
+    curationWindowDays,
+    curationMinSupport,
+    curationMinPositive,
+    curationMinPrecision,
+    curationMaxApply,
     pruneKeepLatest,
     maxRecommendations: 5,
     maxProductsPerEstablishment: 8

@@ -673,22 +673,56 @@ async function fetchStoreCapabilityProfilesByStoreIds(
     return new Map();
   }
 
-  const { data, error } = await supabase
-    .from("store_capability_profiles")
+  const { data: liteData, error: liteError } = await supabase
+    .from("store_capabilities_lite_v1")
     .select(
-      "establishment_id, store_type, business_roles, likely_products, likely_services, confidence, validation_status, profile_version, updated_at"
+      "establishment_id, store_role_primary, profile_roles, likely_products, likely_services, profile_confidence, profile_validation_status, updated_at"
     )
-    .in("establishment_id", establishmentIds)
-    .eq("profile_version", "v1");
+    .in("establishment_id", establishmentIds);
 
-  if (error) {
-    if (isSchemaCompatibilityError(error.message)) {
-      return new Map();
+  let rows: SupabaseStoreCapabilityProfileRow[] = [];
+  if (liteError) {
+    const { data, error } = await supabase
+      .from("store_capability_profiles")
+      .select(
+        "establishment_id, store_type, business_roles, likely_products, likely_services, confidence, validation_status, profile_version, updated_at"
+      )
+      .in("establishment_id", establishmentIds)
+      .eq("profile_version", "v1");
+
+    if (error) {
+      if (isSchemaCompatibilityError(error.message)) {
+        return new Map();
+      }
+      throw new Error(`Supabase store capability profile query failed: ${error.message}`);
     }
-    throw new Error(`Supabase store capability profile query failed: ${error.message}`);
+    rows = (data ?? []) as SupabaseStoreCapabilityProfileRow[];
+  } else {
+    rows = ((liteData ?? []) as Array<Record<string, unknown>>).map((row) => ({
+      establishment_id: Number(row.establishment_id),
+      store_type: typeof row.store_role_primary === "string" ? row.store_role_primary : null,
+      business_roles: Array.isArray(row.profile_roles)
+        ? (row.profile_roles as string[])
+        : [],
+      likely_products: Array.isArray(row.likely_products)
+        ? (row.likely_products as string[])
+        : [],
+      likely_services: Array.isArray(row.likely_services)
+        ? (row.likely_services as string[])
+        : [],
+      confidence:
+        typeof row.profile_confidence === "number"
+          ? row.profile_confidence
+          : Number(row.profile_confidence ?? 0),
+      validation_status:
+        typeof row.profile_validation_status === "string"
+          ? (row.profile_validation_status as SupabaseStoreCapabilityProfileRow["validation_status"])
+          : null,
+      profile_version: "v1",
+      updated_at: typeof row.updated_at === "string" ? row.updated_at : new Date().toISOString()
+    }));
   }
 
-  const rows = (data ?? []) as SupabaseStoreCapabilityProfileRow[];
   const byStoreId = new Map<string, StoreCapabilityProfile>();
 
   for (const row of rows) {

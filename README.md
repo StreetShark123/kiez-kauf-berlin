@@ -197,6 +197,16 @@ npm run curate:moabit:ring
 npm run curate:moabit:ring:daily
 ```
 
+Benchmark + demanda no resuelta (gates de calidad):
+
+```bash
+# benchmark de personas (usa suite fija y genera reporte)
+npm run benchmark:personas -- --min-hit-rate=0.65 --fail-on-below-threshold=true
+
+# reporte de zero-results para expansion dirigida de catalogo
+npm run report:zero-results-demand -- --window-days=21 --district-scope=mitte
+```
+
 Pruning de auditoria (control de crecimiento):
 
 ```bash

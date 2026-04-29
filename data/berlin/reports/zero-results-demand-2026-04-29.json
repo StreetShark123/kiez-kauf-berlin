@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-04-29T15:15:31.130Z",
+  "scope": {
+    "window_days": 21,
+    "district_scope": "mitte",
+    "unresolved_only": true,
+    "limit": 150
+  },
+  "summary": {
+    "total_failed_queries": 0,
+    "mapped_to_existing_terms": 0,
+    "unmapped_queries": 0,
+    "top_unmapped_by_failures": []
+  },
+  "rows": []
+}

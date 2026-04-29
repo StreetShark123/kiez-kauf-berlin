@@ -1,0 +1,39 @@
+{
+  "version": "v1",
+  "default_origin": {
+    "lat": 52.5316,
+    "lng": 13.342,
+    "radius_meters": 2500
+  },
+  "queries": [
+    { "persona": "Lara", "query": "light bulb", "intent": "product" },
+    { "persona": "Lara", "query": "milk", "intent": "product" },
+    { "persona": "Lara", "query": "garlic", "intent": "product" },
+
+    { "persona": "Jonas", "query": "usb-c cable", "intent": "product" },
+    { "persona": "Jonas", "query": "phone repair", "intent": "service" },
+    { "persona": "Jonas", "query": "aa battery", "intent": "product" },
+
+    { "persona": "Meryem", "query": "organic vegetables", "intent": "product" },
+    { "persona": "Meryem", "query": "second hand", "intent": "product" },
+    { "persona": "Meryem", "query": "refill detergent", "intent": "product" },
+
+    { "persona": "Felix", "query": "2mm mechanical pencil", "intent": "product" },
+    { "persona": "Felix", "query": "shoe glue", "intent": "product" },
+    { "persona": "Felix", "query": "pliers", "intent": "product" },
+
+    { "persona": "Clara", "query": "tampons", "intent": "product" },
+    { "persona": "Clara", "query": "laundry detergent", "intent": "product" },
+    { "persona": "Clara", "query": "apricot", "intent": "product" },
+
+    { "persona": "David", "query": "baby wipes", "intent": "product" },
+    { "persona": "David", "query": "diapers", "intent": "product" },
+    { "persona": "David", "query": "school glue", "intent": "product" },
+
+    { "persona": "Regression", "query": "antiques", "intent": "product" },
+    { "persona": "Regression", "query": "art", "intent": "product" },
+    { "persona": "Regression", "query": "guinness", "intent": "product" },
+    { "persona": "Regression", "query": "cassette", "intent": "product" },
+    { "persona": "Regression", "query": "condoms", "intent": "product" }
+  ]
+}

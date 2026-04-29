@@ -25,6 +25,7 @@ Main additions:
 - `establishment_service_merged`
 - `canonical_search_terms`
 - `failed_searches`
+- `store_capabilities_lite_v1` (lean runtime view for fast role/capability reads)
 
 ## Pipelines
 ### 1) Classify store roles
@@ -56,3 +57,4 @@ npm run curate:moabit-10553 -- --resume --max-cost-usd-per-run=1.2 --max-cost-us
 - keep service candidates to max 3-6 per store in rule generation
 - keep raw prompts/responses out of DB (only aggregates/hashes)
 - use unresolved queries (`failed_searches`) to prioritize enrichment instead of broad generation
+- run persona gate + zero-result demand reports on each curation cycle
