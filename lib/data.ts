@@ -76,6 +76,38 @@ const GROUP_FALLBACK_APP_CATEGORY_ALLOWLIST: Record<string, string[]> = {
   snacks: ["convenience", "grocery", "bakery", "drinks"]
 };
 const STRATEGY_AUGMENT_THRESHOLD = 110;
+const SERVICE_INTENT_QUERY_HINTS = [
+  "repair",
+  "reparatur",
+  "fix",
+  "service",
+  "servicio",
+  "tailor",
+  "schneid",
+  "shoe repair",
+  "cobbler",
+  "key copy",
+  "key cutting",
+  "locksmith",
+  "schluessel",
+  "schlussel",
+  "bike repair",
+  "fahrrad reparatur",
+  "phone repair",
+  "iphone repair",
+  "screen repair",
+  "copy shop",
+  "druck",
+  "dry cleaning",
+  "laundry"
+];
+const STORE_ROLE_SERVICE_PRIORITIES = new Set([
+  "repair_service",
+  "sells_services",
+  "beauty_personal_care",
+  "health_care",
+  "specialist_retail"
+]);
 
 function isSchemaCompatibilityError(message: string | undefined): boolean {
   const lower = String(message ?? "").toLowerCase();
@@ -338,6 +370,30 @@ type SupabaseServiceSearchRow = {
     | null;
 };
 
+type SupabaseStoreCapabilityProfileRow = {
+  establishment_id: number;
+  store_type: string | null;
+  business_roles: string[] | null;
+  likely_products: string[] | null;
+  likely_services: string[] | null;
+  confidence: number | null;
+  validation_status: "unvalidated" | "likely" | "validated" | "rejected" | null;
+  profile_version: string;
+  updated_at: string;
+};
+
+type StoreCapabilityProfile = {
+  establishmentId: number;
+  storeType: string | null;
+  businessRoles: string[];
+  likelyProducts: string[];
+  likelyServices: string[];
+  confidence: number;
+  validationStatus: "unvalidated" | "likely" | "validated" | "rejected" | null;
+  profileVersion: string;
+  updatedAt: string;
+};
+
 type DatasetSearchStrategy =
   | "product_name"
   | "canonical_multilingual"
@@ -370,6 +426,25 @@ let canonicalServiceCatalogCache:
 const CANONICAL_CACHE_TTL_MS = 1000 * 60 * 10;
 const APP_CATEGORY_INTENT_MAP: Array<{ category: string; terms: string[] }> = [
   {
+    category: "beauty",
+    terms: [
+      "wax",
+      "waxing",
+      "depilation",
+      "hair removal",
+      "eyebrow",
+      "brow",
+      "lashes",
+      "nails",
+      "manicure",
+      "pedicure",
+      "beauty",
+      "beauty salon",
+      "kosmetik",
+      "kosmetikstudio"
+    ]
+  },
+  {
     category: "art",
     terms: [
       "art",
@@ -398,12 +473,12 @@ const APP_CATEGORY_INTENT_MAP: Array<{ category: string; terms: string[] }> = [
   }
 ];
 const APP_CATEGORY_INTENT_OSM_ALLOWLIST: Record<string, string[]> = {
+  beauty: ["beauty", "cosmetics", "perfumery", "hairdresser", "chemist"],
   art: ["art", "stationery", "craft", "antiques", "books", "second_hand"],
   antiques: ["antiques", "art", "second_hand", "books", "stationery", "craft"]
 };
 const APP_CATEGORY_INTENT_GROUP_ALLOWLIST: Record<string, string[]> = {
-  art: [],
-  antiques: []
+  beauty: ["personal_care", "pharmacy"]
 };
 
 function inferAppCategoryIntents(query: string): string[] {
@@ -448,6 +523,124 @@ function splitNormalizedTokens(value: string): string[] {
 function normalizeSearchQuery(value: string): string {
   const normalized = normalizeQuery(value);
   return applyVocabularyTypos(normalized);
+}
+
+async function fetchStoreCapabilityProfilesByStoreIds(
+  storeIds: string[]
+): Promise<Map<string, StoreCapabilityProfile>> {
+  if (!supabase || storeIds.length === 0) {
+    return new Map();
+  }
+
+  const establishmentIds = Array.from(
+    new Set(
+      storeIds
+        .map((storeId) => Number(storeId))
+        .filter((value) => Number.isFinite(value) && value > 0)
+    )
+  );
+
+  if (establishmentIds.length === 0) {
+    return new Map();
+  }
+
+  const { data, error } = await supabase
+    .from("store_capability_profiles")
+    .select(
+      "establishment_id, store_type, business_roles, likely_products, likely_services, confidence, validation_status, profile_version, updated_at"
+    )
+    .in("establishment_id", establishmentIds)
+    .eq("profile_version", "v1");
+
+  if (error) {
+    if (isSchemaCompatibilityError(error.message)) {
+      return new Map();
+    }
+    throw new Error(`Supabase store capability profile query failed: ${error.message}`);
+  }
+
+  const rows = (data ?? []) as SupabaseStoreCapabilityProfileRow[];
+  const byStoreId = new Map<string, StoreCapabilityProfile>();
+
+  for (const row of rows) {
+    const key = String(row.establishment_id);
+    const candidate: StoreCapabilityProfile = {
+      establishmentId: row.establishment_id,
+      storeType: row.store_type,
+      businessRoles: Array.isArray(row.business_roles) ? row.business_roles.map((value) => normalizeQuery(String(value))).filter(Boolean) : [],
+      likelyProducts: Array.isArray(row.likely_products) ? row.likely_products.map((value) => normalizeQuery(String(value))).filter(Boolean) : [],
+      likelyServices: Array.isArray(row.likely_services) ? row.likely_services.map((value) => normalizeQuery(String(value))).filter(Boolean) : [],
+      confidence: typeof row.confidence === "number" ? row.confidence : Number(row.confidence ?? 0),
+      validationStatus: row.validation_status ?? null,
+      profileVersion: row.profile_version,
+      updatedAt: row.updated_at
+    };
+
+    const existing = byStoreId.get(key);
+    if (!existing) {
+      byStoreId.set(key, candidate);
+      continue;
+    }
+
+    const existingScore =
+      validationRank(existing.validationStatus) * 1000 +
+      Math.round((existing.confidence || 0) * 100);
+    const nextScore =
+      validationRank(candidate.validationStatus) * 1000 +
+      Math.round((candidate.confidence || 0) * 100);
+
+    if (nextScore > existingScore) {
+      byStoreId.set(key, candidate);
+    }
+  }
+
+  return byStoreId;
+}
+
+function profileSupportsServiceIntent(
+  profile: StoreCapabilityProfile | null | undefined,
+  normalizedQuery: string
+): boolean {
+  if (!profile) {
+    return false;
+  }
+
+  const hasRoleSupport = profile.businessRoles.some((role) => STORE_ROLE_SERVICE_PRIORITIES.has(role));
+  if (hasRoleSupport) {
+    return true;
+  }
+
+  if (!normalizedQuery) {
+    return false;
+  }
+
+  return profile.likelyServices.some((service) => normalizedFuzzyMatch(service, normalizedQuery));
+}
+
+function profileContradictsProductIntent(
+  profile: StoreCapabilityProfile | null | undefined,
+  normalizedQuery: string
+): boolean {
+  if (!profile || !normalizedQuery) {
+    return false;
+  }
+
+  const hasProductRole =
+    profile.businessRoles.includes("sells_physical_products") ||
+    profile.businessRoles.includes("food_grocery") ||
+    profile.businessRoles.includes("specialist_retail") ||
+    profile.businessRoles.includes("health_care");
+
+  if (hasProductRole) {
+    return false;
+  }
+
+  const hasLikelyProductSignal = profile.likelyProducts.some((term) => normalizedFuzzyMatch(term, normalizedQuery));
+  if (hasLikelyProductSignal) {
+    return false;
+  }
+
+  return true;
 }
 
 function levenshteinDistanceWithinLimit(a: string, b: string, maxDistance: number): number {
@@ -562,6 +755,54 @@ function isSpecificProductQuery(normalizedQuery: string): boolean {
   }
 
   return queryTokens.some((token) => token.length >= 4);
+}
+
+function isLikelyServiceIntentQuery(normalizedQuery: string): boolean {
+  if (!normalizedQuery) {
+    return false;
+  }
+
+  if (SERVICE_INTENT_QUERY_HINTS.some((hint) => normalizedQuery.includes(hint))) {
+    return true;
+  }
+
+  const tokens = splitNormalizedTokens(normalizedQuery);
+  const hasServiceVerb = tokens.some((token) =>
+    ["repair", "reparatur", "fix", "service", "servicio"].includes(token)
+  );
+  const hasObjectToken = tokens.some((token) =>
+    [
+      "bike",
+      "fahrrad",
+      "phone",
+      "iphone",
+      "screen",
+      "shoe",
+      "key",
+      "lock",
+      "copy",
+      "print",
+      "tailor"
+    ].includes(token)
+  );
+
+  return hasServiceVerb && hasObjectToken;
+}
+
+function keepProductResultForServiceIntent(result: SearchResult, normalizedQuery: string): boolean {
+  const productName = normalizeSearchQuery(result.product.normalizedName ?? "");
+  const hasDirectMatch =
+    productName === normalizedQuery ||
+    productName.includes(normalizedQuery) ||
+    normalizedFuzzyMatch(productName, normalizedQuery);
+  const confidence = typeof result.confidence === "number" ? result.confidence : 0;
+  const trustedSource =
+    result.validationStatus === "validated" ||
+    result.sourceType === "user_validated" ||
+    result.sourceType === "merchant_added" ||
+    result.sourceType === "website_extracted";
+
+  return hasDirectMatch && trustedSource && confidence >= 0.86;
 }
 
 function shouldKeepGroupFallbackRow(args: {
@@ -1313,8 +1554,139 @@ async function searchServiceFallbackResults(args: {
     .slice(0, MAX_SEARCH_RESULTS);
 }
 
+async function searchCategoryIntentStoreFallback(args: {
+  query: string;
+  lat: number;
+  lng: number;
+  radiusMeters: number;
+}): Promise<SearchResult[]> {
+  if (!supabase) {
+    return [];
+  }
+
+  const categoryIntents = inferAppCategoryIntents(args.query);
+  if (categoryIntents.length === 0) {
+    return [];
+  }
+
+  const bounds = getBoundingBoxFromRadius({
+    lat: args.lat,
+    lng: args.lng,
+    radiusMeters: args.radiusMeters
+  });
+
+  const { data, error } = await supabase
+    .from("establishments")
+    .select(
+      "id, name, address, district, lat, lon, opening_hours, website, phone, osm_category, app_categories, active_status"
+    )
+    .in("active_status", ["active", "temporarily_closed", "unknown"])
+    .gte("lat", bounds.minLat)
+    .lte("lat", bounds.maxLat)
+    .gte("lon", bounds.minLng)
+    .lte("lon", bounds.maxLng)
+    .limit(1200);
+
+  if (error) {
+    if (isSchemaCompatibilityError(error.message)) {
+      return [];
+    }
+    throw new Error(`Supabase category-intent fallback query failed: ${error.message}`);
+  }
+
+  const rows = (data ?? []) as Array<{
+    id: number;
+    name: string | null;
+    address: string | null;
+    district: string | null;
+    lat: number | null;
+    lon: number | null;
+    opening_hours: string | null;
+    website: string | null;
+    phone: string | null;
+    osm_category: string | null;
+    app_categories: string[] | null;
+    active_status: string | null;
+  }>;
+
+  const results: SearchResult[] = [];
+  const normalizedQuery = normalizeSearchQuery(args.query);
+
+  for (const row of rows) {
+    if (!hasValidStoreCoordinates({ lat: row.lat, lng: row.lon })) {
+      continue;
+    }
+
+    const normalizedOsm = normalizeQuery(String(row.osm_category ?? ""));
+    const normalizedApps = (row.app_categories ?? []).map((item) => normalizeQuery(String(item ?? "")));
+    const matchedCategory = categoryIntents.find((category) => {
+      const allowedOsm = APP_CATEGORY_INTENT_OSM_ALLOWLIST[category] ?? [];
+      return normalizedApps.includes(category) || allowedOsm.includes(normalizedOsm);
+    });
+
+    if (!matchedCategory) {
+      continue;
+    }
+
+    const distanceMeters = haversineMeters(args.lat, args.lng, row.lat, row.lon);
+    if (distanceMeters > args.radiusMeters) {
+      continue;
+    }
+
+    const rank = 22000 - distanceMeters;
+    const displayName = matchedCategory === "antiques" ? "Antiques shop" : matchedCategory === "art" ? "Art shop" : `${matchedCategory} store`;
+    const normalizedName = matchedCategory === "antiques" ? "antiques" : matchedCategory;
+
+    results.push({
+      offer: {
+        id: `category_${matchedCategory}_${row.id}`,
+        storeId: String(row.id),
+        productId: `category_${matchedCategory}`,
+        priceOptional: null,
+        availability: "unknown",
+        updatedAt: new Date().toISOString()
+      },
+      product: {
+        id: `category_${matchedCategory}`,
+        normalizedName,
+        displayName,
+        brand: null,
+        category: "discovery"
+      },
+      store: {
+        id: String(row.id),
+        name: String(row.name ?? "Unknown store"),
+        address: String(row.address ?? ""),
+        district: String(row.district ?? "Berlin"),
+        openingHours: String(row.opening_hours ?? ""),
+        lat: row.lat,
+        lng: row.lon,
+        website: row.website ?? null,
+        phone: row.phone ?? null,
+        ownershipType: inferOwnershipTypeFromStoreName(row.name),
+        appCategories: row.app_categories ?? [],
+        osmCategory: row.osm_category
+      },
+      distanceMeters,
+      freshnessHours: 0,
+      rank,
+      confidence: 0.72,
+      validationStatus: "likely",
+      whyThisProductMatches: `Store category likely matches "${normalizedQuery}" intent.`,
+      lastCheckedAt: null,
+      sourceType: "rules_generated",
+      resultKind: "product",
+      availabilityStatus: null
+    });
+  }
+
+  return dedupeRankedResults(results).sort((a, b) => b.rank - a.rank).slice(0, 24);
+}
+
 function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng: number; radius: number }): SearchResult[] {
   const normalized = normalizeSearchQuery(args.query);
+  const queryIsSpecific = isSpecificProductQuery(normalized);
+  const likelyServiceIntent = isLikelyServiceIntentQuery(normalized);
   const validRows: JoinedRow[] = [];
   let droppedRows = 0;
 
@@ -1347,6 +1719,11 @@ function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng:
       const includesMatch = row.product.normalizedName.includes(normalized) ? 1 : 0;
       const fuzzyMatch = normalizedFuzzyMatch(normalizeQuery(row.product.normalizedName), normalized) ? 1 : 0;
       const confidenceScore = typeof row.confidence === "number" ? row.confidence * 2000 : 0;
+      const hasStrongTextMatch =
+        exactMatch === 1 ||
+        includesMatch === 1 ||
+        fuzzyMatch === 1 ||
+        hasMeaningfulTokenMatch(normalizeQuery(row.product.normalizedName), normalized);
       const validationScore =
         row.validationStatus === "validated"
           ? 1500
@@ -1361,6 +1738,19 @@ function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng:
       const establishmentFreshnessScore =
         typeof row.establishmentFreshnessScore === "number" ? row.establishmentFreshnessScore : 0;
       const freshnessScore = candidateFreshnessScore * 520 + establishmentFreshnessScore * 280;
+      const normalizedOsmCategory = normalizeQuery(row.store.osmCategory ?? "");
+      const storeRoles = Array.isArray(row.store.storeRoles)
+        ? row.store.storeRoles.map((role) => normalizeQuery(String(role)))
+        : [];
+      const hasServiceRoleSupport = storeRoles.some((role) => STORE_ROLE_SERVICE_PRIORITIES.has(role));
+      const genericStorePenalty =
+        queryIsSpecific &&
+        !hasStrongTextMatch &&
+        (normalizedOsmCategory === "mall" || normalizedOsmCategory === "department store")
+          ? 1800
+          : 0;
+      const serviceIntentPenalty =
+        likelyServiceIntent && !hasStrongTextMatch && !hasServiceRoleSupport ? 3200 : 0;
 
       const rank =
         exactMatch * 100000 +
@@ -1370,6 +1760,8 @@ function rankResults(rows: JoinedRow[], args: { query: string; lat: number; lng:
         validationScore +
         sourceScore +
         freshnessScore -
+        genericStorePenalty -
+        serviceIntentPenalty -
         distanceMeters -
         freshnessHours * 2;
 
@@ -1655,10 +2047,7 @@ async function searchSupabaseRowsFromDataset(args: {
           if (allowedOsmCategories.length > 0) {
             scoped = scoped.in("osm_category", allowedOsmCategories);
           }
-          if (Array.isArray(allowedGroups)) {
-            if (allowedGroups.length === 0) {
-              return scoped.eq("canonical_product_id", -1);
-            }
+          if (Array.isArray(allowedGroups) && allowedGroups.length > 0) {
             return scoped.in("product_group", allowedGroups);
           }
           return scoped;
@@ -2001,6 +2390,27 @@ export async function searchOffersDetailed(args: {
     backendSource = "mock";
   }
 
+  const capabilityProfiles = hasSupabase
+    ? await fetchStoreCapabilityProfilesByStoreIds(rows.map((row) => row.store.id))
+    : new Map<string, StoreCapabilityProfile>();
+
+  rows = rows.map((row) => {
+    const profile = capabilityProfiles.get(String(row.store.id));
+    if (!profile) {
+      return row;
+    }
+
+    return {
+      ...row,
+      store: {
+        ...row.store,
+        storeRoles: profile.businessRoles,
+        storeRolePrimary: profile.storeType,
+        storeRoleConfidence: profile.confidence
+      }
+    };
+  });
+
   const normalized = normalizeSearchQuery(args.query);
   if (GENERIC_QUERY_TERMS.has(normalized)) {
     return {
@@ -2010,6 +2420,8 @@ export async function searchOffersDetailed(args: {
       backendSource
     };
   }
+  const likelyServiceIntent = isLikelyServiceIntentQuery(normalized);
+  const queryIsSpecific = isSpecificProductQuery(normalized);
 
   const filtered =
     datasetStrategy === "canonical_multilingual" ||
@@ -2021,6 +2433,19 @@ export async function searchOffersDetailed(args: {
           return productName === normalized || productName.includes(normalized);
         });
   const plausibilityFiltered = filtered.filter((row) => {
+    const storeProfile = capabilityProfiles.get(String(row.store.id));
+
+    if (likelyServiceIntent) {
+      const hasTextMatch =
+        normalizeQuery(row.product.normalizedName).includes(normalized) ||
+        normalizedFuzzyMatch(normalizeQuery(row.product.normalizedName), normalized);
+      const profileSupportsService = profileSupportsServiceIntent(storeProfile, normalized);
+
+      if (!profileSupportsService && !hasTextMatch && row.validationStatus !== "validated") {
+        return false;
+      }
+    }
+
     const isServiceBeautyStore = isLikelyServiceOnlyBeautyStore(row.store);
     if (
       isSpecificProductQuery(normalized) &&
@@ -2063,20 +2488,63 @@ export async function searchOffersDetailed(args: {
     if (hasStrongTextMatch) {
       return true;
     }
+
+    if (queryIsSpecific && profileContradictsProductIntent(storeProfile, normalized)) {
+      return false;
+    }
+
     return confidence >= minConfidenceThresholdForRow(row);
   });
 
-  const results = dedupeRankedResults(
+  let results = dedupeRankedResults(
     rankResults(plausibilityFiltered, { query: args.query, lat, lng, radius })
   ).slice(0, MAX_SEARCH_RESULTS);
 
-  const serviceFallback = await searchServiceFallbackResults({
+  let serviceFallback = await searchServiceFallbackResults({
     query: args.query,
     lat,
     lng,
     radiusMeters: radius,
     excludeStoreIds: new Set(results.map((result) => result.store.id))
   });
+
+  if (serviceFallback.length > 0 && hasSupabase) {
+    const serviceProfiles = await fetchStoreCapabilityProfilesByStoreIds(
+      serviceFallback.map((item) => item.store.id)
+    );
+    serviceFallback = serviceFallback.map((item) => {
+      const profile = serviceProfiles.get(String(item.store.id));
+      if (!profile) {
+        return item;
+      }
+      return {
+        ...item,
+        store: {
+          ...item.store,
+          storeRoles: profile.businessRoles,
+          storeRolePrimary: profile.storeType,
+          storeRoleConfidence: profile.confidence
+        }
+      };
+    });
+  }
+
+  if (likelyServiceIntent && serviceFallback.length > 0) {
+    results = results.filter((result) => keepProductResultForServiceIntent(result, normalized));
+  }
+
+  let categoryFallback: SearchResult[] = [];
+  if (results.length === 0 && serviceFallback.length === 0) {
+    categoryFallback = await searchCategoryIntentStoreFallback({
+      query: args.query,
+      lat,
+      lng,
+      radiusMeters: radius
+    });
+    if (categoryFallback.length > 0) {
+      results = categoryFallback;
+    }
+  }
 
   const resultMode: "products_only" | "products_plus_services" | "services_fallback_only" =
     results.length > 0
@@ -2136,6 +2604,8 @@ export const __private = {
   dedupeRankedResults,
   hasMeaningfulTokenMatch,
   isSpecificProductQuery,
+  isLikelyServiceIntentQuery,
+  keepProductResultForServiceIntent,
   shouldKeepGroupFallbackRow,
   inferAppCategoryIntents
 };

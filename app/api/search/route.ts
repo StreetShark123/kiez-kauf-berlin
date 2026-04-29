@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBerlinCenter, searchOffersDetailed } from "@/lib/data";
+import {
+  chooseEffectiveQuery,
+  persistQueryResolutionLog,
+  resolveQueryWithLlm
+} from "@/lib/query-intelligence";
 
 const DEFAULT_RADIUS_METERS = 2000;
 const MIN_RADIUS_METERS = 300;
@@ -58,6 +63,15 @@ export async function GET(request: NextRequest) {
     );
 
     const fallbackRequested = searchParams.get("fallback") === "1";
+    const requestId = crypto.randomUUID();
+    const resolution = await resolveQueryWithLlm({
+      requestId,
+      query: q,
+      lat,
+      lng,
+      radiusMeters: radius
+    });
+    const effectiveQuery = chooseEffectiveQuery(resolution);
     let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutHandle = setTimeout(() => {
@@ -66,7 +80,7 @@ export async function GET(request: NextRequest) {
     });
 
     const searchPromise = searchOffersDetailed({
-      query: q,
+      query: effectiveQuery,
       lat,
       lng,
       radiusMeters: radius
@@ -82,15 +96,31 @@ export async function GET(request: NextRequest) {
     }
 
     const { results, serviceFallback, resultMode, backendSource } = searchResponse;
+    const endpoint = `${fallbackRequested ? "search_api_fallback" : "search_api_primary"}:${backendSource}`;
+
+    await persistQueryResolutionLog({
+      resolution,
+      lat,
+      lng,
+      radiusMeters: radius,
+      resultMode,
+      resultsCount: results.length,
+      serviceFallbackCount: serviceFallback.length,
+      endpoint
+    });
 
     return NextResponse.json({
       query: q,
+      effective_query: effectiveQuery,
+      query_intent: resolution.intentType,
+      query_resolution_confidence: Number(resolution.confidence.toFixed(4)),
+      query_resolution_used_llm: resolution.usedLlm,
       origin: { lat, lng },
       radius,
       results,
       service_fallback: serviceFallback,
       result_mode: resultMode,
-      endpoint: `${fallbackRequested ? "search_api_fallback" : "search_api_primary"}:${backendSource}`
+      endpoint
     });
   } catch (error) {
     if (error instanceof Error && error.message === "SEARCH_TIMEOUT") {

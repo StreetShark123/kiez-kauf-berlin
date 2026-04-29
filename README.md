@@ -159,6 +159,7 @@ npm run seed:canonical-products
 npm run seed:lean-catalog-v1
 npm run generate:rule-candidates
 npm run generate:ai-candidates
+npm run profile:stores:llm
 npm run cleanup:legacy-ai
 npm run merge:candidates
 npm run build:search-dataset
@@ -184,7 +185,16 @@ npm run classify:establishments -- --batch-size=300 --resume
 npm run enrich:websites -- --batch-size=25 --stale-days=10 --resume
 npm run generate:rule-candidates -- --batch-size=350 --resume
 npm run generate:ai-candidates -- --batch-size=120 --resume
+npm run profile:stores:llm -- --district-scope=moabit --postal-code-scope=10553 --batch-size=120 --max-establishments=250 --max-cost-usd-per-run=1.2 --max-cost-usd-per-day=2 --require-website-signals=true --only-ambiguous=true --profile-version=v1 --resume
 npm run merge:candidates -- --batch-size=500 --resume
+```
+
+Curacion progresiva Moabit + anillo cercano (Mitte subzonas):
+
+```bash
+npm run curate:moabit:ring
+# corrida diaria mas corta
+npm run curate:moabit:ring:daily
 ```
 
 Pruning de auditoria (control de crecimiento):

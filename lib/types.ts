@@ -13,6 +13,9 @@ export type Store = {
   ownershipType?: "independent" | "chain" | "unknown";
   appCategories?: string[];
   osmCategory?: string | null;
+  storeRoles?: string[];
+  storeRolePrimary?: string | null;
+  storeRoleConfidence?: number | null;
 };
 
 export type Product = {

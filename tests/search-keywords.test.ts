@@ -177,5 +177,40 @@ describe("keyword intent helpers", () => {
     expect(__private.inferAppCategoryIntents("art")).toContain("art");
     expect(__private.inferAppCategoryIntents("art supplies")).toContain("art");
     expect(__private.inferAppCategoryIntents("stationery")).toContain("art");
+    expect(__private.inferAppCategoryIntents("wax")).toContain("beauty");
+    expect(__private.inferAppCategoryIntents("waxing")).toContain("beauty");
+  });
+
+  it("detects service-intent queries and suppresses weak product-only matches", () => {
+    expect(__private.isLikelyServiceIntentQuery("repair")).toBe(true);
+    expect(__private.isLikelyServiceIntentQuery("bike repair")).toBe(true);
+    expect(__private.isLikelyServiceIntentQuery("key copy")).toBe(true);
+    expect(__private.isLikelyServiceIntentQuery("milk")).toBe(false);
+
+    const weakRuleResult = {
+      product: { normalizedName: "hair repair shampoo" },
+      confidence: 0.62,
+      validationStatus: "likely",
+      sourceType: "rules_generated"
+    };
+    const trustedMatchResult = {
+      product: { normalizedName: "repair kit" },
+      confidence: 0.91,
+      validationStatus: "validated",
+      sourceType: "website_extracted"
+    };
+
+    expect(
+      __private.keepProductResultForServiceIntent(
+        weakRuleResult as never,
+        "repair"
+      )
+    ).toBe(false);
+    expect(
+      __private.keepProductResultForServiceIntent(
+        trustedMatchResult as never,
+        "repair"
+      )
+    ).toBe(true);
   });
 });

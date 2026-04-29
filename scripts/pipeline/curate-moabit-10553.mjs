@@ -81,6 +81,21 @@ async function main() {
     [
       "node",
       [
+        "scripts/pipeline/profile-stores-llm.mjs",
+        ...commonScopeArgs,
+        ...resumeArgs,
+        "--model=gpt-4.1-mini",
+        `--max-establishments=${maxAiEstablishments}`,
+        `--max-cost-usd-per-run=${maxCostUsdPerRun}`,
+        `--max-cost-usd-per-day=${maxCostUsdPerDay}`,
+        `--require-website-signals=${requireWebsiteSignals}`,
+        `--only-ambiguous=${onlyAmbiguous}`,
+        "--profile-version=v1"
+      ]
+    ],
+    [
+      "node",
+      [
         "scripts/pipeline/merge-candidates.mjs",
         ...commonScopeArgs,
         ...resumeArgs,
