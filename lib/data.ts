@@ -82,6 +82,19 @@ const SERVICE_INTENT_QUERY_HINTS = [
   "fix",
   "service",
   "servicio",
+  "pedicure",
+  "manicure",
+  "haircut",
+  "barber",
+  "nail",
+  "nails",
+  "waxing",
+  "depilation",
+  "massage",
+  "alteration",
+  "tailoring",
+  "tailor",
+  "schneiderei",
   "tailor",
   "schneid",
   "shoe repair",
@@ -99,8 +112,34 @@ const SERVICE_INTENT_QUERY_HINTS = [
   "copy shop",
   "druck",
   "dry cleaning",
-  "laundry"
+  "laundry",
+  "shoe glue"
 ];
+const SERVICE_SINGLE_TOKEN_HINTS = new Set([
+  "repair",
+  "reparatur",
+  "pedicure",
+  "manicure",
+  "barber",
+  "haircut",
+  "massage",
+  "locksmith",
+  "schluessel",
+  "schlussel",
+  "tailor",
+  "tailoring",
+  "schneiderei",
+  "cobbler",
+  "laundry",
+  "alteration"
+]);
+const STRICT_GROUP_TOKEN_MATCH = new Set([
+  "household",
+  "pharmacy",
+  "personal_care",
+  "pet_care",
+  "beverages"
+]);
 const STORE_ROLE_SERVICE_PRIORITIES = new Set([
   "repair_service",
   "sells_services",
@@ -447,6 +486,52 @@ let canonicalServiceCatalogCache:
 const CANONICAL_CACHE_TTL_MS = 1000 * 60 * 10;
 const APP_CATEGORY_INTENT_MAP: Array<{ category: string; terms: string[] }> = [
   {
+    category: "pharmacy",
+    terms: [
+      "pharmacy",
+      "apotheke",
+      "chemist",
+      "condom",
+      "condoms",
+      "tampon",
+      "tampons",
+      "pregnancy test",
+      "painkiller",
+      "ibuprofen",
+      "paracetamol"
+    ]
+  },
+  {
+    category: "hardware",
+    terms: [
+      "hardware",
+      "hammer",
+      "screwdriver",
+      "pliers",
+      "wrench",
+      "drill",
+      "nails",
+      "glue",
+      "lightbulb",
+      "light bulb",
+      "fuse"
+    ]
+  },
+  {
+    category: "electronics",
+    terms: [
+      "usb c cable",
+      "usb cable",
+      "charger",
+      "phone charger",
+      "adapter",
+      "travel adapter",
+      "lightning cable",
+      "hdmi cable",
+      "power bank"
+    ]
+  },
+  {
     category: "beauty",
     terms: [
       "wax",
@@ -494,11 +579,17 @@ const APP_CATEGORY_INTENT_MAP: Array<{ category: string; terms: string[] }> = [
   }
 ];
 const APP_CATEGORY_INTENT_OSM_ALLOWLIST: Record<string, string[]> = {
+  pharmacy: ["pharmacy", "chemist", "medical_supply"],
+  hardware: ["doityourself", "hardware"],
+  electronics: ["electronics", "mobile_phone", "computer", "hifi", "appliance", "convenience", "kiosk"],
   beauty: ["beauty", "cosmetics", "perfumery", "hairdresser", "chemist"],
   art: ["art", "stationery", "craft", "antiques", "books", "second_hand"],
   antiques: ["antiques", "art", "second_hand", "books", "stationery", "craft"]
 };
 const APP_CATEGORY_INTENT_GROUP_ALLOWLIST: Record<string, string[]> = {
+  pharmacy: ["pharmacy", "personal_care"],
+  hardware: ["household"],
+  electronics: ["household"],
   beauty: ["personal_care", "pharmacy"]
 };
 
@@ -788,6 +879,9 @@ function isLikelyServiceIntentQuery(normalizedQuery: string): boolean {
   }
 
   const tokens = splitNormalizedTokens(normalizedQuery);
+  if (tokens.length === 1 && SERVICE_SINGLE_TOKEN_HINTS.has(tokens[0])) {
+    return true;
+  }
   const hasServiceVerb = tokens.some((token) =>
     ["repair", "reparatur", "fix", "service", "servicio"].includes(token)
   );
@@ -897,18 +991,23 @@ function shouldKeepGroupFallbackRow(args: {
     normalizedAppCategories.length > 0 &&
     normalizedAppCategories.some((category) => allowedAppCategories.includes(category));
   const hasStoreGroupFit = hasOsmGroupFit || hasAppCategoryFit;
+  const strictGroup = STRICT_GROUP_TOKEN_MATCH.has(normalizedGroup);
+  const trustedSource =
+    sourceType === "user_validated" ||
+    sourceType === "merchant_added" ||
+    sourceType === "website_extracted" ||
+    validationStatus === "validated";
+  const hasTokenLevelMatch = hasMeaningfulTokenMatch(productNameNormalized, normalizedQuery);
+
+  if (strictGroup && !hasTokenLevelMatch && !trustedSource) {
+    return false;
+  }
 
   if (hasStoreGroupFit && confidence >= 0.78 && validationStatus !== "rejected") {
     return true;
   }
 
-  const highTrustSource =
-    sourceType === "user_validated" ||
-    sourceType === "merchant_added" ||
-    sourceType === "website_extracted" ||
-    validationStatus === "validated";
-
-  return highTrustSource && confidence >= 0.9 && (hasStoreGroupFit || confidence >= 0.97);
+  return trustedSource && confidence >= 0.9 && (hasStoreGroupFit || confidence >= 0.97);
 }
 
 function scoreMatchedVocabularyTerm(term: string, normalizedQuery: string): number {
@@ -2502,9 +2601,10 @@ export async function searchOffersDetailed(args: {
     const confidence = typeof row.confidence === "number" ? row.confidence : 0;
 
     if (
-      datasetStrategy === "group_keyword" ||
+    datasetStrategy === "group_keyword" ||
       datasetStrategy === "product_name" ||
-      datasetStrategy === "canonical_multilingual"
+      datasetStrategy === "canonical_multilingual" ||
+      datasetStrategy === "category_intent"
     ) {
       const keepByGroupGuard = shouldKeepGroupFallbackRow({
         normalizedQuery: normalized,

@@ -193,6 +193,26 @@ function isOpenAtMinute(
   return false;
 }
 
+function hasCoverageForCurrentOrOvernight(
+  currentDayIndex: number,
+  rules: ParsedScheduleRule[]
+) {
+  const previousDay = (currentDayIndex + 6) % 7;
+
+  for (const rule of rules) {
+    for (const interval of rule.intervals) {
+      if (rule.days.has(currentDayIndex)) {
+        return true;
+      }
+      if (interval.endMinute <= interval.startMinute && rule.days.has(previousDay)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 function formatMinuteAsTime(minuteOfDay: number) {
   const bounded = Math.max(0, Math.min(1439, minuteOfDay));
   const hour = Math.floor(bounded / 60);
@@ -262,6 +282,13 @@ export function evaluateOpeningInfo(
   const rules = parseScheduleRules(openingHours);
   if (rules.length > 0) {
     const { dayIndex, minuteOfDay } = getBerlinDayAndMinute(now);
+    const hasCoverage = hasCoverageForCurrentOrOvernight(dayIndex, rules);
+    if (!hasCoverage) {
+      return {
+        status: "unknown",
+        closesAt: null
+      };
+    }
     const isOpen = isOpenAtMinute(dayIndex, minuteOfDay, rules);
     if (!isOpen) {
       return {

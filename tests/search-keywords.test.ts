@@ -160,6 +160,18 @@ describe("keyword intent helpers", () => {
 
     expect(
       __private.shouldKeepGroupFallbackRow({
+        normalizedQuery: "guinness",
+        productNameNormalized: "wasser still 1.5l",
+        productGroup: "beverages",
+        osmCategory: "supermarket",
+        confidence: 0.86,
+        sourceType: "rules_generated",
+        validationStatus: "likely"
+      })
+    ).toBe(false);
+
+    expect(
+      __private.shouldKeepGroupFallbackRow({
         normalizedQuery: "brush",
         productNameNormalized: "tampons 32",
         productGroup: "personal_care",
@@ -185,6 +197,8 @@ describe("keyword intent helpers", () => {
     expect(__private.isLikelyServiceIntentQuery("repair")).toBe(true);
     expect(__private.isLikelyServiceIntentQuery("bike repair")).toBe(true);
     expect(__private.isLikelyServiceIntentQuery("key copy")).toBe(true);
+    expect(__private.isLikelyServiceIntentQuery("pedicure")).toBe(true);
+    expect(__private.isLikelyServiceIntentQuery("manicure")).toBe(true);
     expect(__private.isLikelyServiceIntentQuery("milk")).toBe(false);
 
     const weakRuleResult = {
