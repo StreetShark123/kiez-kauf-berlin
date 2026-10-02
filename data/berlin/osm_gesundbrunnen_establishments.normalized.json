@@ -36,7 +36,37 @@
       "osm_type": "node",
       "osm_id": 10658455542,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/4317555814",
+    "name": "2 Jahreszeiten",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.549632,
+    "lon": 13.388885,
+    "osm_category": "confectionery",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "b3723894fa149d580f7af9a0989f840bb618bd67",
+    "is_useful": true,
+    "raw_tags": {
+      "level": "0",
+      "name": "2 Jahreszeiten",
+      "shop": "confectionery",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 4317555814,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -75,7 +105,7 @@
       "osm_type": "node",
       "osm_id": 9937044800,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -109,7 +139,35 @@
       "osm_type": "node",
       "osm_id": 7955521982,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/6458745585",
+    "name": "Abu Khaled Sweets",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.550029,
+    "lon": 13.368581,
+    "osm_category": "pastry",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "37e439b9f8c3edae8629b8d3b5699be860dff2da",
+    "is_useful": true,
+    "raw_tags": {
+      "name": "Abu Khaled Sweets",
+      "shop": "pastry"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 6458745585,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -146,7 +204,7 @@
       "osm_type": "node",
       "osm_id": 4139464889,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -174,7 +232,7 @@
       "osm_type": "node",
       "osm_id": 13410539139,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -216,7 +274,7 @@
       "osm_type": "node",
       "osm_id": 604939149,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -253,7 +311,7 @@
       "osm_type": "node",
       "osm_id": 2752211152,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -283,7 +341,7 @@
       "osm_type": "node",
       "osm_id": 9693577410,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -311,7 +369,7 @@
       "osm_type": "node",
       "osm_id": 4539206648,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -348,7 +406,67 @@
       "osm_type": "node",
       "osm_id": 646601544,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "way/1530016350",
+    "name": "Aldi",
+    "address": "Gerichtstraße 2-3, 13347, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.54262,
+    "lon": 13.378479,
+    "osm_category": "supermarket",
+    "app_categories": [],
+    "website": "https://www.aldi-nord.de/filialen-und-oeffnungszeiten/berlin/gerichtstrasse-2-3/3180473.html",
+    "phone": null,
+    "opening_hours": "Mo-Sa 07:00-21:00; PH off",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "99d5e521966d7de47072f67ba6d1065eaa4ec21b",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "2-3",
+      "addr:postcode": "13347",
+      "addr:street": "Gerichtstraße",
+      "addr:suburb": "Gesundbrunnen",
+      "air_conditioning": "yes",
+      "brand": "Aldi Nord",
+      "brand:wikidata": "Q41171373",
+      "building": "retail",
+      "building:levels": "1",
+      "check_date": "2026-06-16",
+      "name": "Aldi",
+      "opening_hours": "Mo-Sa 07:00-21:00; PH off",
+      "organic": "yes",
+      "payment:american_express": "yes",
+      "payment:app": "yes",
+      "payment:apple_pay": "yes",
+      "payment:cards": "yes",
+      "payment:cash": "yes",
+      "payment:contactless": "yes",
+      "payment:diners_club": "yes",
+      "payment:discover_card": "yes",
+      "payment:google_pay": "yes",
+      "payment:maestro": "yes",
+      "payment:mastercard": "yes",
+      "payment:v_pay": "yes",
+      "payment:visa": "yes",
+      "roof:shape": "flat",
+      "shop": "supermarket",
+      "start_date": "2026-05-29",
+      "toilets": "yes",
+      "website": "https://www.aldi-nord.de/filialen-und-oeffnungszeiten/berlin/gerichtstrasse-2-3/3180473.html",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "way",
+      "osm_id": 1530016350,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -382,7 +500,7 @@
       "osm_type": "node",
       "osm_id": 4317555810,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -424,7 +542,7 @@
       "osm_type": "node",
       "osm_id": 707425912,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -453,7 +571,7 @@
       "osm_type": "node",
       "osm_id": 4436482287,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -483,7 +601,7 @@
       "osm_type": "node",
       "osm_id": 11757773351,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -519,7 +637,7 @@
       "osm_type": "node",
       "osm_id": 9309752751,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -544,8 +662,8 @@
       "addr:housenumber": "18",
       "addr:postcode": "13347",
       "addr:street": "Schönwalder Straße",
-      "check_date": "2025-05-17",
-      "check_date:opening_hours": "2024-04-12",
+      "check_date": "2026-08-23",
+      "check_date:opening_hours": "2026-08-23",
       "level": "0",
       "name": "Ankauf & Verkauf Technik",
       "opening_hours:signed": "no",
@@ -557,7 +675,7 @@
       "osm_type": "node",
       "osm_id": 9395585861,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -570,7 +688,7 @@
     "lon": 13.382706,
     "osm_category": "bakery",
     "app_categories": [],
-    "website": "http://www.antepliogullari.de/",
+    "website": "https://www.antepliogullari.de/",
     "phone": "+49 30 94057570",
     "opening_hours": "Mo-Sa 10:00-21:00; Su,PH 11:00-21:00",
     "description": "Imported from OSM Overpass for Berlin.",
@@ -590,14 +708,14 @@
       "phone": "+49 30 94057570",
       "shop": "bakery",
       "smoking": "outside",
-      "website": "http://www.antepliogullari.de/",
+      "website": "https://www.antepliogullari.de/",
       "wheelchair": "yes"
     },
     "source_payload": {
       "osm_type": "node",
       "osm_id": 4899394021,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -630,7 +748,7 @@
       "osm_type": "node",
       "osm_id": 1298511709,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -670,7 +788,7 @@
       "osm_type": "node",
       "osm_id": 576608994,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -699,7 +817,7 @@
       "osm_type": "node",
       "osm_id": 5031751087,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -729,7 +847,36 @@
       "osm_type": "node",
       "osm_id": 5248627030,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/14144892418",
+    "name": "Avanti",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.558725,
+    "lon": 13.375325,
+    "osm_category": "locksmith",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "8243d6d487fc350e1113a8d2c7229fda6959fd05",
+    "is_useful": true,
+    "raw_tags": {
+      "check_date": "2026-09-03",
+      "name": "Avanti",
+      "shop": "locksmith"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 14144892418,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -765,7 +912,7 @@
       "osm_type": "node",
       "osm_id": 8890286246,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -796,7 +943,7 @@
       "osm_type": "node",
       "osm_id": 10709325642,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -826,7 +973,7 @@
       "osm_type": "node",
       "osm_id": 2566382658,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -860,7 +1007,7 @@
       "osm_type": "node",
       "osm_id": 4318477522,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -893,7 +1040,7 @@
       "osm_type": "node",
       "osm_id": 3086242561,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -929,7 +1076,7 @@
       "osm_type": "node",
       "osm_id": 5923190751,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -963,7 +1110,7 @@
       "osm_type": "node",
       "osm_id": 5257750955,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -993,7 +1140,7 @@
       "osm_type": "node",
       "osm_id": 7710976602,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -1031,7 +1178,7 @@
       "osm_type": "node",
       "osm_id": 707452472,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -1073,7 +1220,7 @@
       "osm_type": "node",
       "osm_id": 4139417218,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -1107,7 +1254,7 @@
       "osm_type": "node",
       "osm_id": 2752211158,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -1138,7 +1285,49 @@
       "osm_type": "node",
       "osm_id": 10029073665,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/419545767",
+    "name": "Baraka Supermarkt",
+    "address": "Badstraße 58, 13357, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.551395,
+    "lon": 13.382898,
+    "osm_category": "supermarket",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Sa 07:00-22:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "2ebac428fbe2910955b959fd5fcae42ecfb4c16e",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "58",
+      "addr:postcode": "13357",
+      "addr:street": "Badstraße",
+      "addr:suburb": "Gesundbrunnen",
+      "check_date": "2026-06-10",
+      "description": "Einfahrt zum Kunden-Parkplatz in der Bastianstraße.",
+      "level": "0",
+      "name": "Baraka Supermarkt",
+      "not:brand:wikidata": "Q16968817",
+      "opening_hours": "Mo-Sa 07:00-22:00",
+      "payment:mastercard": "yes",
+      "payment:visa": "yes",
+      "shop": "supermarket",
+      "wheelchair": "limited"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 419545767,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -1173,7 +1362,7 @@
       "osm_type": "node",
       "osm_id": 316056224,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.378Z"
     }
   },
   {
@@ -1203,7 +1392,7 @@
       "osm_type": "node",
       "osm_id": 13483961854,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -1240,7 +1429,7 @@
       "osm_type": "node",
       "osm_id": 4877987621,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -1272,7 +1461,7 @@
       "osm_type": "node",
       "osm_id": 2110645717,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -1307,7 +1496,7 @@
       "osm_type": "node",
       "osm_id": 5032732330,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -1380,7 +1569,208 @@
       "osm_type": "node",
       "osm_id": 312854886,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.378Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/2752211159",
+    "name": "Blümel",
+    "address": "Wollankstraße 65, 13359, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.560174,
+    "lon": 13.387775,
+    "osm_category": "florist",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Tu-Fr 09:00-17:00; Sa 09:00-13:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "c88f382363d1ae2a740e27c12d6e6c13592552fb",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "65",
+      "addr:postcode": "13359",
+      "addr:street": "Wollankstraße",
+      "addr:suburb": "Gesundbrunnen",
+      "name": "Blümel",
+      "opening_hours": "Tu-Fr 09:00-17:00; Sa 09:00-13:00",
+      "shop": "florist"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 2752211159,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.382Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/13410547900",
+    "name": "Blumen",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.543024,
+    "lon": 13.39271,
+    "osm_category": "florist",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "230f2778f892f90d7c032e90a196d62d64e07499",
+    "is_useful": true,
+    "raw_tags": {
+      "check_date:opening_hours": "2026-02-26",
+      "name": "Blumen",
+      "opening_hours:signed": "no",
+      "shop": "florist"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 13410547900,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/10739601225",
+    "name": "Blumen & Pflanzen",
+    "address": "Brunnenstraße 63, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.540149,
+    "lon": 13.394851,
+    "osm_category": "florist",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Fr 08:30-15:00; Sa 09:00-12:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "25fd4d508cf5bb5202b579a32168eb0cd6885029",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:housenumber": "63",
+      "addr:street": "Brunnenstraße",
+      "check_date": "2026-01-25",
+      "level": "0",
+      "name": "Blumen & Pflanzen",
+      "opening_hours": "Mo-Fr 08:30-15:00; Sa 09:00-12:00",
+      "shop": "florist",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 10739601225,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/282570429",
+    "name": "Blumen und Pflanzen",
+    "address": "Neue Hochstraße 30, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.543033,
+    "lon": 13.375877,
+    "osm_category": "florist",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Fr 09:00-18:00; Sa 09:00-16:00; Su,PH 10:00-15:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "19139039718496886ec5dce0b6eb5af714b7f2a8",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:housenumber": "30",
+      "addr:street": "Neue Hochstraße",
+      "check_date": "2026-02-08",
+      "check_date:opening_hours": "2026-02-08",
+      "level": "0",
+      "name": "Blumen und Pflanzen",
+      "opening_hours": "Mo-Fr 09:00-18:00; Sa 09:00-16:00; Su,PH 10:00-15:00",
+      "shop": "florist",
+      "wheelchair": "limited"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 282570429,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.377Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/5248627025",
+    "name": "Blütenreich",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.557319,
+    "lon": 13.373203,
+    "osm_category": "florist",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "760dffc1e6a9bf946d948eebb5666212e0f851bc",
+    "is_useful": true,
+    "raw_tags": {
+      "check_date:opening_hours": "2023-07-13",
+      "layer": "-1",
+      "level": "-1",
+      "name": "Blütenreich",
+      "opening_hours:signed": "no",
+      "shop": "florist"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 5248627025,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "way/438501228",
+    "name": "Blütenreich",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.549572,
+    "lon": 13.387095,
+    "osm_category": "florist",
+    "app_categories": [],
+    "website": null,
+    "phone": "+49 30 49301919",
+    "opening_hours": "Mo-Fr 07:00-21:00; Sa 08:00-21:00; Su 09:00-19:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "b17fa1da7a4aec43e19c6812ef6462fecee2bca2",
+    "is_useful": true,
+    "raw_tags": {
+      "check_date": "2025-03-15",
+      "indoor": "room",
+      "level": "0",
+      "name": "Blütenreich",
+      "opening_hours": "Mo-Fr 07:00-21:00; Sa 08:00-21:00; Su 09:00-19:00",
+      "phone": "+49 30 49301919",
+      "room": "shop",
+      "shop": "florist",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "way",
+      "osm_id": 438501228,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -1421,7 +1811,7 @@
       "osm_type": "node",
       "osm_id": 577383675,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -1458,7 +1848,7 @@
       "osm_type": "node",
       "osm_id": 4317555791,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -1499,7 +1889,7 @@
       "osm_type": "node",
       "osm_id": 581322478,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -1533,7 +1923,7 @@
       "osm_type": "node",
       "osm_id": 6480348199,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -1567,7 +1957,7 @@
       "osm_type": "node",
       "osm_id": 646593042,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -1614,7 +2004,7 @@
       "osm_type": "node",
       "osm_id": 607756448,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -1642,7 +2032,7 @@
       "osm_type": "node",
       "osm_id": 11534658751,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -1672,7 +2062,7 @@
       "osm_type": "node",
       "osm_id": 4317462782,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -1702,7 +2092,80 @@
       "osm_type": "node",
       "osm_id": 4813100968,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/316056229",
+    "name": "Cigo",
+    "address": "Residenzstraße 85, 13409, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.558939,
+    "lon": 13.372961,
+    "osm_category": "newsagent",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Sa 08:00-20:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "26e7f402c3cbfb7b984a5d85bb67bc094c7d9d47",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "85",
+      "addr:postcode": "13409",
+      "addr:street": "Residenzstraße",
+      "brand": "Cigo",
+      "brand:wikidata": "Q113290782",
+      "check_date:opening_hours": "2023-10-30",
+      "name": "Cigo",
+      "opening_hours": "Mo-Sa 08:00-20:00",
+      "shop": "newsagent",
+      "tobacco": "yes",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 316056229,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.378Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/3840033036",
+    "name": "City Restposten",
+    "address": "Drontheimer Straße 2, 13359, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.557302,
+    "lon": 13.377268,
+    "osm_category": "variety_store",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "054e357754766da27649e619411782d31579590d",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "2",
+      "addr:postcode": "13359",
+      "addr:street": "Drontheimer Straße",
+      "addr:suburb": "Gesundbrunnen",
+      "name": "City Restposten",
+      "shop": "variety_store",
+      "wheelchair": "no"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 3840033036,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -1732,7 +2195,44 @@
       "osm_type": "node",
       "osm_id": 12582221923,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/12662734801",
+    "name": "Cocoon",
+    "address": "Exerzierstraße 14, 13357, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.554026,
+    "lon": 13.374613,
+    "osm_category": "coffee",
+    "app_categories": [],
+    "website": "https://cocoonberlin.com/",
+    "phone": null,
+    "opening_hours": "Fr, Sa 12:00-00:00; Tu 12:00-20:00; We, Th 12:00-20:00; Su 11:00-18:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "e26720a6febbb68181065058d2c947ea60dd59fe",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:housenumber": "14",
+      "addr:postcode": "13357",
+      "addr:street": "Exerzierstraße",
+      "amenity": "cafe",
+      "indoor_seating": "yes",
+      "internet_access": "wlan",
+      "name": "Cocoon",
+      "opening_hours": "Fr, Sa 12:00-00:00; Tu 12:00-20:00; We, Th 12:00-20:00; Su 11:00-18:00",
+      "outdoor_seating": "yes",
+      "shop": "coffee",
+      "website": "https://cocoonberlin.com/"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 12662734801,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -1762,7 +2262,7 @@
       "osm_type": "node",
       "osm_id": 4351511594,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -1798,7 +2298,7 @@
       "osm_type": "node",
       "osm_id": 3471425375,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -1833,7 +2333,7 @@
       "osm_type": "node",
       "osm_id": 2419330374,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -1874,7 +2374,7 @@
       "osm_type": "node",
       "osm_id": 4388732495,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -1916,7 +2416,7 @@
       "osm_type": "node",
       "osm_id": 4388735295,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -1951,7 +2451,7 @@
       "osm_type": "way",
       "osm_id": 438501232,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -1983,46 +2483,50 @@
       "osm_type": "node",
       "osm_id": 7840293990,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
     "external_source": "osm-overpass",
-    "external_id": "node/4436482370",
-    "name": "Dafne Apotheke",
-    "address": "Badstraße 32, 13357, Berlin",
+    "external_id": "node/2813050934",
+    "name": "Deichmann",
+    "address": "Badstraße 4, 13357, Berlin",
     "district": "Gesundbrunnen",
-    "lat": 52.552976,
-    "lon": 13.380135,
-    "osm_category": "pharmacy",
+    "lat": 52.549654,
+    "lon": 13.389915,
+    "osm_category": "shoes",
     "app_categories": [],
-    "website": null,
+    "website": "https://stores.deichmann.com/de-de/de/berlin/berlin/badstrasse-4",
     "phone": null,
-    "opening_hours": "Mo-Fr 08:30-18:30; Sa 09:30-14:00",
+    "opening_hours": null,
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
-    "checksum": "5989694b95013e0b614ba6b1781ffaae516dd0ef",
+    "checksum": "ed2d7c891e52b5ca6c3d0f044c580b2caf3de1d5",
     "is_useful": true,
     "raw_tags": {
       "addr:city": "Berlin",
       "addr:country": "DE",
-      "addr:housename": "Dafne Apotheke",
-      "addr:housenumber": "32",
+      "addr:housename": "Gesundbrunnen-Center",
+      "addr:housenumber": "4",
       "addr:postcode": "13357",
       "addr:street": "Badstraße",
       "addr:suburb": "Gesundbrunnen",
-      "amenity": "pharmacy",
-      "check_date:opening_hours": "2024-04-28",
-      "healthcare": "pharmacy",
-      "name": "Dafne Apotheke",
-      "opening_hours": "Mo-Fr 08:30-18:30; Sa 09:30-14:00",
-      "wheelchair": "yes"
+      "brand": "Deichmann",
+      "brand:wikidata": "Q664543",
+      "check_date": "2026-01-25",
+      "level": "1",
+      "name": "Deichmann",
+      "payment:cash": "yes",
+      "payment:mastercard": "yes",
+      "payment:visa": "yes",
+      "shop": "shoes",
+      "website": "https://stores.deichmann.com/de-de/de/berlin/berlin/badstrasse-4"
     },
     "source_payload": {
       "osm_type": "node",
-      "osm_id": 4436482370,
+      "osm_id": 2813050934,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -2051,7 +2555,7 @@
       "osm_type": "node",
       "osm_id": 9198286178,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -2094,7 +2598,7 @@
       "osm_type": "node",
       "osm_id": 4791546521,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -2143,7 +2647,7 @@
       "osm_type": "node",
       "osm_id": 3906099257,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -2183,7 +2687,7 @@
       "osm_type": "node",
       "osm_id": 646593040,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -2219,7 +2723,7 @@
       "osm_type": "node",
       "osm_id": 3221929062,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -2254,7 +2758,7 @@
       "osm_type": "node",
       "osm_id": 4197401453,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -2299,7 +2803,7 @@
       "osm_type": "way",
       "osm_id": 392605419,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -2345,7 +2849,7 @@
       "osm_type": "node",
       "osm_id": 2147041012,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -2396,7 +2900,7 @@
       "osm_type": "node",
       "osm_id": 2423076594,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -2428,7 +2932,7 @@
       "osm_type": "node",
       "osm_id": 13483894831,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -2475,14 +2979,14 @@
       "osm_type": "node",
       "osm_id": 9395604410,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
     "external_source": "osm-overpass",
     "external_id": "node/332964520",
     "name": "Dr. Gropler´s Apotheke",
-    "address": "13347, Berlin",
+    "address": "Reinickendorfer Straße 47, 13347, Berlin",
     "district": "Gesundbrunnen",
     "lat": 52.549867,
     "lon": 13.368663,
@@ -2490,18 +2994,23 @@
     "app_categories": [],
     "website": null,
     "phone": null,
-    "opening_hours": "Mo-Fr 08:00-18:30; Sa 08:00-13:00",
+    "opening_hours": "Mo-Tu 08:00-18:30, We 08:00-18:00, Th 08:00-18:30, Fr 08:00-18:00, Sa 09:00-13:00",
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
-    "checksum": "f9404e29ef795a0e2a5922fe59bbf2aba8a351d7",
+    "checksum": "04f87ca4c0214a1c36899a8ed68d6b11005f4ef3",
     "is_useful": true,
     "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "47",
       "addr:postcode": "13347",
+      "addr:street": "Reinickendorfer Straße",
       "amenity": "pharmacy",
+      "contact:phone": "+49 30 46507947",
+      "contact:website": "https://www.dr-groplers-apotheke.de/",
       "dispensing": "yes",
       "healthcare": "pharmacy",
       "name": "Dr. Gropler´s Apotheke",
-      "opening_hours": "Mo-Fr 08:00-18:30; Sa 08:00-13:00",
+      "opening_hours": "Mo-Tu 08:00-18:30, We 08:00-18:00, Th 08:00-18:30, Fr 08:00-18:00, Sa 09:00-13:00",
       "wheelchair": "yes",
       "wheelchair:description": "Rampe vorhanden, einfach nachfragen"
     },
@@ -2509,7 +3018,7 @@
       "osm_type": "node",
       "osm_id": 332964520,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.378Z"
     }
   },
   {
@@ -2540,7 +3049,7 @@
       "osm_type": "node",
       "osm_id": 4100572578,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -2569,7 +3078,7 @@
       "osm_type": "node",
       "osm_id": 5887756717,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -2598,7 +3107,7 @@
       "osm_type": "node",
       "osm_id": 10739622428,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -2636,7 +3145,7 @@
       "osm_type": "node",
       "osm_id": 626859062,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -2678,7 +3187,7 @@
       "osm_type": "node",
       "osm_id": 2752211167,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -2708,7 +3217,7 @@
       "osm_type": "node",
       "osm_id": 11050787211,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -2723,7 +3232,7 @@
     "app_categories": [],
     "website": "https://www.fatima-beauty-berlin.de",
     "phone": "+49 1522 2504050",
-    "opening_hours": "Mo-Fr 10:00-14:30, 16:00-19:00; Sa 10:00-14:30",
+    "opening_hours": "Mo-Fr 09:30-18:00; Sa 11:00-15:00",
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
     "checksum": "fd0b636356ac253c8b2e848197704274e79d760e",
@@ -2738,7 +3247,7 @@
       "beauty": "nails;cosmetics",
       "email": "fatima.beauty-berlin@hotmail.com",
       "name": "Fatima Beauty",
-      "opening_hours": "Mo-Fr 10:00-14:30, 16:00-19:00; Sa 10:00-14:30",
+      "opening_hours": "Mo-Fr 09:30-18:00; Sa 11:00-15:00",
       "operator": "Fatima Anani",
       "phone": "+49 1522 2504050",
       "shop": "beauty",
@@ -2749,7 +3258,7 @@
       "osm_type": "node",
       "osm_id": 5377715288,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -2785,7 +3294,7 @@
       "osm_type": "node",
       "osm_id": 5287822222,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -2822,7 +3331,7 @@
       "osm_type": "node",
       "osm_id": 5887756704,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -2855,7 +3364,46 @@
       "osm_type": "node",
       "osm_id": 9823829854,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/4304460830",
+    "name": "Flying Roasters Kaffeerösterei",
+    "address": "Hochstraße 43, 13357, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.543346,
+    "lon": 13.378233,
+    "osm_category": "coffee",
+    "app_categories": [],
+    "website": "https://www.flyingroasters.de",
+    "phone": "+49 30 41 95 39 70",
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "7bdbf6692a846deb08302ecd5e189a0f6efa0b91",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "43",
+      "addr:postcode": "13357",
+      "addr:street": "Hochstraße",
+      "check_date": "2025-03-27",
+      "description": "Coffee Roastery",
+      "level": "0",
+      "name": "Flying Roasters Kaffeerösterei",
+      "operator": "Heymann und Klitsch GbR",
+      "phone": "+49 30 41 95 39 70",
+      "shop": "coffee",
+      "website": "https://www.flyingroasters.de",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 4304460830,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -2891,7 +3439,7 @@
       "osm_type": "node",
       "osm_id": 6533440076,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -2925,7 +3473,7 @@
       "osm_type": "node",
       "osm_id": 4439716022,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -2959,7 +3507,7 @@
       "osm_type": "node",
       "osm_id": 4439716024,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -2987,7 +3535,7 @@
       "osm_type": "node",
       "osm_id": 8929005318,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -3022,7 +3570,7 @@
       "osm_type": "node",
       "osm_id": 11008619718,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -3062,7 +3610,7 @@
       "osm_type": "node",
       "osm_id": 627415668,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -3120,7 +3668,7 @@
       "osm_type": "way",
       "osm_id": 20980117,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -3156,7 +3704,7 @@
       "osm_type": "node",
       "osm_id": 4061948095,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -3194,7 +3742,7 @@
       "osm_type": "node",
       "osm_id": 1847155514,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -3229,7 +3777,36 @@
       "osm_type": "node",
       "osm_id": 4931617824,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/4317555797",
+    "name": "Greyder",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.549834,
+    "lon": 13.388777,
+    "osm_category": "shoes",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "5ec5791d5b2d18cc78df24fda6545c180cff0308",
+    "is_useful": true,
+    "raw_tags": {
+      "level": "0",
+      "name": "Greyder",
+      "shop": "shoes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 4317555797,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -3265,7 +3842,7 @@
       "osm_type": "node",
       "osm_id": 1948766225,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -3297,7 +3874,7 @@
       "osm_type": "node",
       "osm_id": 13483966289,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -3329,7 +3906,7 @@
       "osm_type": "node",
       "osm_id": 5506852021,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -3359,7 +3936,7 @@
       "osm_type": "node",
       "osm_id": 9198286179,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -3393,7 +3970,7 @@
       "osm_type": "node",
       "osm_id": 8999222415,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -3429,7 +4006,7 @@
       "osm_type": "node",
       "osm_id": 4095732757,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -3461,7 +4038,7 @@
       "osm_type": "node",
       "osm_id": 5887756719,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -3506,7 +4083,7 @@
       "osm_type": "node",
       "osm_id": 419545768,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -3535,7 +4112,7 @@
       "osm_type": "node",
       "osm_id": 4436491041,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -3576,7 +4153,7 @@
       "osm_type": "node",
       "osm_id": 3409675298,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -3615,7 +4192,7 @@
       "osm_type": "node",
       "osm_id": 4453604479,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -3648,7 +4225,7 @@
       "osm_type": "node",
       "osm_id": 13483914750,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -3677,7 +4254,7 @@
       "osm_type": "node",
       "osm_id": 10604555729,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -3728,7 +4305,7 @@
       "osm_type": "node",
       "osm_id": 2264296523,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -3743,7 +4320,7 @@
     "app_categories": [],
     "website": "https://www.ilkyaz-getraenke.de/",
     "phone": "+49 30 43 00 42 82",
-    "opening_hours": "Mo-Fr 07:30-18:30, Sa 8:00-18:00",
+    "opening_hours": "Mo-Fr 07:30-18:30, Sa 08:00-18:00",
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
     "checksum": "c134530c94c260f66b7126af655523f6e7b5e305",
@@ -3756,7 +4333,7 @@
       "check_date": "2024-09-27",
       "email": "info@ilkyaz-getraenke.de",
       "name": "Ilkyaz Getränke Abholmärkte",
-      "opening_hours": "Mo-Fr 07:30-18:30, Sa 8:00-18:00",
+      "opening_hours": "Mo-Fr 07:30-18:30, Sa 08:00-18:00",
       "phone": "+49 30 43 00 42 82",
       "shop": "beverages",
       "website": "https://www.ilkyaz-getraenke.de/"
@@ -3765,7 +4342,7 @@
       "osm_type": "node",
       "osm_id": 4318477525,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -3794,7 +4371,7 @@
       "osm_type": "node",
       "osm_id": 4899206821,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -3826,7 +4403,40 @@
       "osm_type": "node",
       "osm_id": 5887756701,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/5640336261",
+    "name": "Inter Tabak",
+    "address": "Brunnenstraße 84, 13355, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.543897,
+    "lon": 13.392017,
+    "osm_category": "tobacco",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "b1fefd8dafe33af257e70293eab42f2fc2585f9d",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "84",
+      "addr:postcode": "13355",
+      "addr:street": "Brunnenstraße",
+      "name": "Inter Tabak",
+      "shop": "tobacco",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 5640336261,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -3858,7 +4468,7 @@
       "osm_type": "node",
       "osm_id": 5057333521,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -3900,7 +4510,7 @@
       "osm_type": "node",
       "osm_id": 3941585864,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -3915,7 +4525,7 @@
     "app_categories": [],
     "website": null,
     "phone": null,
-    "opening_hours": null,
+    "opening_hours": "Mo-Sa 07:00-02:00",
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
     "checksum": "ae3398d2b682c83fe386a1023a1ffe5c9da3ff11",
@@ -3925,15 +4535,18 @@
       "addr:housenumber": "24",
       "addr:postcode": "13357",
       "addr:street": "Jülicher Straße",
+      "check_date": "2026-05-20",
+      "check_date:opening_hours": "2026-05-20",
       "name": "Jüli Späti",
       "note": "Späti",
+      "opening_hours": "Mo-Sa 07:00-02:00",
       "shop": "convenience"
     },
     "source_payload": {
       "osm_type": "node",
       "osm_id": 1161375510,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -3974,7 +4587,7 @@
       "osm_type": "node",
       "osm_id": 644658975,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -4010,7 +4623,46 @@
       "osm_type": "node",
       "osm_id": 7728924601,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/4542091118",
+    "name": "k kiosk",
+    "address": "Brunnenstraße 105-109, 13355, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.547959,
+    "lon": 13.39064,
+    "osm_category": "newsagent",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "052443a1e2362e2159ed9ee7b14875a73fa80a9d",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "105-109",
+      "addr:postcode": "13355",
+      "addr:street": "Brunnenstraße",
+      "addr:suburb": "Gesundbrunnen",
+      "brand": "k kiosk",
+      "brand:wikidata": "Q60381703",
+      "level": "1",
+      "name": "k kiosk",
+      "operator": "k Presse und Buch",
+      "post_office:type": "post_partner",
+      "shop": "newsagent"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 4542091118,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -4053,7 +4705,7 @@
       "osm_type": "node",
       "osm_id": 2546237577,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -4083,41 +4735,7 @@
       "osm_type": "node",
       "osm_id": 4437574123,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
-    }
-  },
-  {
-    "external_source": "osm-overpass",
-    "external_id": "node/12250341954",
-    "name": "Karina Wäschevermietung",
-    "address": "Hochstraße 44, Berlin",
-    "district": "Gesundbrunnen",
-    "lat": 52.543792,
-    "lon": 13.377618,
-    "osm_category": "clothes",
-    "app_categories": [],
-    "website": null,
-    "phone": null,
-    "opening_hours": null,
-    "description": "Imported from OSM Overpass for Berlin.",
-    "active_status": "active",
-    "checksum": "87754fd1b667bf860422dda394a53d837758865b",
-    "is_useful": true,
-    "raw_tags": {
-      "addr:housenumber": "44",
-      "addr:street": "Hochstraße",
-      "check_date": "2024-10-14",
-      "clothes": "workwear",
-      "level": "0",
-      "name": "Karina Wäschevermietung",
-      "shop": "clothes",
-      "wheelchair": "no"
-    },
-    "source_payload": {
-      "osm_type": "node",
-      "osm_id": 12250341954,
-      "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -4157,7 +4775,7 @@
       "osm_type": "node",
       "osm_id": 6031783742,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -4202,7 +4820,7 @@
       "osm_type": "node",
       "osm_id": 498839307,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -4234,8 +4852,8 @@
       "brand:wikipedia": "en:Kaufland",
       "building": "retail",
       "building:levels": "1",
-      "check_date": "2026-01-31",
-      "check_date:opening_hours": "2023-10-30",
+      "check_date": "2026-07-05",
+      "check_date:opening_hours": "2026-07-05",
       "name": "Kaufland",
       "opening_hours": "Mo-Fr 07:00-24:00; Sa 07:00-23:30",
       "operator": "Kaufland Vertrieb 228 GmbH & Co.KG",
@@ -4252,7 +4870,7 @@
       "osm_type": "way",
       "osm_id": 28704816,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -4284,7 +4902,49 @@
       "osm_type": "node",
       "osm_id": 729587082,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/4306025963",
+    "name": "KDWedding",
+    "address": "Gerichtstraße 21, 13347, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.544153,
+    "lon": 13.372906,
+    "osm_category": "alcohol",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "42a3d7f0d6c84a1f3918fb60240f6ec3e9b19d3b",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "21",
+      "addr:postcode": "13347",
+      "addr:street": "Gerichtstraße",
+      "addr:suburb": "Gesundbrunnen",
+      "check_date": "2024-02-19",
+      "check_date:opening_hours": "2024-03-13",
+      "level": "0",
+      "name": "KDWedding",
+      "opening_hours:signed": "no",
+      "operator": "SCNR GmbH",
+      "payment:credit_cards": "yes",
+      "payment:debit_cards": "yes",
+      "shop": "alcohol",
+      "wheelchair": "no"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 4306025963,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -4315,7 +4975,38 @@
       "osm_type": "node",
       "osm_id": 9737000356,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/13871879102",
+    "name": "Kiez Shop",
+    "address": "Soldiner Straße 15, 13358, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.557894,
+    "lon": 13.389731,
+    "osm_category": "kiosk",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "3cc59412920d57ed2a17dc71d47dcc7b97a10794",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:housenumber": "15",
+      "addr:postcode": "13358",
+      "addr:street": "Soldiner Straße",
+      "name": "Kiez Shop",
+      "shop": "kiosk"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 13871879102,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -4361,7 +5052,7 @@
       "osm_type": "node",
       "osm_id": 1298512923,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -4389,7 +5080,7 @@
       "osm_type": "node",
       "osm_id": 13511969933,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -4432,7 +5123,7 @@
       "osm_type": "node",
       "osm_id": 4825870147,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -4467,7 +5158,7 @@
       "osm_type": "node",
       "osm_id": 674019820,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -4504,7 +5195,7 @@
       "osm_type": "node",
       "osm_id": 707490367,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -4538,7 +5229,7 @@
       "osm_type": "node",
       "osm_id": 10982675038,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -4574,7 +5265,42 @@
       "osm_type": "node",
       "osm_id": 4139402061,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/1846813885",
+    "name": "Kiosk Wollankstraße",
+    "address": "Wollankstraße, 13359, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.5645,
+    "lon": 13.392876,
+    "osm_category": "newsagent",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Fr 06:00-19:00; Sa 07:30-19:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "0b8acfc9b52f30c0bed2a72302c804950db92c02",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:postcode": "13359",
+      "addr:street": "Wollankstraße",
+      "name": "Kiosk Wollankstraße",
+      "opening_hours": "Mo-Fr 06:00-19:00; Sa 07:30-19:00",
+      "shop": "newsagent",
+      "toilets:wheelchair": "no",
+      "wheelchair": "no"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 1846813885,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -4589,7 +5315,7 @@
     "app_categories": [],
     "website": null,
     "phone": "+49 177 4241400",
-    "opening_hours": "Mo-Sa 10:00-19:00",
+    "opening_hours": "Mo-Fr 10:00-19:00; Sa 10:00-16:00",
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
     "checksum": "b68125d6adb683f6c4f14f8d9c958f1393bdfe92",
@@ -4599,10 +5325,11 @@
       "addr:housenumber": "20",
       "addr:postcode": "13357",
       "addr:street": "Badstraße",
-      "check_date": "2025-12-01",
+      "check_date": "2026-07-11",
+      "check_date:opening_hours": "2026-07-11",
       "level": "0",
       "name": "KLC mobile store",
-      "opening_hours": "Mo-Sa 10:00-19:00",
+      "opening_hours": "Mo-Fr 10:00-19:00; Sa 10:00-16:00",
       "operator": "Ayyildiz",
       "payment:cash": "yes",
       "phone": "+49 177 4241400",
@@ -4616,7 +5343,7 @@
       "osm_type": "node",
       "osm_id": 10302371178,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -4653,7 +5380,7 @@
       "osm_type": "node",
       "osm_id": 2887017001,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -4697,7 +5424,7 @@
       "osm_type": "node",
       "osm_id": 271282692,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.377Z"
     }
   },
   {
@@ -4737,7 +5464,37 @@
       "osm_type": "node",
       "osm_id": 3341588831,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "way/438501188",
+    "name": "Kompakt Kauf",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.548598,
+    "lon": 13.38857,
+    "osm_category": "kiosk",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "30cac5d657af70a5765055034e270fc8e855d821",
+    "is_useful": true,
+    "raw_tags": {
+      "level": "-3",
+      "name": "Kompakt Kauf",
+      "shop": "kiosk",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "way",
+      "osm_id": 438501188,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -4758,8 +5515,8 @@
     "checksum": "52268c7262b32600a82757e74cca9692652dc266",
     "is_useful": true,
     "raw_tags": {
-      "check_date": "2025-03-15",
-      "check_date:opening_hours": "2024-03-22",
+      "check_date": "2026-07-13",
+      "check_date:opening_hours": "2026-07-13",
       "indoor": "room",
       "name": "Kompakt Kauf",
       "opening_hours:signed": "no",
@@ -4770,7 +5527,39 @@
       "osm_type": "way",
       "osm_id": 438501244,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/9198286170",
+    "name": "Konditorei Al-Iman",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.554456,
+    "lon": 13.375959,
+    "osm_category": "confectionery",
+    "app_categories": [],
+    "website": null,
+    "phone": "+49 30 40394617",
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "a3b56db200e91b20b03c24b1f23dcf43f843a990",
+    "is_useful": true,
+    "raw_tags": {
+      "check_date:opening_hours": "2023-07-13",
+      "name": "Konditorei Al-Iman",
+      "opening_hours:signed": "no",
+      "phone": "+49 30 40394617",
+      "shop": "confectionery",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 9198286170,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -4808,7 +5597,7 @@
       "osm_type": "node",
       "osm_id": 979502650,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -4843,7 +5632,7 @@
       "osm_type": "node",
       "osm_id": 2756763449,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -4876,7 +5665,7 @@
       "osm_type": "node",
       "osm_id": 2752211171,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -4906,7 +5695,7 @@
       "osm_type": "node",
       "osm_id": 10078364349,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -4940,7 +5729,7 @@
       "osm_type": "node",
       "osm_id": 4119519558,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -4972,7 +5761,7 @@
       "osm_type": "way",
       "osm_id": 268315922,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5006,7 +5795,45 @@
       "osm_type": "node",
       "osm_id": 4317462788,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/6883305821",
+    "name": "Lara Carpet Outlet",
+    "address": "Reinickendorfer Straße 14, 13347, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.542542,
+    "lon": 13.370109,
+    "osm_category": "variety_store",
+    "app_categories": [],
+    "website": "https://www.laracarpet.de",
+    "phone": null,
+    "opening_hours": "Mo-Fr 09:00-18:30; Sa 09:00-14:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "a862259b1aa24e9643c470e224bf32e046eb8df9",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "14",
+      "addr:postcode": "13347",
+      "addr:street": "Reinickendorfer Straße",
+      "check_date": "2026-08-10",
+      "check_date:opening_hours": "2026-08-10",
+      "level": "0",
+      "name": "Lara Carpet Outlet",
+      "opening_hours": "Mo-Fr 09:00-18:30; Sa 09:00-14:00",
+      "shop": "variety_store",
+      "website": "https://www.laracarpet.de",
+      "wheelchair": "limited"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 6883305821,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -5030,8 +5857,8 @@
       "addr:housenumber": "44",
       "addr:street": "Hochstraße",
       "beauty": "nails",
-      "check_date": "2025-03-15",
-      "check_date:opening_hours": "2025-03-15",
+      "check_date": "2026-08-04",
+      "check_date:opening_hours": "2026-08-04",
       "level": "0",
       "name": "Lena Nails",
       "opening_hours": "Mo-Fr 09:30-19:00; Sa 09:30-16:00",
@@ -5042,7 +5869,7 @@
       "osm_type": "node",
       "osm_id": 3081222947,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -5088,7 +5915,7 @@
       "osm_type": "node",
       "osm_id": 585473264,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -5131,7 +5958,7 @@
       "osm_type": "node",
       "osm_id": 301787391,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.377Z"
     }
   },
   {
@@ -5173,7 +6000,7 @@
       "osm_type": "node",
       "osm_id": 419545765,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -5203,7 +6030,7 @@
       "brand:wikipedia": "en:Lidl",
       "check_date": "2025-06-29",
       "check_date:opening_hours": "2023-04-20",
-      "contact:phone": "+49 800 4353361",
+      "contact:phone": "0800 4353361",
       "name": "Lidl",
       "opening_hours": "Mo-Sa 07:00-21:00; Su off",
       "shop": "supermarket",
@@ -5215,7 +6042,7 @@
       "osm_type": "node",
       "osm_id": 707456082,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -5229,7 +6056,7 @@
     "osm_category": "supermarket",
     "app_categories": [],
     "website": "https://www.lidl.de/",
-    "phone": "+49 800 4353361",
+    "phone": "0800 4353361",
     "opening_hours": "Mo-Sa 07:00-22:00",
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
@@ -5252,7 +6079,7 @@
       "name": "Lidl",
       "opening_hours": "Mo-Sa 07:00-22:00",
       "operator": "Lidl Vertriebs-GmbH & Co. KG",
-      "phone": "+49 800 4353361",
+      "phone": "0800 4353361",
       "roof:colour": "#A33F40",
       "roof:shape": "gabled",
       "shop": "supermarket",
@@ -5265,7 +6092,7 @@
       "osm_type": "way",
       "osm_id": 27849630,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5306,7 +6133,7 @@
       "osm_type": "way",
       "osm_id": 105805611,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5350,7 +6177,7 @@
       "osm_type": "node",
       "osm_id": 332967255,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.378Z"
     }
   },
   {
@@ -5387,7 +6214,7 @@
       "osm_type": "node",
       "osm_id": 626868231,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -5417,7 +6244,7 @@
       "osm_type": "node",
       "osm_id": 10012569603,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5452,7 +6279,7 @@
       "osm_type": "node",
       "osm_id": 9408430208,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -5490,7 +6317,42 @@
       "osm_type": "node",
       "osm_id": 4200389800,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/13929192552",
+    "name": "LUDI Afroshop",
+    "address": "Osloer Straße 99, 13359, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.555913,
+    "lon": 13.379856,
+    "osm_category": "convenience",
+    "app_categories": [],
+    "website": null,
+    "phone": "+49 15904732551",
+    "opening_hours": "Tu-Sa 10:00-21:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "745830cb021badc485fa67a7a38de85064435e7d",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "99",
+      "addr:place": "Berlin",
+      "addr:postcode": "13359",
+      "addr:street": "Osloer Straße",
+      "name": "LUDI Afroshop",
+      "opening_hours": "Tu-Sa 10:00-21:00",
+      "phone": "+49 15904732551",
+      "shop": "convenience"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 13929192552,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5524,7 +6386,7 @@
       "osm_type": "node",
       "osm_id": 10982675037,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5553,7 +6415,7 @@
       "osm_type": "node",
       "osm_id": 4339053529,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -5590,7 +6452,7 @@
       "osm_type": "node",
       "osm_id": 4437578137,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -5630,7 +6492,7 @@
       "osm_type": "node",
       "osm_id": 11146008755,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5660,7 +6522,7 @@
       "osm_type": "node",
       "osm_id": 10314826081,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5716,7 +6578,7 @@
       "osm_type": "way",
       "osm_id": 27159946,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5737,7 +6599,7 @@
     "checksum": "96ff934a60015d9ac1622a4238730ea55920cd16",
     "is_useful": true,
     "raw_tags": {
-      "check_date:opening_hours": "2025-04-05",
+      "check_date:opening_hours": "2026-05-07",
       "clothes": "women",
       "description": "Kostüme, Mäntel, Röcke, Braut- und Abendkleider",
       "name": "MELDA",
@@ -5749,7 +6611,7 @@
       "osm_type": "node",
       "osm_id": 5640403350,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -5787,7 +6649,7 @@
       "osm_type": "node",
       "osm_id": 12347033185,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5817,7 +6679,7 @@
       "osm_type": "node",
       "osm_id": 11165906109,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5855,7 +6717,7 @@
       "osm_type": "node",
       "osm_id": 9198286163,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -5891,7 +6753,7 @@
       "osm_type": "node",
       "osm_id": 2752211175,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -5920,7 +6782,7 @@
       "osm_type": "node",
       "osm_id": 5569263931,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -5951,7 +6813,7 @@
       "osm_type": "node",
       "osm_id": 10012680616,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -5972,6 +6834,7 @@
     "checksum": "ee596bf720ce41957ce20311fab1c282d30c3308",
     "is_useful": true,
     "raw_tags": {
+      "check_date:opening_hours": "2026-05-18",
       "name": "Mo's Spätkauf",
       "opening_hours:signed": "no",
       "shop": "convenience"
@@ -5980,7 +6843,7 @@
       "osm_type": "node",
       "osm_id": 4339053530,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -6011,7 +6874,7 @@
       "osm_type": "node",
       "osm_id": 674019823,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -6049,7 +6912,7 @@
       "osm_type": "node",
       "osm_id": 4290884742,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -6088,7 +6951,7 @@
       "osm_type": "node",
       "osm_id": 631480658,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -6122,7 +6985,7 @@
       "osm_type": "node",
       "osm_id": 9741661166,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -6159,7 +7022,7 @@
       "osm_type": "node",
       "osm_id": 7627025801,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -6188,7 +7051,7 @@
       "osm_type": "node",
       "osm_id": 5887756712,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -6225,7 +7088,7 @@
       "osm_type": "node",
       "osm_id": 8890286245,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -6259,7 +7122,7 @@
       "osm_type": "node",
       "osm_id": 4109578506,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -6315,7 +7178,7 @@
       "osm_type": "way",
       "osm_id": 24964657,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -6359,7 +7222,7 @@
       "osm_type": "way",
       "osm_id": 147432145,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -6394,7 +7257,7 @@
       "osm_type": "way",
       "osm_id": 1266882963,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -6418,8 +7281,8 @@
       "addr:postcode": "13357",
       "addr:street": "Hanne-Sobek-Platz",
       "amenity": "pharmacy",
-      "check_date": "2025-03-25",
-      "check_date:opening_hours": "2025-03-25",
+      "check_date": "2026-06-17",
+      "check_date:opening_hours": "2026-06-17",
       "dispensing": "no",
       "email": "info@nordkreuz-apotheke.de",
       "healthcare": "pharmacy",
@@ -6438,7 +7301,7 @@
       "osm_type": "node",
       "osm_id": 3350477701,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -6469,7 +7332,7 @@
       "osm_type": "node",
       "osm_id": 6695117188,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -6501,12 +7364,16 @@
       "brand:wikipedia": "de:Obi (Baumarkt)",
       "building": "retail",
       "building:levels": "6",
+      "check_date": "2026-06-06",
       "check_date:opening_hours": "2025-11-01",
       "contact:phone": "+49 30 4634041",
       "contact:website": "http://www.obi.de/de/maerkte/Berlin-Wedding",
       "name": "OBI",
       "opening_hours": "Mo-Sa 08:00-20:00; Su,PH off",
       "operator": "OBI Markt Berlin-Wedding",
+      "payment:cash": "yes",
+      "payment:credit_cards": "yes",
+      "payment:debit_cards": "yes",
       "shop": "doityourself",
       "wheelchair": "limited"
     },
@@ -6514,7 +7381,7 @@
       "osm_type": "way",
       "osm_id": 180687339,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -6548,7 +7415,7 @@
       "osm_type": "node",
       "osm_id": 2756763465,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -6583,7 +7450,7 @@
       "osm_type": "way",
       "osm_id": 1266882966,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -6620,7 +7487,7 @@
       "osm_type": "node",
       "osm_id": 2752211176,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -6654,7 +7521,40 @@
       "osm_type": "node",
       "osm_id": 4155950167,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/4136416728",
+    "name": "Oslo Späti",
+    "address": "Prinzenallee 21, 13357, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.555447,
+    "lon": 13.384266,
+    "osm_category": "convenience",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "c91e1ad45c2ea0c773dfa57dc48443f26f0a09d6",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "21",
+      "addr:postcode": "13357",
+      "addr:street": "Prinzenallee",
+      "check_date": "2026-06-12",
+      "name": "Oslo Späti",
+      "shop": "convenience"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 4136416728,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -6683,7 +7583,7 @@
       "osm_type": "way",
       "osm_id": 1242783008,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -6723,7 +7623,7 @@
       "osm_type": "node",
       "osm_id": 2917279001,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -6755,7 +7655,7 @@
       "osm_type": "node",
       "osm_id": 5248627028,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -6791,7 +7691,44 @@
       "osm_type": "node",
       "osm_id": 4317462785,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/5859059955",
+    "name": "Palace Konditorei",
+    "address": "Badstraße 19, 13357, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.551677,
+    "lon": 13.383378,
+    "osm_category": "pastry",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "25dc076782ee05d7841cb12f10de5cb74d91eb10",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "19",
+      "addr:postcode": "13357",
+      "addr:street": "Badstraße",
+      "check_date": "2022-11-28",
+      "check_date:opening_hours": "2024-04-28",
+      "level": "0",
+      "name": "Palace Konditorei",
+      "opening_hours:signed": "no",
+      "shop": "pastry",
+      "wheelchair": "no"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 5859059955,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -6822,7 +7759,7 @@
       "osm_type": "node",
       "osm_id": 7160668101,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -6863,7 +7800,7 @@
       "osm_type": "node",
       "osm_id": 4193676996,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -6895,6 +7832,7 @@
       "brand:wikipedia": "en:Penny (supermarket)",
       "check_date:opening_hours": "2024-10-29",
       "name": "PENNY",
+      "name:de": "PENNY",
       "name:fa": "پنی",
       "opening_hours": "Mo-Sa 07:00-22:00",
       "shop": "supermarket",
@@ -6904,7 +7842,7 @@
       "osm_type": "node",
       "osm_id": 473611934,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -6917,8 +7855,8 @@
     "lon": 13.393291,
     "osm_category": "supermarket",
     "app_categories": [],
-    "website": null,
-    "phone": null,
+    "website": "https://www.penny.de/markt/berlin/531452/penny-brunnenstrasse-brunnenstrasse-75",
+    "phone": "+4922120199959",
     "opening_hours": "Mo-Sa 07:00-22:00",
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
@@ -6941,14 +7879,16 @@
       "opening_hours": "Mo-Sa 07:00-22:00",
       "payment:mastercard": "yes",
       "payment:visa": "yes",
+      "phone": "+4922120199959",
       "shop": "supermarket",
+      "website": "https://www.penny.de/markt/berlin/531452/penny-brunnenstrasse-brunnenstrasse-75",
       "wheelchair": "yes"
     },
     "source_payload": {
       "osm_type": "node",
       "osm_id": 2026168141,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -6963,14 +7903,16 @@
     "app_categories": [],
     "website": null,
     "phone": null,
-    "opening_hours": "Mo-Sa 07:00-22:00",
+    "opening_hours": "Mo-Sa 07:00-22:00; PH off",
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
     "checksum": "3a53ef4bace7efdec66eda7199a7e97b4581ad45",
     "is_useful": true,
     "raw_tags": {
+      "addr:country": "DE",
       "addr:housenumber": "4",
       "addr:street": "Gerichtstraße",
+      "addr:suburb": "Gesundbrunnen",
       "air_conditioning": "yes",
       "brand": "Penny",
       "brand:wikidata": "Q284688",
@@ -6983,7 +7925,7 @@
       "internet_access": "no",
       "name": "PENNY",
       "name:fa": "پنی",
-      "opening_hours": "Mo-Sa 07:00-22:00",
+      "opening_hours": "Mo-Sa 07:00-22:00; PH off",
       "organic": "yes",
       "payment:mastercard": "yes",
       "payment:visa": "yes",
@@ -6997,7 +7939,7 @@
       "osm_type": "way",
       "osm_id": 53542190,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -7036,7 +7978,7 @@
       "osm_type": "node",
       "osm_id": 2259025211,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -7072,7 +8014,7 @@
       "osm_type": "node",
       "osm_id": 3954780447,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -7109,7 +8051,45 @@
       "osm_type": "node",
       "osm_id": 4318477528,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/627037205",
+    "name": "Pfennigland",
+    "address": "Badstraße 8, 13357, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.549978,
+    "lon": 13.386195,
+    "osm_category": "variety_store",
+    "app_categories": [],
+    "website": "http://www.pfennigland.de/pfennigland-wedd.html",
+    "phone": null,
+    "opening_hours": "Mo-Fr 09:30-19:00; Sa 09:30-14:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "ebbf1af9502ae6d6d821212c0c8231cc66ba3bd6",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "8",
+      "addr:postcode": "13357",
+      "addr:street": "Badstraße",
+      "addr:suburb": "Gesundbrunnen",
+      "check_date:opening_hours": "2026-02-27",
+      "name": "Pfennigland",
+      "opening_hours": "Mo-Fr 09:30-19:00; Sa 09:30-14:00",
+      "shop": "variety_store",
+      "website": "http://www.pfennigland.de/pfennigland-wedd.html",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 627037205,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -7137,7 +8117,7 @@
       "osm_type": "node",
       "osm_id": 12204988222,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -7170,7 +8150,157 @@
       "osm_type": "node",
       "osm_id": 3885853475,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/8522135732",
+    "name": "Pilea",
+    "address": "Ravenéstraße 4, 13347, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.542839,
+    "lon": 13.371176,
+    "osm_category": "florist",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Tu-Sa 12:30-19:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "d0eb0e6042fa61947a284c955d6d4eea79d48adb",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "4",
+      "addr:postcode": "13347",
+      "addr:street": "Ravenéstraße",
+      "addr:suburb": "Gesundbrunnen",
+      "check_date": "2026-04-03",
+      "check_date:opening_hours": "2026-04-03",
+      "contact:email": "info@pilea-living.de",
+      "contact:phone": "+49 30 54825823",
+      "contact:website": "https://pilea-living.de/",
+      "level": "0",
+      "name": "Pilea",
+      "opening_hours": "Tu-Sa 12:30-19:00",
+      "payment:credit_cards": "yes",
+      "payment:debit_cards": "yes",
+      "shop": "florist",
+      "wheelchair": "no"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 8522135732,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/13483929851",
+    "name": "Premium Apotheke",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.549954,
+    "lon": 13.390255,
+    "osm_category": "pharmacy",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "e818560d49c8a855ff20cb6e1cc0405e1585a5ce",
+    "is_useful": true,
+    "raw_tags": {
+      "amenity": "pharmacy",
+      "check_date": "2026-01-25",
+      "healthcare": "pharmacy",
+      "level": "0",
+      "name": "Premium Apotheke"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 13483929851,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/5512967940",
+    "name": "Press & Books",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.556942,
+    "lon": 13.373209,
+    "osm_category": "newsagent",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Fr 04:30-21:30; Sa 05:00-21:30",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "63c122e50208958022bb74cfed301c2744b91511",
+    "is_useful": true,
+    "raw_tags": {
+      "brand": "Press & Books",
+      "brand:wikidata": "Q100407277",
+      "layer": "-1",
+      "level": "-1",
+      "name": "Press & Books",
+      "opening_hours": "Mo-Fr 04:30-21:30; Sa 05:00-21:30",
+      "shop": "newsagent",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 5512967940,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "way/392605420",
+    "name": "Press & Books",
+    "address": "Badstraße 1-3, 13357, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.549206,
+    "lon": 13.388823,
+    "osm_category": "newsagent",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Fr 04:30-21:45; Sa,Su,PH 07:00-21:45",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "79e2f235e91847a5ba933f8fc9a71525937f8306",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "1-3",
+      "addr:postcode": "13357",
+      "addr:street": "Badstraße",
+      "brand": "Press & Books",
+      "brand:wikidata": "Q100407277",
+      "indoor": "room",
+      "level": "0",
+      "name": "Press & Books",
+      "opening_hours": "Mo-Fr 04:30-21:45; Sa,Su,PH 07:00-21:45",
+      "payment:credit_cards": "yes",
+      "payment:debit_cards": "yes",
+      "room": "shop",
+      "shop": "newsagent",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "way",
+      "osm_id": 392605420,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -7211,7 +8341,7 @@
       "osm_type": "node",
       "osm_id": 522780551,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -7238,6 +8368,7 @@
       "addr:postcode": "13359",
       "addr:street": "Koloniestraße",
       "addr:suburb": "Gesundbrunnen",
+      "check_date": "2026-06-01",
       "name": "Prime Shop",
       "shop": "convenience"
     },
@@ -7245,7 +8376,7 @@
       "osm_type": "node",
       "osm_id": 3757302128,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -7280,7 +8411,7 @@
       "osm_type": "node",
       "osm_id": 4449775882,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -7311,7 +8442,7 @@
       "osm_type": "node",
       "osm_id": 8285839575,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -7346,7 +8477,7 @@
       "osm_type": "node",
       "osm_id": 3506086153,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -7388,7 +8519,7 @@
       "osm_type": "node",
       "osm_id": 427043045,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -7416,7 +8547,7 @@
       "osm_type": "node",
       "osm_id": 5031751090,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -7456,7 +8587,7 @@
       "osm_type": "node",
       "osm_id": 1550422326,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -7494,54 +8625,7 @@
       "osm_type": "node",
       "osm_id": 5265015741,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
-    }
-  },
-  {
-    "external_source": "osm-overpass",
-    "external_id": "node/419545767",
-    "name": "REWE",
-    "address": "Badstraße 57-58, 13357, Berlin",
-    "district": "Gesundbrunnen",
-    "lat": 52.551395,
-    "lon": 13.382898,
-    "osm_category": "supermarket",
-    "app_categories": [],
-    "website": "https://www.rewe.de/",
-    "phone": "+49 30 46067706",
-    "opening_hours": "Mo-Fr 07:00-24:00; Sa 07:00-23:30",
-    "description": "Imported from OSM Overpass for Berlin.",
-    "active_status": "active",
-    "checksum": "d091a2a7214e64d71ac7d82c983d883529446b8f",
-    "is_useful": true,
-    "raw_tags": {
-      "addr:city": "Berlin",
-      "addr:country": "DE",
-      "addr:housenumber": "57-58",
-      "addr:postcode": "13357",
-      "addr:street": "Badstraße",
-      "addr:suburb": "Gesundbrunnen",
-      "brand": "Rewe",
-      "brand:wikidata": "Q16968817",
-      "brand:wikipedia": "de:Rewe",
-      "check_date": "2023-01-03",
-      "contact:phone": "+49 30 89048499",
-      "level": "0",
-      "name": "REWE",
-      "opening_hours": "Mo-Fr 07:00-24:00; Sa 07:00-23:30",
-      "organic": "yes",
-      "payment:mastercard": "yes",
-      "payment:visa": "yes",
-      "phone": "+49 30 46067706",
-      "shop": "supermarket",
-      "website": "https://www.rewe.de/",
-      "wheelchair": "yes"
-    },
-    "source_payload": {
-      "osm_type": "node",
-      "osm_id": 419545767,
-      "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -7599,7 +8683,7 @@
       "osm_type": "node",
       "osm_id": 10873128906,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -7624,7 +8708,8 @@
       "addr:street": "Badstraße",
       "brand": "Rewe",
       "brand:wikidata": "Q16968817",
-      "check_date": "2024-11-30",
+      "check_date": "2026-08-03",
+      "check_date:opening_hours": "2026-08-03",
       "contact:phone": "+49 30 49908964",
       "contact:website": "https://www.rewe.de/marktseite/berlin-gesundbrunnen/1931258/rewe-center-badstr-4/",
       "internet_access": "wlan",
@@ -7648,7 +8733,7 @@
       "osm_type": "way",
       "osm_id": 1266882969,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -7680,7 +8765,7 @@
       "osm_type": "node",
       "osm_id": 13483894832,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -7708,7 +8793,7 @@
       "osm_type": "node",
       "osm_id": 12136109874,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -7738,7 +8823,7 @@
       "osm_type": "node",
       "osm_id": 4449115011,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -7786,7 +8871,39 @@
       "osm_type": "node",
       "osm_id": 1308915486,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/6292662742",
+    "name": "Rossmann",
+    "address": "Brunnenstraße 64-65, 13355, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.540676,
+    "lon": 13.394633,
+    "osm_category": "chemist",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "c1e0b45cfed287ab437615094d79924fff1f5ae7",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "64-65",
+      "addr:postcode": "13355",
+      "addr:street": "Brunnenstraße",
+      "name": "Rossmann",
+      "shop": "chemist"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 6292662742,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -7815,7 +8932,43 @@
       "osm_type": "node",
       "osm_id": 11165906112,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/7773620206",
+    "name": "Samake",
+    "address": "Badstraße 21, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.551941,
+    "lon": 13.382724,
+    "osm_category": "seafood",
+    "app_categories": [],
+    "website": null,
+    "phone": "+49 30 23299827",
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "692d4f42a7f585b888295446ab9509410dbd6fd9",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:housenumber": "21",
+      "addr:street": "Badstraße",
+      "check_date": "2023-01-03",
+      "cuisine": "turkish",
+      "diet:halal": "yes",
+      "level": "0",
+      "name": "Samake",
+      "phone": "+49 30 23299827",
+      "shop": "seafood",
+      "wheelchair": "no"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 7773620206,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -7860,7 +9013,7 @@
       "osm_type": "node",
       "osm_id": 646601548,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -7894,7 +9047,7 @@
       "osm_type": "node",
       "osm_id": 9487148767,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -7931,7 +9084,7 @@
       "osm_type": "node",
       "osm_id": 5887756703,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -7969,7 +9122,7 @@
       "osm_type": "node",
       "osm_id": 2752211184,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -7999,7 +9152,7 @@
       "osm_type": "node",
       "osm_id": 10655854843,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -8028,7 +9181,7 @@
       "osm_type": "node",
       "osm_id": 4061948101,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -8063,7 +9216,105 @@
       "osm_type": "node",
       "osm_id": 2752211177,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/707490371",
+    "name": "Shisha Shop",
+    "address": "Badstraße, 13357, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.551605,
+    "lon": 13.383502,
+    "osm_category": "tobacco",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "06afb65b1d5d4635c4a42959745a3d16e0185b78",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:postcode": "13357",
+      "addr:street": "Badstraße",
+      "name": "Shisha Shop",
+      "shop": "tobacco"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 707490371,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.382Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/8890286250",
+    "name": "Shishashop-Wedding",
+    "address": "Brunnenstraße 115, 13355, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.541848,
+    "lon": 13.392919,
+    "osm_category": "tobacco",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "d20ecf87fd891ac00b40c49cabb3352039e4dd21",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:housenumber": "115",
+      "addr:postcode": "13355",
+      "addr:street": "Brunnenstraße",
+      "name": "Shishashop-Wedding",
+      "shop": "tobacco"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 8890286250,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "way/1266882965",
+    "name": "Sizeer",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.54995,
+    "lon": 13.389235,
+    "osm_category": "shoes",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Sa 10:00-21:00; PH off",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "df2e1825201ce23538b6e1684fcca1cad33b110f",
+    "is_useful": true,
+    "raw_tags": {
+      "brand": "Sizeer",
+      "brand:wikidata": "Q93982889",
+      "contact:phone": "+49 30 48 62 80 70",
+      "contact:website": "https://sizeer.de/unsere-stores/berlin-gesundbrunnen-sizeer",
+      "level": "1",
+      "name": "Sizeer",
+      "opening_hours": "Mo-Sa 10:00-21:00; PH off",
+      "second_hand": "no",
+      "shop": "shoes",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "way",
+      "osm_id": 1266882965,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -8100,7 +9351,7 @@
       "osm_type": "node",
       "osm_id": 11046785722,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -8138,7 +9389,7 @@
       "osm_type": "node",
       "osm_id": 707353011,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -8175,7 +9426,7 @@
       "osm_type": "node",
       "osm_id": 473629401,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -8204,7 +9455,7 @@
       "osm_type": "node",
       "osm_id": 6695121386,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -8232,7 +9483,7 @@
       "osm_type": "node",
       "osm_id": 4351511606,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -8268,7 +9519,7 @@
       "osm_type": "node",
       "osm_id": 4799571388,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -8306,7 +9557,7 @@
       "osm_type": "node",
       "osm_id": 2756763428,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -8343,7 +9594,7 @@
       "osm_type": "node",
       "osm_id": 2736043858,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -8380,7 +9631,7 @@
       "osm_type": "node",
       "osm_id": 4109584179,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -8401,6 +9652,7 @@
     "checksum": "bd722417be63a69340fca19fc029eb1205293a4e",
     "is_useful": true,
     "raw_tags": {
+      "check_date": "2026-06-12",
       "name": "Späti 030",
       "payment:credit_cards": "yes",
       "payment:debit_cards": "yes",
@@ -8410,7 +9662,7 @@
       "osm_type": "node",
       "osm_id": 4437587810,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -8440,7 +9692,7 @@
       "osm_type": "node",
       "osm_id": 8890286247,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -8480,7 +9732,7 @@
       "osm_type": "node",
       "osm_id": 312820851,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.378Z"
     }
   },
   {
@@ -8510,7 +9762,7 @@
       "osm_type": "node",
       "osm_id": 1170348050,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -8542,7 +9794,7 @@
       "osm_type": "node",
       "osm_id": 2756763474,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -8572,7 +9824,7 @@
       "osm_type": "node",
       "osm_id": 4139411321,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -8605,7 +9857,7 @@
       "osm_type": "node",
       "osm_id": 4351511616,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -8634,7 +9886,7 @@
       "osm_type": "node",
       "osm_id": 4436486384,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -8663,7 +9915,7 @@
       "osm_type": "node",
       "osm_id": 6135203779,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -8700,7 +9952,7 @@
       "osm_type": "node",
       "osm_id": 8516433535,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -8731,7 +9983,7 @@
       "osm_type": "node",
       "osm_id": 9198286166,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -8765,7 +10017,7 @@
       "osm_type": "node",
       "osm_id": 707353241,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -8804,7 +10056,7 @@
       "osm_type": "node",
       "osm_id": 4100572572,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -8834,7 +10086,7 @@
       "osm_type": "node",
       "osm_id": 646593064,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -8873,7 +10125,7 @@
       "osm_type": "node",
       "osm_id": 5339216377,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.435Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -8912,7 +10164,7 @@
       "osm_type": "node",
       "osm_id": 707452479,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -8955,7 +10207,7 @@
       "osm_type": "node",
       "osm_id": 6895858795,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -8994,7 +10246,7 @@
       "osm_type": "node",
       "osm_id": 3081225427,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -9024,7 +10276,7 @@
       "osm_type": "node",
       "osm_id": 8000678063,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -9053,7 +10305,7 @@
       "osm_type": "node",
       "osm_id": 13410561610,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -9089,7 +10341,7 @@
       "osm_type": "node",
       "osm_id": 644658972,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -9124,7 +10376,70 @@
       "osm_type": "node",
       "osm_id": 2730990672,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/4317555811",
+    "name": "Tabakwaren & Zeitschriften Friese",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.549607,
+    "lon": 13.388799,
+    "osm_category": "tobacco",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "35bc098a4a181b0f1285a756ded13bccefcbebf3",
+    "is_useful": true,
+    "raw_tags": {
+      "check_date": "2024-09-18",
+      "level": "0",
+      "name": "Tabakwaren & Zeitschriften Friese",
+      "shop": "tobacco",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 4317555811,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.384Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/13483931906",
+    "name": "Tamaris",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.549981,
+    "lon": 13.389894,
+    "osm_category": "shoes",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "9ecc4076dcff8e51d5c74b1fc002b710c78def5b",
+    "is_useful": true,
+    "raw_tags": {
+      "brand": "Tamaris",
+      "brand:wikidata": "Q61994827",
+      "check_date": "2026-01-25",
+      "level": "1",
+      "name": "Tamaris",
+      "shop": "shoes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 13483931906,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -9160,7 +10475,7 @@
       "osm_type": "node",
       "osm_id": 6700773085,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -9192,7 +10507,7 @@
       "osm_type": "node",
       "osm_id": 729587081,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -9229,7 +10544,42 @@
       "osm_type": "node",
       "osm_id": 1847156092,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/4317555813",
+    "name": "Tchibo",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.54982,
+    "lon": 13.388591,
+    "osm_category": "coffee",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Sa 10:00-20:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "68189792ed0884a1b84ed7fbb1f6aa25de64dda8",
+    "is_useful": true,
+    "raw_tags": {
+      "brand": "Tchibo",
+      "brand:wikidata": "Q564213",
+      "brand:wikipedia": "de:Tchibo",
+      "coffee": "yes",
+      "level": "0",
+      "name": "Tchibo",
+      "opening_hours": "Mo-Sa 10:00-20:00",
+      "shop": "coffee",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 4317555813,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -9272,7 +10622,7 @@
       "osm_type": "node",
       "osm_id": 627415717,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -9303,7 +10653,48 @@
       "osm_type": "node",
       "osm_id": 7160668100,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/2090941788",
+    "name": "TEDi",
+    "address": "Brunnenstraße 105-109, 13355, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.547976,
+    "lon": 13.390106,
+    "osm_category": "variety_store",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Sa 09:00-20:00; Su,PH off",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "aab11e4c762be0162a32945ebf829df968f1b867",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "105-109",
+      "addr:postcode": "13355",
+      "addr:street": "Brunnenstraße",
+      "addr:suburb": "Gesundbrunnen",
+      "brand": "TEDi",
+      "brand:wikidata": "Q1364603",
+      "brand:wikipedia": "de:TEDi",
+      "check_date:opening_hours": "2023-03-16",
+      "level": "1",
+      "name": "TEDi",
+      "opening_hours": "Mo-Sa 09:00-20:00; Su,PH off",
+      "shop": "variety_store",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 2090941788,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -9334,7 +10725,7 @@
       "osm_type": "node",
       "osm_id": 5887756702,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -9379,7 +10770,7 @@
       "osm_type": "node",
       "osm_id": 6052783185,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -9415,7 +10806,39 @@
       "osm_type": "node",
       "osm_id": 9286872873,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/12666591627",
+    "name": "Thalia",
+    "address": "Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.549701,
+    "lon": 13.390234,
+    "osm_category": "books",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "02f829fe7396902907c94b9b1e7c8692a1a83738",
+    "is_useful": true,
+    "raw_tags": {
+      "brand": "Thalia",
+      "brand:wikidata": "Q2408854",
+      "check_date": "2026-01-25",
+      "level": "0",
+      "name": "Thalia",
+      "shop": "books"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 12666591627,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -9441,8 +10864,8 @@
       "addr:housenumber": "11",
       "addr:postcode": "13357",
       "addr:street": "Badstraße",
-      "check_date": "2023-01-13",
-      "check_date:opening_hours": "2024-05-01",
+      "check_date": "2026-07-13",
+      "check_date:opening_hours": "2026-07-13",
       "indoor_seating": "no",
       "level": "0",
       "name": "Thoben",
@@ -9459,7 +10882,7 @@
       "osm_type": "node",
       "osm_id": 606949415,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -9498,7 +10921,7 @@
       "osm_type": "node",
       "osm_id": 5064174322,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -9512,8 +10935,8 @@
     "osm_category": "clothes",
     "app_categories": [],
     "website": "https://www.tita-berlin.de/",
-    "phone": null,
-    "opening_hours": null,
+    "phone": "+49 176 85070871",
+    "opening_hours": "\"nach Terminabsprache\"",
     "description": "Imported from OSM Overpass for Berlin.",
     "active_status": "active",
     "checksum": "afa4b36dc2594c0554971d336f6c82d77496861f",
@@ -9526,6 +10949,8 @@
       "addr:street": "Eulerstraße",
       "addr:suburb": "Gesundbrunnen",
       "name": "Tita Berlin",
+      "opening_hours": "\"nach Terminabsprache\"",
+      "phone": "+49 176 85070871",
       "shop": "clothes",
       "source": "www.tita-berlin.de/",
       "website": "https://www.tita-berlin.de/"
@@ -9534,7 +10959,7 @@
       "osm_type": "node",
       "osm_id": 2308429864,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -9567,7 +10992,7 @@
       "osm_type": "node",
       "osm_id": 12666591626,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -9602,7 +11027,7 @@
       "osm_type": "node",
       "osm_id": 4100572574,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -9633,7 +11058,7 @@
       "osm_type": "node",
       "osm_id": 419545764,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.431Z"
+      "fetched_at": "2026-10-02T08:04:02.379Z"
     }
   },
   {
@@ -9661,7 +11086,7 @@
       "osm_type": "node",
       "osm_id": 12372318340,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -9674,7 +11099,7 @@
     "lon": 13.375271,
     "osm_category": "second_hand",
     "app_categories": [],
-    "website": "http://troedel-bernauer.de",
+    "website": "https://troedel-bernauer.de/",
     "phone": null,
     "opening_hours": "Mo-Fr 12:00-18:00; Sa 13:00-18:00",
     "description": "Imported from OSM Overpass for Berlin.",
@@ -9689,46 +11114,14 @@
       "name": "Trödel Bernauer",
       "opening_hours": "Mo-Fr 12:00-18:00; Sa 13:00-18:00",
       "shop": "second_hand",
-      "website": "http://troedel-bernauer.de",
+      "website": "https://troedel-bernauer.de/",
       "wheelchair": "no"
     },
     "source_payload": {
       "osm_type": "node",
       "osm_id": 3081226520,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
-    }
-  },
-  {
-    "external_source": "osm-overpass",
-    "external_id": "node/9844946878",
-    "name": "tropez",
-    "address": "Berlin",
-    "district": "Gesundbrunnen",
-    "lat": 52.545885,
-    "lon": 13.381242,
-    "osm_category": "kiosk",
-    "app_categories": [],
-    "website": "https://www.tropeztropez.de/",
-    "phone": "+49 176 66800232",
-    "opening_hours": "Mo-Su 10:00-18:00",
-    "description": "Imported from OSM Overpass for Berlin.",
-    "active_status": "active",
-    "checksum": "96905dbef9bf893a95f4716069149a7ab02f8988",
-    "is_useful": true,
-    "raw_tags": {
-      "name": "tropez",
-      "opening_hours": "Mo-Su 10:00-18:00",
-      "phone": "+49 176 66800232",
-      "shop": "kiosk",
-      "website": "https://www.tropeztropez.de/",
-      "wheelchair": "yes"
-    },
-    "source_payload": {
-      "osm_type": "node",
-      "osm_id": 9844946878,
-      "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -9761,7 +11154,7 @@
       "osm_type": "node",
       "osm_id": 4317555812,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.384Z"
     }
   },
   {
@@ -9802,7 +11195,7 @@
       "osm_type": "node",
       "osm_id": 1298246171,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -9833,7 +11226,7 @@
       "osm_type": "node",
       "osm_id": 5248627026,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -9870,7 +11263,7 @@
       "osm_type": "node",
       "osm_id": 11766872169,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -9921,7 +11314,7 @@
       "osm_type": "way",
       "osm_id": 392606750,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -9964,7 +11357,7 @@
       "osm_type": "node",
       "osm_id": 1845158730,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -10000,7 +11393,7 @@
       "osm_type": "node",
       "osm_id": 1847159132,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -10028,7 +11421,7 @@
       "osm_type": "node",
       "osm_id": 9423354156,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   },
   {
@@ -10070,7 +11463,7 @@
       "osm_type": "node",
       "osm_id": 2423076739,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.382Z"
     }
   },
   {
@@ -10116,7 +11509,7 @@
       "osm_type": "node",
       "osm_id": 7430297886,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -10147,7 +11540,7 @@
       "osm_type": "node",
       "osm_id": 5887756716,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.436Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -10179,7 +11572,43 @@
       "osm_type": "node",
       "osm_id": 2756763461,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/9198286157",
+    "name": "Youssef",
+    "address": "Schwedenstraße 17, 13357, Berlin",
+    "district": "Gesundbrunnen",
+    "lat": 52.554858,
+    "lon": 13.375596,
+    "osm_category": "tobacco",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": null,
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "47f7f688958f45e5e8a7465c4482cafd90153a29",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "17",
+      "addr:postcode": "13357",
+      "addr:street": "Schwedenstraße",
+      "addr:suburb": "Gesundbrunnen",
+      "check_date:opening_hours": "2023-07-13",
+      "name": "Youssef",
+      "opening_hours:signed": "no",
+      "shop": "tobacco"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 9198286157,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -10215,7 +11644,7 @@
       "osm_type": "node",
       "osm_id": 4100572573,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -10253,7 +11682,7 @@
       "osm_type": "node",
       "osm_id": 4455470037,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.385Z"
     }
   },
   {
@@ -10286,7 +11715,7 @@
       "osm_type": "node",
       "osm_id": 4899075822,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.434Z"
+      "fetched_at": "2026-10-02T08:04:02.386Z"
     }
   },
   {
@@ -10330,7 +11759,7 @@
       "osm_type": "node",
       "osm_id": 644659553,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.432Z"
+      "fetched_at": "2026-10-02T08:04:02.381Z"
     }
   },
   {
@@ -10369,7 +11798,7 @@
       "osm_type": "node",
       "osm_id": 3757314996,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.433Z"
+      "fetched_at": "2026-10-02T08:04:02.383Z"
     }
   },
   {
@@ -10401,7 +11830,7 @@
       "osm_type": "node",
       "osm_id": 11199678483,
       "source": "overpass",
-      "fetched_at": "2026-04-29T13:59:14.437Z"
+      "fetched_at": "2026-10-02T08:04:02.387Z"
     }
   }
 ]

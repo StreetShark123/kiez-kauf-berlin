@@ -44,7 +44,7 @@
       "osm_type": "node",
       "osm_id": 816598789,
       "source": "overpass",
-      "fetched_at": "2026-04-29T14:00:03.729Z"
+      "fetched_at": "2026-10-02T08:13:53.381Z"
     }
   },
   {
@@ -76,7 +76,37 @@
       "osm_type": "node",
       "osm_id": 8333748450,
       "source": "overpass",
-      "fetched_at": "2026-04-29T14:00:03.730Z"
+      "fetched_at": "2026-10-02T08:13:53.383Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/4970985871",
+    "name": "Blumen",
+    "address": "10557, Berlin",
+    "district": "Hansaviertel",
+    "lat": 52.518594,
+    "lon": 13.342591,
+    "osm_category": "florist",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Fr 07:30-19:30; Sa 07:30-19:30; Su 09:00-16:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "e234179c59970817499cf653fbdc7442bab74456",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:postcode": "10557",
+      "name": "Blumen",
+      "opening_hours": "Mo-Fr 07:30-19:30; Sa 07:30-19:30; Su 09:00-16:00",
+      "shop": "florist"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 4970985871,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:13:53.383Z"
     }
   },
   {
@@ -106,7 +136,7 @@
       "osm_type": "node",
       "osm_id": 2724240145,
       "source": "overpass",
-      "fetched_at": "2026-04-29T14:00:03.730Z"
+      "fetched_at": "2026-10-02T08:13:53.383Z"
     }
   },
   {
@@ -145,7 +175,61 @@
       "osm_type": "node",
       "osm_id": 2283101504,
       "source": "overpass",
-      "fetched_at": "2026-04-29T14:00:03.730Z"
+      "fetched_at": "2026-10-02T08:13:53.383Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/2102541972",
+    "name": "Konditorei & Café Buchwald",
+    "address": "Bartningallee 29, 10557, Berlin",
+    "district": "Hansaviertel",
+    "lat": 52.521226,
+    "lon": 13.347677,
+    "osm_category": "pastry",
+    "app_categories": [],
+    "website": null,
+    "phone": null,
+    "opening_hours": "Mo-Su 11:00-18:00",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "9e3affc828c9bf673fc8fe712f2dbfbd91bac288",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:city": "Berlin",
+      "addr:country": "DE",
+      "addr:housenumber": "29",
+      "addr:postcode": "10557",
+      "addr:street": "Bartningallee",
+      "addr:suburb": "Hansaviertel",
+      "amenity": "cafe",
+      "changing_table": "yes",
+      "check_date": "2024-06-10",
+      "contact:email": "info@konditorei-buchwald.de",
+      "contact:phone": "+49 30 3915931",
+      "contact:website": "http://www.konditorei-buchwald.de",
+      "cuisine": "cake;coffee_shop;german;tea",
+      "indoor_seating": "yes",
+      "level": "0",
+      "name": "Konditorei & Café Buchwald",
+      "opening_hours": "Mo-Su 11:00-18:00",
+      "outdoor_seating": "yes",
+      "payment:credit_cards": "yes",
+      "payment:debit_cards": "yes",
+      "shop": "pastry",
+      "smoking": "outside",
+      "toilets:wheelchair": "no",
+      "wheelchair": "no",
+      "wheelchair:description": "Vor dem Eingang befinden sich 6 Stufen. Aber der Sommergarten ist barrierefrei!",
+      "wikidata": "Q90406921",
+      "wikimedia_commons": "File:Konditorei & Café Buchwald.jpg",
+      "wikipedia": "de:Konditorei Buchwald"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 2102541972,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:13:53.383Z"
     }
   },
   {
@@ -177,7 +261,7 @@
       "osm_type": "node",
       "osm_id": 2724240147,
       "source": "overpass",
-      "fetched_at": "2026-04-29T14:00:03.730Z"
+      "fetched_at": "2026-10-02T08:13:53.383Z"
     }
   },
   {
@@ -228,7 +312,7 @@
       "osm_type": "way",
       "osm_id": 25779478,
       "source": "overpass",
-      "fetched_at": "2026-04-29T14:00:03.731Z"
+      "fetched_at": "2026-10-02T08:13:53.383Z"
     }
   },
   {
@@ -279,7 +363,7 @@
       "osm_type": "way",
       "osm_id": 268901430,
       "source": "overpass",
-      "fetched_at": "2026-04-29T14:00:03.731Z"
+      "fetched_at": "2026-10-02T08:13:53.383Z"
     }
   },
   {
@@ -309,7 +393,7 @@
       "osm_type": "node",
       "osm_id": 11622451233,
       "source": "overpass",
-      "fetched_at": "2026-04-29T14:00:03.730Z"
+      "fetched_at": "2026-10-02T08:13:53.383Z"
     }
   },
   {
@@ -341,7 +425,49 @@
       "osm_type": "node",
       "osm_id": 12307298106,
       "source": "overpass",
-      "fetched_at": "2026-04-29T14:00:03.730Z"
+      "fetched_at": "2026-10-02T08:13:53.383Z"
+    }
+  },
+  {
+    "external_source": "osm-overpass",
+    "external_id": "node/11944893686",
+    "name": "Winehane",
+    "address": "Bartningallee 5, Berlin",
+    "district": "Hansaviertel",
+    "lat": 52.518737,
+    "lon": 13.342735,
+    "osm_category": "wine",
+    "app_categories": [],
+    "website": "https://weinhane.de",
+    "phone": "+49 163 8606969",
+    "opening_hours": "Tu-Th 12:00-18:00; Fr 12:00-20:00; Sa 10:00-14:00; PH off",
+    "description": "Imported from OSM Overpass for Berlin.",
+    "active_status": "active",
+    "checksum": "2efb01902fac9fd19b027455251c48d13b55ac95",
+    "is_useful": true,
+    "raw_tags": {
+      "addr:housenumber": "5",
+      "addr:street": "Bartningallee",
+      "check_date": "2025-12-08",
+      "check_date:opening_hours": "2025-12-08",
+      "email": "mail@weinhane.de",
+      "internet_access": "wlan",
+      "internet_access:fee": "customers",
+      "level": "0",
+      "name": "Winehane",
+      "opening_hours": "Tu-Th 12:00-18:00; Fr 12:00-20:00; Sa 10:00-14:00; PH off",
+      "payment:credit_cards": "yes",
+      "payment:debit_cards": "yes",
+      "phone": "+49 163 8606969",
+      "shop": "wine",
+      "website": "https://weinhane.de",
+      "wheelchair": "yes"
+    },
+    "source_payload": {
+      "osm_type": "node",
+      "osm_id": 11944893686,
+      "source": "overpass",
+      "fetched_at": "2026-10-02T08:13:53.383Z"
     }
   }
 ]

@@ -73,7 +73,27 @@ const SHOP_TYPES = [
   "electronics",
   "computer",
   "bicycle",
-  "locksmith"
+  "locksmith",
+  // Everyday-need retail that the presence model covers (batteries, cables, flowers, pet food...).
+  "variety_store",
+  "newsagent",
+  "tobacco",
+  "florist",
+  "garden_centre",
+  "pet",
+  "books",
+  "toys",
+  "alcohol",
+  "wine",
+  "confectionery",
+  "pastry",
+  "seafood",
+  "coffee",
+  "tea",
+  "baby_goods",
+  "shoes",
+  "houseware",
+  "zero_waste"
 ];
 
 const SHOP_REGEX = SHOP_TYPES.join("|");
@@ -648,6 +668,11 @@ async function main() {
   const outFile = path.join(DATA_DIR, `osm_${scope.label}_establishments.normalized.json`);
   await writeJsonFile(outFile, sliced);
   logInfo(`Wrote normalized snapshot to ${outFile}`);
+
+  if (args["snapshot-only"] === true || args["snapshot-only"] === "true") {
+    logInfo("Snapshot-only run: skipped Supabase stage/promote steps");
+    return;
+  }
 
   const chunks = chunkArray(sliced, batchSize);
   let processed = 0;

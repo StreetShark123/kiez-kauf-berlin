@@ -5,7 +5,10 @@ const CONTENT_SECURITY_POLICY = [
   "base-uri 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
-  "script-src 'self' 'unsafe-inline'",
+  // `next dev` (React Refresh) needs eval; production keeps the strict policy.
+  process.env.NODE_ENV === "development"
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    : "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline' https:",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",
@@ -44,6 +47,13 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   typedRoutes: true,
   outputFileTracingRoot: process.cwd(),
+  // The presence engine falls back to the committed OSM snapshots when Supabase is not available.
+  outputFileTracingIncludes: {
+    "/api/search": ["./data/berlin/osm_*_establishments.normalized.json"],
+    "/api/presence/**": ["./data/berlin/osm_*_establishments.normalized.json"],
+    "/api/admin/presence/**": ["./data/berlin/osm_*_establishments.normalized.json"],
+    "/[locale]/store/[id]": ["./data/berlin/osm_*_establishments.normalized.json"]
+  },
   async headers() {
     return [
       {

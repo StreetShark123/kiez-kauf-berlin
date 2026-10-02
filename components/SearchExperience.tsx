@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LocalMap } from "@/components/LocalMap";
+import { PresenceFeedback } from "@/components/PresenceFeedback";
 import { track } from "@vercel/analytics";
 import type { Dictionary } from "@/lib/i18n";
 import { estimateTravelMinutes } from "@/lib/maps";
 import { evaluateOpeningInfo, type OpeningInfo, type OpeningStatus } from "@/lib/opening-hours";
-import type { SearchResult } from "@/lib/types";
+import type { Locale, SearchResult } from "@/lib/types";
 
 type SearchPayload = {
+  engine?: "presence" | "legacy";
   query: string;
   origin: { lat: number; lng: number };
   radius: number;
@@ -547,10 +549,12 @@ function UiIcon({
 
 export function SearchExperience({
   dictionary,
-  initialCenter
+  initialCenter,
+  locale = "de"
 }: {
   dictionary: Dictionary;
   initialCenter: { lat: number; lng: number };
+  locale?: Locale;
 }) {
   const safeInitialCenter = isValidCenterPoint(initialCenter) ? initialCenter : BERLIN_FALLBACK_CENTER;
   const cachedCenter = useMemo(() => readCachedLocation(), []);
@@ -582,6 +586,8 @@ export function SearchExperience({
   const [activeQuickIntent, setActiveQuickIntent] = useState<string | null>(null);
   const [showCachedResultBadge, setShowCachedResultBadge] = useState(false);
   const [lastSearchEndpoint, setLastSearchEndpoint] = useState<string | null>(null);
+  const [lastSearchEngine, setLastSearchEngine] = useState<"presence" | "legacy" | null>(null);
+  const [lastSubmittedQuery, setLastSubmittedQuery] = useState<string>("");
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
   const [activeRecentIndex, setActiveRecentIndex] = useState(-1);
   const lastHapticAtRef = useRef(0);
@@ -1090,6 +1096,12 @@ export function SearchExperience({
           return statusDelta;
         }
 
+        // The presence engine already ranks by probability discounted by distance; re-sorting by
+        // distance alone would put a "possible" shop next door above a "likely" one 200 m away.
+        if (lastSearchEngine === "presence") {
+          return a.result.rank - b.result.rank;
+        }
+
         const distanceDelta = a.result.distanceMeters - b.result.distanceMeters;
         if (distanceDelta !== 0) {
           return distanceDelta;
@@ -1097,7 +1109,7 @@ export function SearchExperience({
 
         return b.result.rank - a.result.rank;
       });
-  }, [resultsWithOpeningInfo]);
+  }, [lastSearchEngine, resultsWithOpeningInfo]);
 
   const filteredListResults = useMemo(() => {
     return prioritizedListResults.filter((entry) => {
@@ -1600,7 +1612,8 @@ export function SearchExperience({
         q: effectiveQuery,
         lat: String(safeCenter.lat),
         lng: String(safeCenter.lng),
-        radius: String(Math.round(radiusKm * 1000))
+        radius: String(Math.round(radiusKm * 1000)),
+        locale
       });
 
       const attemptEndpoints = [SEARCH_PRIMARY_ENDPOINT, SEARCH_FALLBACK_ENDPOINT];
@@ -1759,6 +1772,8 @@ export function SearchExperience({
       }
 
       setResults(displayResults);
+      setLastSearchEngine(data?.engine ?? "legacy");
+      setLastSubmittedQuery(effectiveQuery);
       setSelectedOfferId(displayResults[0]?.offer.id ?? null);
       setHasSearched(true);
       setNoResultsGuidance(guidance);
@@ -2434,6 +2449,16 @@ export function SearchExperience({
                       <span className="store-meta-chip">{dictionary.savedStoreLabel}</span>
                     ) : null}
                   </div>
+                  {lastSearchEngine === "presence" ? (
+                    <PresenceFeedback
+                      key={selectedResultEntry.result.offer.id}
+                      dictionary={dictionary}
+                      storeId={selectedResultEntry.result.store.id}
+                      productTypeId={selectedResultEntry.result.product.id}
+                      productLabel={displayProductName(selectedResultEntry.result.product)}
+                      query={lastSubmittedQuery}
+                    />
+                  ) : null}
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {(() => {
                       const travel = selectedTravel ?? estimateTravel(selectedResultEntry.result.distanceMeters);

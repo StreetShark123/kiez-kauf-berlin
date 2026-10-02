@@ -17,6 +17,8 @@ if (!globalRateLimitState.__kiezRateLimitBuckets) {
 
 const ADMIN_LIMIT = { max: 120, windowMs: 60_000 };
 const ANALYTICS_LIMIT = { max: 240, windowMs: 60_000 };
+// Crowd feedback writes evidence; keep bursts small (per-device daily caps live in the API).
+const PRESENCE_FEEDBACK_LIMIT = { max: 30, windowMs: 60_000 };
 
 function getClientIp(request: NextRequest): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -107,11 +109,27 @@ function buildLimitExceededResponse(retryAfterSeconds: number) {
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  if (!pathname.startsWith("/api/admin") && !pathname.startsWith("/api/analytics")) {
+  if (
+    !pathname.startsWith("/api/admin") &&
+    !pathname.startsWith("/api/analytics") &&
+    !pathname.startsWith("/api/presence/feedback")
+  ) {
     return NextResponse.next();
   }
 
   const clientIp = getClientIp(request);
+
+  if (pathname.startsWith("/api/presence/feedback")) {
+    const result = consumeToken({
+      key: `presence:${clientIp}`,
+      max: PRESENCE_FEEDBACK_LIMIT.max,
+      windowMs: PRESENCE_FEEDBACK_LIMIT.windowMs
+    });
+    if (!result.allowed) {
+      return buildLimitExceededResponse(result.retryAfterSeconds);
+    }
+    return NextResponse.next();
+  }
 
   if (pathname.startsWith("/api/admin")) {
     const result = consumeToken({

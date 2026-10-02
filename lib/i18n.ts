@@ -50,6 +50,12 @@ export type Dictionary = {
   sourceLabel: string;
   validationLabel: string;
   whyMatchLabel: string;
+  presenceQuestionTemplate: string;
+  presenceYesAction: string;
+  presenceNoAction: string;
+  presenceThanks: string;
+  presenceError: string;
+  presenceHint: string;
   validationLikely: string;
   validationValidated: string;
   validationUnvalidated: string;
@@ -150,7 +156,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     noResultsRefineHint: "Kein Treffer? Probier eine einfache Alternative:",
     noResultsSuggestionLabel: "Zum Testen:",
     expandSearchButtonTemplate: "Auf {radius} km erweitern",
-    compactResultsSummaryTemplate: "{shown} von {total} Treffern (offen + nah zuerst).",
+    compactResultsSummaryTemplate: "{shown} von {total} Treffern (offen + beste Treffer in der Naehe zuerst).",
     viewMoreResultsLabel: "Mehr sehen",
     viewLessResultsLabel: "Weniger sehen",
     openStore: "Filiale ansehen",
@@ -172,9 +178,15 @@ const dictionaries: Record<Locale, Dictionary> = {
     sourceLabel: "Quelle",
     validationLabel: "Datenstatus",
     whyMatchLabel: "Warum dieser Treffer",
+    presenceQuestionTemplate: "Gibt es hier {product}?",
+    presenceYesAction: "Ja, gesehen",
+    presenceNoAction: "Nein, nicht da",
+    presenceThanks: "Danke! Das macht die Treffer fuer deine Nachbarn genauer.",
+    presenceError: "Konnte nicht gespeichert werden. Bitte spaeter nochmal.",
+    presenceHint: "Anonym. Eine Antwort pro Laden und Produkt.",
     validationLikely: "Wahrscheinlich",
     validationValidated: "Bestaetigt",
-    validationUnvalidated: "Offen",
+    validationUnvalidated: "Moeglich",
     validationRejected: "Verworfen",
     unknownCategory: "Ohne Typ",
     unknownConfidence: "Keine Angabe",
@@ -270,7 +282,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     noResultsRefineHint: "No match yet? Try a simpler term:",
     noResultsSuggestionLabel: "Try:",
     expandSearchButtonTemplate: "Expand to {radius} km",
-    compactResultsSummaryTemplate: "Showing {shown} of {total} stores (open + nearest first).",
+    compactResultsSummaryTemplate: "Showing {shown} of {total} stores (open + best nearby match first).",
     viewMoreResultsLabel: "View more",
     viewLessResultsLabel: "View less",
     openStore: "Store details",
@@ -292,9 +304,15 @@ const dictionaries: Record<Locale, Dictionary> = {
     sourceLabel: "Match source",
     validationLabel: "Reliability",
     whyMatchLabel: "Why it matched",
+    presenceQuestionTemplate: "Do they have {product} here?",
+    presenceYesAction: "Yes, I saw it",
+    presenceNoAction: "No, not there",
+    presenceThanks: "Thanks! This makes results more accurate for your neighbours.",
+    presenceError: "Couldn't save that. Please try again later.",
+    presenceHint: "Anonymous. One answer per shop and product.",
     validationLikely: "Likely",
-    validationValidated: "Validated",
-    validationUnvalidated: "Unvalidated",
+    validationValidated: "Confirmed",
+    validationUnvalidated: "Possible",
     validationRejected: "Rejected",
     unknownCategory: "Unclassified",
     unknownConfidence: "N/A",
@@ -390,7 +408,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     noResultsRefineHint: "Sin resultados? Prueba una forma mas simple:",
     noResultsSuggestionLabel: "Prueba:",
     expandSearchButtonTemplate: "Ampliar a {radius} km",
-    compactResultsSummaryTemplate: "Mostrando {shown} de {total} tiendas (abiertas + cercanas primero).",
+    compactResultsSummaryTemplate: "Mostrando {shown} de {total} tiendas (abiertas + mejor opción cercana primero).",
     viewMoreResultsLabel: "Ver mas",
     viewLessResultsLabel: "Ver menos",
     openStore: "Ver tienda",
@@ -412,9 +430,15 @@ const dictionaries: Record<Locale, Dictionary> = {
     sourceLabel: "Origen del match",
     validationLabel: "Fiabilidad",
     whyMatchLabel: "Por que sale",
+    presenceQuestionTemplate: "¿Tienen {product} aquí?",
+    presenceYesAction: "Sí, lo vi",
+    presenceNoAction: "No lo tenían",
+    presenceThanks: "¡Gracias! Así los resultados son más precisos para tus vecinos.",
+    presenceError: "No se pudo guardar. Inténtalo más tarde.",
+    presenceHint: "Anónimo. Una respuesta por tienda y producto.",
     validationLikely: "Probable",
-    validationValidated: "Validado",
-    validationUnvalidated: "Sin revisar",
+    validationValidated: "Confirmado",
+    validationUnvalidated: "Posible",
     validationRejected: "Descartado",
     unknownCategory: "Sin tipo",
     unknownConfidence: "Sin dato",

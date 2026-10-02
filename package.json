@@ -41,7 +41,11 @@
     "curate:moabit:ring:daily": "node scripts/pipeline/curate-moabit-10553.mjs --district-scope=mitte --postal-code-scope=10553,10551,10555,10557,10559 --batch-size=180 --max-establishments=180 --max-cost-usd-per-run=1.5 --max-cost-usd-per-day=2 --require-website-signals=true --only-ambiguous=true --prune-keep-latest=2 --resume",
     "maintenance:prune-audit": "node scripts/pipeline/prune-audit.mjs",
     "maintenance:prune-nonserving-candidates": "node scripts/pipeline/prune-nonserving-candidates.mjs",
-    "audit:enrichment": "node scripts/pipeline/audit-enrichment.mjs"
+    "audit:enrichment": "node scripts/pipeline/audit-enrichment.mjs",
+    "eval:gold": "node scripts/eval/run-gold-eval.mjs",
+    "eval:gold:compare": "node scripts/eval/run-gold-eval.mjs --engine=legacy && node scripts/eval/run-gold-eval.mjs --engine=presence",
+    "presence:format": "node scripts/presence/format-data.mjs",
+    "import:mitte:snapshot": "node scripts/pipeline/import-mitte-subzones.mjs --snapshot-only"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.103.0",
