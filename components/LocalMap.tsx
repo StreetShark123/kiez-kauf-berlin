@@ -544,6 +544,20 @@ export function LocalMap({
     };
   }, []);
 
+  // The map can be mounted while hidden (mobile "show map" toggle) or inside a container that
+  // changes height; keep the canvas in sync with its box.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const observer = new ResizeObserver(() => {
+      mapRef.current?.resize();
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     return () => {
       if (hintTimeoutRef.current) {

@@ -63,7 +63,7 @@ export function PresenceFeedback({
           <>
             <button
               type="button"
-              className="btn-ghost px-2 py-0.5 text-[0.66rem]"
+              className="nb-chip"
               disabled={state === "sending"}
               aria-label={`${question} ${dictionary.presenceYesAction}`}
               title={dictionary.presenceYesAction}
@@ -73,7 +73,7 @@ export function PresenceFeedback({
             </button>
             <button
               type="button"
-              className="btn-ghost px-2 py-0.5 text-[0.66rem]"
+              className="nb-chip"
               disabled={state === "sending"}
               aria-label={`${question} ${dictionary.presenceNoAction}`}
               title={dictionary.presenceNoAction}
@@ -94,36 +94,34 @@ export function PresenceFeedback({
 
   if (state === "thanks") {
     return (
-      <p className="status-text mt-1.5" role="status">
+      <p className="nb-feedback-thanks" role="status">
         {dictionary.presenceThanks}
       </p>
     );
   }
 
   return (
-    <div className="mt-1.5 space-y-1">
-      <p className="store-detail-line">
-        <span>{dictionary.presenceQuestionTemplate.replace("{product}", productLabel)}</span>
-      </p>
-      <div className="flex flex-wrap gap-1.5">
+    <div className="nb-feedback">
+      <p className="nb-feedback-question">{dictionary.presenceQuestionTemplate.replace("{product}", productLabel)}</p>
+      <div className="nb-actions">
         <button
           type="button"
-          className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${answer === true ? "is-active" : ""}`}
+          className={`nb-btn nb-btn-small ${answer === true ? "is-active" : ""}`}
           disabled={state === "sending"}
           onClick={() => void send(true)}
         >
-          {dictionary.presenceYesAction}
+          ✓ {dictionary.presenceYesAction}
         </button>
         <button
           type="button"
-          className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${answer === false ? "is-active" : ""}`}
+          className={`nb-btn nb-btn-small ${answer === false ? "is-active" : ""}`}
           disabled={state === "sending"}
           onClick={() => void send(false)}
         >
-          {dictionary.presenceNoAction}
+          ✗ {dictionary.presenceNoAction}
         </button>
       </div>
-      <p className="status-text text-[0.68rem]" role={state === "error" ? "alert" : undefined}>
+      <p className="nb-feedback-hint" role={state === "error" ? "alert" : undefined}>
         {state === "error" ? dictionary.presenceError : dictionary.presenceHint}
       </p>
     </div>

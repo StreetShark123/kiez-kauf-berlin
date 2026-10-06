@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
+import { Caveat, IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "@/app/globals.css";
+import "@/app/notebook.css";
 
 const displayFont = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-display"
+});
+
+// Handwritten accent for the notebook feel (titles, hints), never for body text.
+const handFont = Caveat({
+  subsets: ["latin"],
+  variable: "--font-hand",
+  weight: ["500", "600"]
 });
 
 const monoFont = IBM_Plex_Mono({
@@ -70,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={`${displayFont.variable} ${monoFont.variable}`}>
+      <body className={`${displayFont.variable} ${monoFont.variable} ${handFont.variable}`}>
         {children}
         <Analytics />
         <SpeedInsights />

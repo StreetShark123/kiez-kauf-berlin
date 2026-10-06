@@ -1,10 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import type { Route } from "next";
 import { LocalMap } from "@/components/LocalMap";
 import { PresenceFeedback } from "@/components/PresenceFeedback";
 import { track } from "@vercel/analytics";
 import type { Dictionary } from "@/lib/i18n";
+import { categoryLabel } from "@/lib/category-labels";
 import { estimateTravelMinutes } from "@/lib/maps";
 import { evaluateOpeningInfo, type OpeningInfo, type OpeningStatus } from "@/lib/opening-hours";
 import type { Locale, SearchResult } from "@/lib/types";
@@ -70,7 +73,7 @@ const MIN_RADIUS_KM = 0.5;
 const MAX_RADIUS_KM = 15;
 const RADIUS_STEP_KM = 0.5;
 const RADIUS_PICKER_OPTIONS = [0.5, 1, 1.5, 2, 3, 5, 8, 12, 15] as const;
-const COLLAPSED_RESULTS_LIMIT = 3;
+const COLLAPSED_RESULTS_LIMIT = 6;
 const SEARCH_CACHE_TTL_MS = 1000 * 60 * 10;
 const ROUTE_CACHE_TTL_MS = 1000 * 60 * 5;
 const SEARCH_TIMEOUT_MS = 10000;
@@ -244,26 +247,11 @@ function applyTemplate(template: string, replacements: Record<string, string>) {
   return output;
 }
 
-function primaryCategory(result: SearchResult, unknownCategoryLabel: string) {
-  return result.store.appCategories?.[0] ?? result.store.osmCategory ?? unknownCategoryLabel;
-}
-
 function formatValidation(dictionary: Dictionary, status: SearchResult["validationStatus"]) {
   if (status === "validated") return dictionary.validationValidated;
   if (status === "likely") return dictionary.validationLikely;
   if (status === "rejected") return dictionary.validationRejected;
   return dictionary.validationUnvalidated;
-}
-
-function compactWhyText(value: string | null | undefined, maxLength = 130) {
-  if (!value) {
-    return "";
-  }
-  const normalized = value.replace(/\s+/g, " ").trim();
-  if (normalized.length <= maxLength) {
-    return normalized;
-  }
-  return `${normalized.slice(0, maxLength - 1)}...`;
 }
 
 function humanizeProductName(value: string | null | undefined) {
@@ -299,13 +287,6 @@ function formatRelativeCheckedAt(
     return dictionary.checkedYesterday;
   }
   return applyTemplate(dictionary.checkedDaysAgoTemplate, { days: String(deltaDays) });
-}
-
-function validationToneClass(status: SearchResult["validationStatus"]) {
-  if (status === "validated") return "is-validated";
-  if (status === "likely") return "is-likely";
-  if (status === "rejected") return "is-rejected";
-  return "is-unvalidated";
 }
 
 function resolveDisplayValidationStatus(
@@ -345,28 +326,9 @@ function sanitizePhoneHref(phone: string | null | undefined) {
   return `tel:${cleaned}`;
 }
 
-function formatStoreOwnership(
-  dictionary: Dictionary,
-  ownership: SearchResult["store"]["ownershipType"] | undefined
-) {
-  if (ownership === "independent") {
-    return dictionary.ownershipIndependent;
-  }
-  if (ownership === "chain") {
-    return dictionary.ownershipChain;
-  }
-  return dictionary.ownershipUnknown;
-}
-
 function displayProductName(product: SearchResult["product"]) {
   const readable = humanizeProductName(product.displayName ?? product.normalizedName);
   return readable || product.normalizedName;
-}
-
-function openingStatusToneClass(status: OpeningStatus) {
-  if (status === "open") return "is-open-now";
-  if (status === "closed") return "is-closed-now";
-  return "is-hours-unknown";
 }
 
 function openingStatusSortRank(status: OpeningStatus) {
@@ -584,10 +546,12 @@ export function SearchExperience({
   const [routeLoadingKey, setRouteLoadingKey] = useState<string | null>(null);
   const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
   const [activeQuickIntent, setActiveQuickIntent] = useState<string | null>(null);
-  const [showCachedResultBadge, setShowCachedResultBadge] = useState(false);
-  const [lastSearchEndpoint, setLastSearchEndpoint] = useState<string | null>(null);
+  const [, setShowCachedResultBadge] = useState(false);
+  const [, setLastSearchEndpoint] = useState<string | null>(null);
   const [lastSearchEngine, setLastSearchEngine] = useState<"presence" | "legacy" | null>(null);
   const [lastSubmittedQuery, setLastSubmittedQuery] = useState<string>("");
+  // Mobile only: the map is opt-in so results come first. Desktop always shows it (CSS).
+  const [isMapVisible, setIsMapVisible] = useState(false);
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
   const [activeRecentIndex, setActiveRecentIndex] = useState(-1);
   const lastHapticAtRef = useRef(0);
@@ -930,40 +894,6 @@ export function SearchExperience({
   }, [independentOnly, openNowOnly, resultsWithOpeningInfo, savedOnly, savedStoreIdSet]);
   const statusFiltersHideAllResults = hasSearched && results.length > 0 && statusFilteredCount === 0;
 
-  const resultSummary = useMemo(() => {
-    if (isLoading) {
-      return dictionary.searchingLabel;
-    }
-    if (!hasSearched) {
-      return dictionary.mapEmptyState;
-    }
-    if (statusFiltersHideAllResults) {
-      return dictionary.noFilteredResultsLabel;
-    }
-    if (results.length === 0 && noResultsGuidance?.type === "nearby") {
-      return applyTemplate(dictionary.noResultsNearbyTemplate, {
-        distance: formatDistance(noResultsGuidance.nearestDistanceMeters)
-      });
-    }
-    if (results.length === 0 && noResultsGuidance?.type === "catalog_gap") {
-      return dictionary.noResultsCatalogHint;
-    }
-    return `${statusFilteredCount} ${dictionary.resultsCountLabel}`;
-  }, [
-    dictionary.noFilteredResultsLabel,
-    dictionary.mapEmptyState,
-    dictionary.noResultsCatalogHint,
-    dictionary.noResultsNearbyTemplate,
-    dictionary.resultsCountLabel,
-    dictionary.searchingLabel,
-    statusFilteredCount,
-    statusFiltersHideAllResults,
-    hasSearched,
-    isLoading,
-    noResultsGuidance,
-    results.length
-  ]);
-
   const liveStatus = useMemo(() => {
     if (isLoading) {
       return dictionary.searchingLabel;
@@ -1133,65 +1063,7 @@ export function SearchExperience({
     return filteredListResults.slice(0, COLLAPSED_RESULTS_LIMIT);
   }, [filteredListResults, isResultsExpanded]);
 
-  const selectedResultEntry = useMemo(() => {
-    if (filteredListResults.length === 0) {
-      return null;
-    }
-    if (!selectedOfferId) {
-      return filteredListResults[0];
-    }
-    return (
-      filteredListResults.find((entry) => entry.result.offer.id === selectedOfferId) ??
-      filteredListResults[0]
-    );
-  }, [filteredListResults, selectedOfferId]);
-
-  const selectedMatchSummary = useMemo(() => {
-    if (!selectedResultEntry) {
-      return "";
-    }
-
-    const matchReason = compactWhyText(selectedResultEntry.result.whyThisProductMatches, 150);
-    if (matchReason) {
-      return matchReason;
-    }
-
-    const categoryLabel = primaryCategory(selectedResultEntry.result, dictionary.unknownCategory);
-    return `${dictionary.storeCategoryLabel}: ${categoryLabel}`;
-  }, [
-    dictionary.storeCategoryLabel,
-    dictionary.unknownCategory,
-    selectedResultEntry
-  ]);
-
-  const selectedEntityLabel =
-    selectedResultEntry?.result.resultKind === "service"
-      ? dictionary.matchedServiceLabel
-      : dictionary.matchedProductLabel;
-  const selectedDisplayValidationStatus = useMemo(() => {
-    if (!selectedResultEntry) {
-      return "unvalidated" as const;
-    }
-    return resolveDisplayValidationStatus(selectedResultEntry.result);
-  }, [selectedResultEntry]);
-
   const hasHiddenListResults = filteredListResults.length > COLLAPSED_RESULTS_LIMIT;
-
-  const compactListSummary = useMemo(() => {
-    if (isResultsExpanded || !hasHiddenListResults) {
-      return "";
-    }
-    return applyTemplate(dictionary.compactResultsSummaryTemplate, {
-      shown: String(visibleListResults.length),
-      total: String(filteredListResults.length)
-    });
-  }, [
-    dictionary.compactResultsSummaryTemplate,
-    filteredListResults.length,
-    hasHiddenListResults,
-    isResultsExpanded,
-    visibleListResults.length
-  ]);
 
   const mapResults = useMemo(
     () => filteredListResults.map((entry) => entry.result),
@@ -1228,18 +1100,6 @@ export function SearchExperience({
   }, [showRecentSearchesDropdown, visibleRecentSearches.length]);
 
   const filtersHideAllResults = hasSearched && results.length > 0 && filteredListResults.length === 0;
-  const districtContext = useMemo(() => {
-    const firstResult = filteredListResults[0]?.result;
-    if (!firstResult) {
-      return null;
-    }
-    const district = firstResult.store.district?.trim();
-    if (!district) {
-      return null;
-    }
-    return applyTemplate(dictionary.districtContextTemplate, { district });
-  }, [dictionary.districtContextTemplate, filteredListResults]);
-
   const estimateTravel = useCallback(
     (distanceMeters: number) => {
       const walkMin = estimateTravelMinutes(distanceMeters, "walk");
@@ -1253,13 +1113,6 @@ export function SearchExperience({
     },
     [dictionary.etaApproxLabel]
   );
-
-  const selectedTravel = useMemo(() => {
-    if (!selectedResultEntry) {
-      return null;
-    }
-    return estimateTravel(selectedResultEntry.result.distanceMeters);
-  }, [estimateTravel, selectedResultEntry]);
 
   useEffect(() => {
     const searchCache = searchCacheRef.current;
@@ -1293,11 +1146,8 @@ export function SearchExperience({
       return;
     }
 
-    const selectedStillExists = selectedOfferId
-      ? filteredListResults.some((entry) => entry.result.offer.id === selectedOfferId)
-      : false;
-
-    if (!selectedStillExists) {
+    // null means "all cards collapsed" (user choice); only repair a selection that vanished.
+    if (selectedOfferId && !filteredListResults.some((entry) => entry.result.offer.id === selectedOfferId)) {
       setSelectedOfferId(filteredListResults[0]?.result.offer.id ?? null);
     }
   }, [filteredListResults, selectedOfferId]);
@@ -1316,11 +1166,6 @@ export function SearchExperience({
       clearTimeout(flashTimeout);
     };
   }, [selectedOfferId]);
-
-  const mapPanelClassName =
-    activeRoute && hasSearched
-      ? "h-[clamp(248px,42svh,430px)] md:h-[66vh] md:min-h-[360px]"
-      : "h-[clamp(320px,56svh,560px)] md:h-[66vh] md:min-h-[360px]";
 
   function scrollToMapSection(force = false) {
     if (typeof window === "undefined") {
@@ -2024,6 +1869,9 @@ export function SearchExperience({
 
   const onMapMarkerSelect = useCallback((result: SearchResult) => {
     setSelectedOfferId(result.offer.id);
+    requestAnimationFrame(() => {
+      document.getElementById(`result-row-${result.offer.id}`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
   }, []);
 
   const onMapManualCenterChange = useCallback(
@@ -2034,190 +1882,244 @@ export function SearchExperience({
     [dictionary.manualPinHint, resetSearchForLocationChange]
   );
 
+  const showResultsArea = hasSearched || isLoading;
+  const usingUserLocation =
+    geolocationPermission === "granted" ||
+    center.lat !== safeInitialCenter.lat ||
+    center.lng !== safeInitialCenter.lng;
+  const resultsHeading = (() => {
+    const first = filteredListResults[0]?.result;
+    const productLabel = first && lastSearchEngine === "presence" ? displayProductName(first.product) : lastSubmittedQuery;
+    const [before, after = ""] = applyTemplate(dictionary.resultsHeadingTemplate, {
+      count: String(filteredListResults.length)
+    }).split("{product}");
+    return (
+      <>
+        {before}
+        <mark className="nb-mark">{productLabel}</mark>
+        {after}
+      </>
+    );
+  })();
+
+  function openRoute(result: SearchResult, mode: RouteMode) {
+    setIsMapVisible(true);
+    void drawRouteOnMap(result, mode);
+  }
+
   return (
-    <section className="space-y-3 md:space-y-3.5">
+    <section className={`nb ${showResultsArea ? "nb-has-results" : "nb-idle"}`}>
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {liveStatus}
       </p>
-      <section className="tool-block">
-        <div className="tool-row hand-divider p-2.5 md:p-3">
-          <div className="space-y-1.5 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:gap-1.5 md:space-y-0">
-            <label className="sr-only" htmlFor="search-query-input">
-              {dictionary.searchPlaceholder}
-            </label>
-            <div className="search-input-wrap md:col-start-1 md:row-start-1">
-              <UiIcon kind="search" className="search-input-icon" />
-              <input
-                id="search-query-input"
-                value={query}
-                onChange={(event) => {
-                  const nextValue = event.target.value;
-                  setQuery(nextValue);
-                  if (activeQuickIntent) {
-                    const activeLabel =
-                      quickIntents.find((intent) => intent.id === activeQuickIntent)?.label ?? "";
-                    if (normalizeQueryForAnalytics(nextValue) !== normalizeQueryForAnalytics(activeLabel)) {
-                      setActiveQuickIntent(null);
-                    }
+
+      <header className="nb-hero">
+        <p className="nb-kicker mono">{dictionary.appTitle}</p>
+        {!showResultsArea ? <h1 className="nb-title">{dictionary.heroTitle}</h1> : null}
+
+        <form
+          className="nb-search"
+          role="search"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void runSearch();
+          }}
+        >
+          <label className="sr-only" htmlFor="search-query-input">
+            {dictionary.searchPlaceholder}
+          </label>
+          <div className="nb-search-field">
+            <UiIcon kind="search" className="nb-search-icon" />
+            <input
+              id="search-query-input"
+              value={query}
+              autoComplete="off"
+              enterKeyHint="search"
+              onChange={(event) => {
+                const nextValue = event.target.value;
+                setQuery(nextValue);
+                if (activeQuickIntent) {
+                  const activeLabel = quickIntents.find((intent) => intent.id === activeQuickIntent)?.label ?? "";
+                  if (normalizeQueryForAnalytics(nextValue) !== normalizeQueryForAnalytics(activeLabel)) {
+                    setActiveQuickIntent(null);
                   }
-                }}
-                onKeyDown={(event) => {
-                  if (showRecentSearchesDropdown && event.key === "ArrowDown") {
-                    event.preventDefault();
-                    setActiveRecentIndex((current) =>
-                      Math.min(current + 1, visibleRecentSearches.length - 1)
-                    );
-                    return;
-                  }
-                  if (showRecentSearchesDropdown && event.key === "ArrowUp") {
-                    event.preventDefault();
-                    setActiveRecentIndex((current) => Math.max(current - 1, 0));
-                    return;
-                  }
-                  if (showRecentSearchesDropdown && event.key === "Escape") {
-                    event.preventDefault();
-                    setIsSearchInputFocused(false);
-                    setActiveRecentIndex(-1);
-                    return;
-                  }
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    if (showRecentSearchesDropdown && activeRecentIndex >= 0) {
-                      const highlighted = visibleRecentSearches[activeRecentIndex];
-                      if (highlighted) {
-                        selectRecentSearch(highlighted);
-                        return;
-                      }
-                    }
-                    void runSearch();
-                  }
-                }}
-                onFocus={() => {
-                  if (searchInputBlurTimeoutRef.current) {
-                    clearTimeout(searchInputBlurTimeoutRef.current);
-                    searchInputBlurTimeoutRef.current = null;
-                  }
-                  setIsSearchInputFocused(true);
-                }}
-                onBlur={() => {
-                  if (searchInputBlurTimeoutRef.current) {
-                    clearTimeout(searchInputBlurTimeoutRef.current);
-                  }
-                  searchInputBlurTimeoutRef.current = setTimeout(() => {
-                    setIsSearchInputFocused(false);
-                    searchInputBlurTimeoutRef.current = null;
-                  }, 120);
-                }}
-                placeholder={dictionary.searchPlaceholder}
-                className="field-input search-input"
-                role="combobox"
-                aria-haspopup="listbox"
-                aria-autocomplete="list"
-                aria-expanded={showRecentSearchesDropdown}
-                aria-controls="recent-searches-listbox"
-                aria-activedescendant={
-                  showRecentSearchesDropdown && activeRecentIndex >= 0
-                    ? `recent-option-${activeRecentIndex}`
-                    : undefined
                 }
-              />
-              {showRecentSearchesDropdown ? (
-                <div
-                  id="recent-searches-listbox"
-                  className="search-recent-dropdown"
-                  role="listbox"
-                  aria-label={dictionary.recentSearchesLabel}
-                >
-                  <p className="search-recent-label">{dictionary.recentSearchesLabel}</p>
-                  {visibleRecentSearches.map((term, index) => (
-                    <button
-                      key={`recent-dropdown-${term}-${index}`}
-                      id={`recent-option-${index}`}
-                      type="button"
-                      className="search-recent-item"
-                      role="option"
-                      aria-selected={activeRecentIndex === index}
-                      onMouseDown={(event) => {
-                        event.preventDefault();
-                        selectRecentSearch(term);
-                      }}
-                      onMouseEnter={() => setActiveRecentIndex(index)}
-                      disabled={isLoading}
-                    >
-                      {term}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-            <div className="search-action-row">
-              <button
-                type="button"
-                onClick={() => {
-                  void runSearch();
-                }}
-                disabled={isLoading}
-                className="btn-primary search-submit search-action-btn min-w-[108px] sm:min-w-[124px] md:min-w-[150px] disabled:cursor-not-allowed"
-                aria-busy={isLoading}
+              }}
+              onKeyDown={(event) => {
+                if (showRecentSearchesDropdown && event.key === "ArrowDown") {
+                  event.preventDefault();
+                  setActiveRecentIndex((current) => Math.min(current + 1, visibleRecentSearches.length - 1));
+                  return;
+                }
+                if (showRecentSearchesDropdown && event.key === "ArrowUp") {
+                  event.preventDefault();
+                  setActiveRecentIndex((current) => Math.max(current - 1, 0));
+                  return;
+                }
+                if (showRecentSearchesDropdown && event.key === "Escape") {
+                  event.preventDefault();
+                  setIsSearchInputFocused(false);
+                  setActiveRecentIndex(-1);
+                  return;
+                }
+                if (event.key === "Enter" && showRecentSearchesDropdown && activeRecentIndex >= 0) {
+                  const highlighted = visibleRecentSearches[activeRecentIndex];
+                  if (highlighted) {
+                    event.preventDefault();
+                    selectRecentSearch(highlighted);
+                  }
+                }
+              }}
+              onFocus={() => {
+                if (searchInputBlurTimeoutRef.current) {
+                  clearTimeout(searchInputBlurTimeoutRef.current);
+                  searchInputBlurTimeoutRef.current = null;
+                }
+                setIsSearchInputFocused(true);
+              }}
+              onBlur={() => {
+                if (searchInputBlurTimeoutRef.current) {
+                  clearTimeout(searchInputBlurTimeoutRef.current);
+                }
+                searchInputBlurTimeoutRef.current = setTimeout(() => {
+                  setIsSearchInputFocused(false);
+                  searchInputBlurTimeoutRef.current = null;
+                }, 120);
+              }}
+              placeholder={dictionary.searchPlaceholder}
+              className="nb-search-input"
+              role="combobox"
+              aria-haspopup="listbox"
+              aria-autocomplete="list"
+              aria-expanded={showRecentSearchesDropdown}
+              aria-controls="recent-searches-listbox"
+              aria-activedescendant={
+                showRecentSearchesDropdown && activeRecentIndex >= 0 ? `recent-option-${activeRecentIndex}` : undefined
+              }
+            />
+            {showRecentSearchesDropdown ? (
+              <div
+                id="recent-searches-listbox"
+                className="nb-recent"
+                role="listbox"
+                aria-label={dictionary.recentSearchesLabel}
               >
-                <span className="btn-label">{isLoading ? dictionary.searchingLabel : dictionary.searchButton}</span>
-              </button>
-            </div>
-            <div className="md:col-span-2 quick-intents flex flex-wrap items-center gap-1.5">
-              <span className="note-label">{dictionary.quickIntentLabel}</span>
-              {quickIntents.map((intent) => (
+                <p className="nb-recent-label mono">{dictionary.recentSearchesLabel}</p>
+                {visibleRecentSearches.map((term, index) => (
+                  <button
+                    key={`recent-dropdown-${term}-${index}`}
+                    id={`recent-option-${index}`}
+                    type="button"
+                    className="nb-recent-item"
+                    role="option"
+                    aria-selected={activeRecentIndex === index}
+                    onMouseDown={(event) => {
+                      event.preventDefault();
+                      selectRecentSearch(term);
+                    }}
+                    onMouseEnter={() => setActiveRecentIndex(index)}
+                    disabled={isLoading}
+                  >
+                    {term}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <button type="submit" disabled={isLoading} className="nb-btn nb-btn-primary" aria-busy={isLoading}>
+            {isLoading ? dictionary.searchingLabel : dictionary.searchButton}
+          </button>
+        </form>
+
+        <p className="nb-where">
+          <UiIcon kind="distance" className="nb-inline-icon" />
+          <span>
+            {dictionary.nearLabel}{" "}
+            <strong>{usingUserLocation ? dictionary.nearYourLocation : dictionary.nearDefaultArea}</strong>
+          </span>
+          {geolocationPermission !== "granted" && geolocationPermission !== "unsupported" ? (
+            <button
+              type="button"
+              className="nb-link"
+              onClick={() => requestBrowserLocation()}
+              disabled={isLocating}
+            >
+              {isLocating ? dictionary.searchingLabel : dictionary.useMyLocation}
+            </button>
+          ) : null}
+        </p>
+
+        {!showResultsArea ? (
+          <p className="nb-try">
+            <span className="nb-hand">{dictionary.tryLabel}:</span>{" "}
+            {quickIntents.map((intent, index) => (
+              <span key={`try-${intent.id}`}>
                 <button
-                  key={`quick-intent-top-${intent.id}`}
                   type="button"
-                  className={`btn-ghost quick-intent-chip px-2.5 py-1.5 text-[0.72rem] ${
-                    activeQuickIntent === intent.id ? "is-active" : ""
-                  }`}
+                  className="nb-link"
                   onClick={() => {
                     setQuery(intent.label);
                     setActiveQuickIntent(intent.id);
                     void runSearch({ overrideQuery: intent.label, category: intent.id });
                   }}
                   disabled={isLoading}
-                  aria-pressed={activeQuickIntent === intent.id}
                 >
                   {intent.label}
                 </button>
+                {index < quickIntents.length - 1 ? <span aria-hidden="true"> · </span> : null}
+              </span>
+            ))}
+          </p>
+        ) : null}
+
+        {errorMessage || (locationMessage && locationMessage !== dictionary.manualPinHint) ? (
+          <div className="nb-status" role="status" aria-live="polite" aria-atomic="true">
+            {errorMessage ? <p className="nb-status-error">{errorMessage}</p> : null}
+            {/* The map shows its own drag-the-pin affordance; don't repeat it as text. */}
+            {!errorMessage && locationMessage && locationMessage !== dictionary.manualPinHint ? <p>{locationMessage}</p> : null}
+          </div>
+        ) : null}
+      </header>
+
+      {showResultsArea ? (
+        <div className="nb-results">
+          <div className="nb-toolbar">
+            <label htmlFor="radius-km-picker" className="nb-toolbar-label mono">
+              {dictionary.radiusLabel}
+            </label>
+            <select
+              id="radius-km-picker"
+              value={formatRadiusValue(radiusKm)}
+              onChange={(event) => {
+                const next = Number(event.target.value);
+                if (!Number.isNaN(next)) {
+                  setRadiusFromPicker(next);
+                }
+              }}
+              className="nb-select mono"
+            >
+              {RADIUS_PICKER_OPTIONS.map((option) => (
+                <option key={`radius-${option}`} value={formatRadiusValue(option)}>
+                  {formatRadiusKm(option)}
+                </option>
               ))}
-            </div>
-            <div className="search-compact-controls md:col-span-2">
-              <label htmlFor="radius-km-picker" className="note-label">
-                {dictionary.radiusLabel}
-              </label>
-              <select
-                id="radius-km-picker"
-                value={formatRadiusValue(radiusKm)}
-                onChange={(event) => {
-                  const next = Number(event.target.value);
-                  if (!Number.isNaN(next)) {
-                    setRadiusFromPicker(next);
-                  }
-                }}
-                className="field-input radius-picker"
-              >
-                {RADIUS_PICKER_OPTIONS.map((option) => (
-                  <option key={`radius-${option}`} value={formatRadiusValue(option)}>
-                    {formatRadiusKm(option)}
-                  </option>
-                ))}
-              </select>
+            </select>
+            <button
+              type="button"
+              className={`nb-chip ${openNowOnly ? "is-active" : ""}`}
+              aria-pressed={openNowOnly}
+              onClick={() => {
+                setOpenNowOnly((current) => !current);
+                pulse(6);
+              }}
+            >
+              {dictionary.openNowOnlyLabel}
+            </button>
+            {savedStoreIds.length > 0 ? (
               <button
                 type="button"
-                className={`btn-ghost compact-toggle ${openNowOnly ? "is-active" : ""}`}
-                onClick={() => {
-                  setOpenNowOnly((current) => !current);
-                  pulse(6);
-                }}
-              >
-                {dictionary.openNowOnlyLabel}
-              </button>
-              <button
-                type="button"
-                className={`btn-ghost compact-toggle ${savedOnly ? "is-active" : ""}`}
+                className={`nb-chip ${savedOnly ? "is-active" : ""}`}
+                aria-pressed={savedOnly}
                 onClick={() => {
                   setSavedOnly((current) => !current);
                   pulse(6);
@@ -2225,460 +2127,309 @@ export function SearchExperience({
               >
                 {dictionary.savedOnlyLabel}
               </button>
-              <button
-                type="button"
-                className={`btn-ghost compact-toggle ${independentOnly ? "is-active" : ""}`}
-                onClick={() => {
-                  setIndependentOnly((current) => !current);
-                  pulse(6);
-                }}
-              >
-                {dictionary.independentOnlyLabel}
-              </button>
-            </div>
+            ) : null}
+            <button
+              type="button"
+              className="nb-chip nb-map-toggle"
+              aria-pressed={isMapVisible}
+              onClick={() => setIsMapVisible((current) => !current)}
+            >
+              {isMapVisible ? dictionary.hideMapAction : dictionary.showMapAction}
+            </button>
           </div>
-        </div>
 
-        {(locationMessage || errorMessage) && (
-          <div className="p-2.5 md:p-3" role="status" aria-live="polite" aria-atomic="true">
-            {locationMessage ? <p className="status-text">{locationMessage}</p> : null}
-            {errorMessage ? <p className="status-text status-error">{errorMessage}</p> : null}
-          </div>
-        )}
-      </section>
+          <div className="nb-columns">
+            <div className="nb-list-col">
+              {isLoading && filteredListResults.length === 0 ? (
+                <p className="nb-loading nb-hand">{dictionary.searchingLabel}</p>
+              ) : null}
 
-      <section id="map" ref={mapSectionRef} className="space-y-1.5 md:space-y-2">
-        <div className="hand-divider flex items-end justify-end pb-2">
-          <div className="flex items-center gap-2">
-            {showCachedResultBadge && !isLoading ? (
-              <span className="status-chip" title={lastSearchEndpoint ?? undefined}>
-                {dictionary.cachedResultLabel}
-              </span>
-            ) : null}
-            <p className="status-text">{resultSummary}</p>
-          </div>
-        </div>
-        {districtContext ? <p className="status-text -mt-1">{districtContext}</p> : null}
-        {(routeLoadingKey || activeRouteLabel || routeErrorMessage) && (
-          <div className="route-status-row" role="status" aria-live="polite" aria-atomic="true">
-            {routeLoadingKey ? <span className="route-status-chip is-loading">{dictionary.routeLoadingLabel}</span> : null}
-            {!routeLoadingKey && activeRouteLabel ? (
-              <span className="route-status-chip is-active">{activeRouteLabel}</span>
-            ) : null}
-            {!routeLoadingKey && routeErrorMessage ? (
-              <span className="route-status-chip is-error">{routeErrorMessage}</span>
-            ) : null}
-            {activeRoute ? (
-              <button
-                type="button"
-                className="btn-ghost route-status-clear-btn px-2.5 py-1.5 text-[0.72rem]"
-                onClick={() => {
-                  setActiveRoute(null);
-                  setRouteErrorMessage(null);
-                  pulse(8);
-                }}
-              >
-                {dictionary.clearRouteAction}
-              </button>
-            ) : null}
-          </div>
-        )}
-        <LocalMap
-          center={safeCenter}
-          results={mapResults}
-          themeMode={themeMode}
-          berlinOnlyHint={dictionary.berlinOnlyHint}
-          geolocationPermission={geolocationPermission}
-          isLocating={isLocating}
-          geolocationLabel={dictionary.useMyLocation}
-          geolocationDeniedLabel={dictionary.geolocationDenied}
-          onRequestGeolocation={() => {
-            requestBrowserLocation();
-          }}
-          manualCenterEnabled={manualCenterEnabled}
-          onManualCenterChange={onMapManualCenterChange}
-          radiusMeters={Math.round(radiusKm * 1000)}
-          activeRouteGeometry={activeRoute?.geometry ?? null}
-          activeRouteFitKey={
-            activeRoute
-              ? `${activeRoute.offerId}:${activeRoute.mode}:${Math.round(activeRoute.distanceMeters)}`
-              : null
-          }
-          selectedOfferId={selectedOfferId}
-          onMarkerSelect={onMapMarkerSelect}
-          isLoading={isLoading}
-          loadingLabel={dictionary.searchingLabel}
-          cacheIndicatorLabel={showCachedResultBadge && !isLoading ? dictionary.cachedResultLabel : null}
-          className={mapPanelClassName}
-        />
-
-        {!isLoading && hasSearched && (results.length === 0 || filtersHideAllResults) ? (
-          <div className="note-empty no-results-box p-3">
-            <p>{noResultsMessage}</p>
-            {noResultsGuidance?.type === "nearby" && !filtersHideAllResults ? (
-              <button
-                type="button"
-                className="btn-secondary mt-2 w-full text-[0.76rem] md:w-auto"
-                onClick={() => {
-                  expandSearchTo(noResultsGuidance.suggestedRadiusKm, "no_results");
-                }}
-                disabled={isLoading}
-              >
-                {expandSearchButtonLabel}
-              </button>
-            ) : null}
-            {filtersHideAllResults ? (
-              <button
-                type="button"
-                className="btn-secondary mt-2 w-full text-[0.76rem] md:w-auto"
-                onClick={() => {
-                  setOpenNowOnly(false);
-                  setSavedOnly(false);
-                  setIndependentOnly(false);
-                  pulse(7);
-                }}
-              >
-                {dictionary.clearFiltersAction}
-              </button>
-            ) : null}
-            <p className="status-text mt-2">{dictionary.noResultsRefineHint}</p>
-            {relatedTerms.length > 0 ? (
-              <>
-                <p className="status-text mt-2">{dictionary.relatedTermsLabel}</p>
-                <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                  {relatedTerms.map((term) => (
-                    <button
-                      key={`related-${term}`}
-                      type="button"
-                      className="btn-ghost quick-intent-chip px-2.5 py-1.5 text-[0.72rem]"
-                      onClick={() => {
-                        setQuery(term);
-                        setActiveQuickIntent(null);
-                        void runSearch({ overrideQuery: term, category: null });
-                      }}
-                      disabled={isLoading}
-                    >
-                      {term}
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : null}
-          </div>
-        ) : null}
-
-        {filteredListResults.length > 0 ? (
-          <section className="note-divider pt-2">
-            {selectedResultEntry ? (
-              <article
-                id="selected-store-card"
-                key={selectedResultEntry.result.offer.id}
-                className={`store-item selected-store-card ${openingStatusToneClass(
-                  selectedResultEntry.openingStatus
-                )} is-selected selected-store-card-enter`}
-              >
-                <div className="selected-store-head">
-                  <p className="store-summary-name">{selectedResultEntry.result.store.name}</p>
-                  <span className="store-summary-meta">
-                    <span className="mono store-summary-distance">
-                      <UiIcon kind="distance" className="store-summary-icon" />
-                      {formatDistance(selectedResultEntry.result.distanceMeters)}
-                    </span>
-                    <span
-                      className={`store-summary-badge ${openingStatusToneClass(
-                        selectedResultEntry.openingStatus
-                      )}`}
-                    >
-                      {formatOpeningStatusWithDetails(dictionary, selectedResultEntry.openingInfo)}
-                    </span>
-                    <span
-                      className={`store-summary-badge ${validationToneClass(
-                        selectedDisplayValidationStatus
-                      )}`}
-                    >
-                      {formatValidation(dictionary, selectedDisplayValidationStatus)}
-                    </span>
-                  </span>
-                </div>
-                <p className="selected-store-match">
-                  <UiIcon kind="note" className="store-detail-icon" />
-                  <span>
-                    {dictionary.whyMatchLabel}: {selectedMatchSummary}
-                  </span>
-                </p>
-                <div className="store-details selected-store-details">
-                  <p className="store-detail-line">
-                    <UiIcon kind="product" className="store-detail-icon" />
-                    <span>
-                      {selectedEntityLabel}: {displayProductName(selectedResultEntry.result.product)}
-                    </span>
-                  </p>
-                  <p className="store-detail-line">
-                    <UiIcon kind="category" className="store-detail-icon" />
-                    <span>
-                      {dictionary.storeCategoryLabel}:{" "}
-                      {primaryCategory(selectedResultEntry.result, dictionary.unknownCategory)}
-                    </span>
-                  </p>
-                  <p className="store-detail-line">
-                    <UiIcon kind="category" className="store-detail-icon" />
-                    <span>
-                      {dictionary.ownershipLabel}:{" "}
-                      {formatStoreOwnership(dictionary, selectedResultEntry.result.store.ownershipType)}
-                    </span>
-                  </p>
-                  {selectedResultEntry.result.store.openingHours ? (
-                    <p className="store-detail-line">
-                      <UiIcon kind="hours" className="store-detail-icon" />
-                      <span>
-                        {dictionary.openingHoursLabel}: {selectedResultEntry.result.store.openingHours}
-                      </span>
-                    </p>
-                  ) : null}
-                  <div className="store-meta-wrap">
-                    <span className="store-meta-chip">
-                      {dictionary.checkedLabel}:{" "}
-                      {formatRelativeCheckedAt(selectedResultEntry.result.lastCheckedAt, {
-                        checkedUnknown: dictionary.checkedUnknown,
-                        checkedToday: dictionary.checkedToday,
-                        checkedYesterday: dictionary.checkedYesterday,
-                        checkedDaysAgoTemplate: dictionary.checkedDaysAgoTemplate
-                      })}
-                    </span>
-                    {savedStoreIdSet.has(selectedResultEntry.result.store.id) ? (
-                      <span className="store-meta-chip">{dictionary.savedStoreLabel}</span>
-                    ) : null}
-                  </div>
-                  {lastSearchEngine === "presence" ? (
-                    <PresenceFeedback
-                      key={selectedResultEntry.result.offer.id}
-                      dictionary={dictionary}
-                      storeId={selectedResultEntry.result.store.id}
-                      productTypeId={selectedResultEntry.result.product.id}
-                      productLabel={displayProductName(selectedResultEntry.result.product)}
-                      query={lastSubmittedQuery}
-                    />
-                  ) : null}
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
-                    {(() => {
-                      const travel = selectedTravel ?? estimateTravel(selectedResultEntry.result.distanceMeters);
-                      const walkRouteKey = `${selectedResultEntry.result.offer.id}:walk`;
-                      const bikeRouteKey = `${selectedResultEntry.result.offer.id}:bike`;
-                      const walkRouteActive =
-                        activeRoute?.offerId === selectedResultEntry.result.offer.id && activeRoute.mode === "walk";
-                      const bikeRouteActive =
-                        activeRoute?.offerId === selectedResultEntry.result.offer.id && activeRoute.mode === "bike";
-                      const walkRouteLoading = routeLoadingKey === walkRouteKey;
-                      const bikeRouteLoading = routeLoadingKey === bikeRouteKey;
-                      const phoneHref = sanitizePhoneHref(selectedResultEntry.result.store.phone);
-                      const isSavedStore = savedStoreIdSet.has(selectedResultEntry.result.store.id);
+              {filteredListResults.length > 0 ? (
+                <>
+                  <h2 className="nb-results-heading">{resultsHeading}</h2>
+                  <ol className="nb-list" aria-label={dictionary.resultsTitle}>
+                    {visibleListResults.map(({ result, openingStatus, openingInfo }, index) => {
+                      const isOpen = selectedOfferId === result.offer.id;
+                      const status = resolveDisplayValidationStatus(result);
+                      const tierClass =
+                        status === "validated" ? "is-confirmed" : status === "likely" ? "is-likely" : "is-possible";
+                      const travel = estimateTravel(result.distanceMeters);
+                      const category = categoryLabel(result.store.osmCategory, locale);
+                      const openingLabel =
+                        openingStatus === "unknown" ? null : formatOpeningStatusWithDetails(dictionary, openingInfo);
+                      const walkRouteActive = activeRoute?.offerId === result.offer.id && activeRoute.mode === "walk";
+                      const bikeRouteActive = activeRoute?.offerId === result.offer.id && activeRoute.mode === "bike";
+                      const routeLoading = routeLoadingKey?.startsWith(`${result.offer.id}:`) ?? false;
+                      const phoneHref = sanitizePhoneHref(result.store.phone);
+                      const isSaved = savedStoreIdSet.has(result.store.id);
+                      const confirmedAgo =
+                        status === "validated" && result.lastCheckedAt
+                          ? formatRelativeCheckedAt(result.lastCheckedAt, {
+                              checkedUnknown: dictionary.checkedUnknown,
+                              checkedToday: dictionary.checkedToday,
+                              checkedYesterday: dictionary.checkedYesterday,
+                              checkedDaysAgoTemplate: dictionary.checkedDaysAgoTemplate
+                            })
+                          : null;
 
                       return (
-                        <>
+                        <li
+                          key={result.offer.id}
+                          id={`result-row-${result.offer.id}`}
+                          className={`nb-card ${isOpen ? "is-open" : ""} ${
+                            flashedOfferId === result.offer.id ? "is-flashing" : ""
+                          } ${openingStatus === "closed" ? "is-closed" : ""}`}
+                        >
                           <button
                             type="button"
-                            className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
-                              walkRouteActive ? "is-active" : ""
-                            }`}
-                            disabled={walkRouteLoading}
+                            className="nb-card-head"
+                            aria-expanded={isOpen}
+                            aria-controls={`result-body-${result.offer.id}`}
                             onClick={() => {
-                              void drawRouteOnMap(selectedResultEntry.result, "walk");
+                              pulse(6);
+                              setSelectedOfferId(isOpen ? null : result.offer.id);
                             }}
                           >
-                            {walkRouteLoading
-                              ? dictionary.routeLoadingLabel
-                              : walkRouteActive
-                                ? dictionary.clearRouteAction
-                                : `${dictionary.routeOnMapAction} · ${dictionary.walkTimeLabel} ${travel.walkMin}m`}
+                            <span className="nb-card-index mono" aria-hidden="true">
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
+                            <span className="nb-card-main">
+                              <span className="nb-card-title-row">
+                                <span className="nb-card-name">{result.store.name}</span>
+                                <span className="nb-card-distance mono">
+                                  {formatDistance(result.distanceMeters)}
+                                </span>
+                              </span>
+                              <span className="nb-card-meta">
+                                <span className="nb-card-meta-main">
+                                  <span className={`nb-tier ${tierClass}`}>{formatValidation(dictionary, status)}</span>
+                                  {category ? <span>{category}</span> : null}
+                                </span>
+                                {openingLabel ? (
+                                  <span className={`nb-card-hours mono ${openingStatus === "closed" ? "nb-closed" : ""}`}>
+                                    {openingLabel}
+                                  </span>
+                                ) : null}
+                              </span>
+                            </span>
                           </button>
-                          <button
-                            type="button"
-                            className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${
-                              bikeRouteActive ? "is-active" : ""
-                            }`}
-                            disabled={bikeRouteLoading}
-                            onClick={() => {
-                              void drawRouteOnMap(selectedResultEntry.result, "bike");
-                            }}
-                          >
-                            {bikeRouteLoading
-                              ? dictionary.routeLoadingLabel
-                              : bikeRouteActive
-                                ? dictionary.clearRouteAction
-                              : `${dictionary.routeOnMapAction} · ${dictionary.bikeTimeLabel} ${travel.bikeMin}m`}
-                          </button>
-                          {phoneHref ? (
-                            <a
-                              href={phoneHref}
-                              className="btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5"
-                              onClick={() => {
-                                trackEvent("store_call_click", {
-                                  store_id: selectedResultEntry.result.store.id
-                                });
-                              }}
-                            >
-                              {dictionary.callStoreAction}
-                            </a>
+
+                          {isOpen ? (
+                            <div className="nb-card-body" id={`result-body-${result.offer.id}`}>
+                              <p className="nb-why">
+                                <strong>{displayProductName(result.product)}</strong>
+                                {result.whyThisProductMatches ? <> — {result.whyThisProductMatches}</> : null}
+                                {confirmedAgo ? (
+                                  <span className="nb-muted"> · {confirmedAgo}</span>
+                                ) : null}
+                              </p>
+
+                              <div className="nb-actions">
+                                <button
+                                  type="button"
+                                  className={`nb-btn nb-btn-primary nb-btn-small ${walkRouteActive ? "is-active" : ""}`}
+                                  disabled={routeLoading}
+                                  onClick={() => openRoute(result, "walk")}
+                                >
+                                  <UiIcon kind="walk" className="nb-inline-icon" />
+                                  {walkRouteActive
+                                    ? dictionary.clearRouteAction
+                                    : `${dictionary.directionsAction} · ${applyTemplate(dictionary.walkMinutesTemplate, {
+                                        min: String(travel.walkMin)
+                                      })}`}
+                                </button>
+                                <button
+                                  type="button"
+                                  className={`nb-btn nb-btn-small ${bikeRouteActive ? "is-active" : ""}`}
+                                  disabled={routeLoading}
+                                  onClick={() => openRoute(result, "bike")}
+                                >
+                                  <UiIcon kind="bike" className="nb-inline-icon" />
+                                  {bikeRouteActive
+                                    ? dictionary.clearRouteAction
+                                    : applyTemplate(dictionary.bikeMinutesTemplate, { min: String(travel.bikeMin) })}
+                                </button>
+                                <button
+                                  type="button"
+                                  className={`nb-btn nb-btn-small ${isSaved ? "is-active" : ""}`}
+                                  aria-pressed={isSaved}
+                                  onClick={() => toggleSavedStore(result.store.id)}
+                                >
+                                  {isSaved ? `★ ${dictionary.unsaveStoreAction}` : `☆ ${dictionary.saveStoreAction}`}
+                                </button>
+                                {phoneHref ? (
+                                  <a
+                                    href={phoneHref}
+                                    className="nb-btn nb-btn-small"
+                                    onClick={() => trackEvent("store_call_click", { store_id: result.store.id })}
+                                  >
+                                    {dictionary.callStoreAction}
+                                  </a>
+                                ) : null}
+                              </div>
+
+                              {lastSearchEngine === "presence" ? (
+                                <PresenceFeedback
+                                  key={result.offer.id}
+                                  dictionary={dictionary}
+                                  storeId={result.store.id}
+                                  productTypeId={result.product.id}
+                                  productLabel={displayProductName(result.product)}
+                                  query={lastSubmittedQuery}
+                                />
+                              ) : null}
+
+                              <p className="nb-card-foot mono">
+                                <span>{result.store.address}</span>
+                                {result.store.openingHours ? <span>{result.store.openingHours}</span> : null}
+                                <Link href={`/${locale}/store/${result.store.id}` as Route} className="nb-link">
+                                  {dictionary.storePageAction} →
+                                </Link>
+                              </p>
+                            </div>
                           ) : null}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  {hasHiddenListResults ? (
+                    <button
+                      type="button"
+                      className="nb-link nb-more"
+                      onClick={() => {
+                        setIsResultsExpanded((current) => !current);
+                        pulse(7);
+                      }}
+                    >
+                      {isResultsExpanded
+                        ? dictionary.viewLessResultsLabel
+                        : applyTemplate(dictionary.moreResultsTemplate, {
+                            count: String(filteredListResults.length - visibleListResults.length)
+                          })}
+                    </button>
+                  ) : null}
+                  {quickExpandRadiusKm !== null ? (
+                    <button
+                      type="button"
+                      className="nb-link nb-more"
+                      onClick={() => expandSearchTo(quickExpandRadiusKm, "results_list")}
+                      disabled={isLoading}
+                    >
+                      {quickExpandButtonLabel}
+                    </button>
+                  ) : null}
+                </>
+              ) : null}
+
+              {!isLoading && hasSearched && (results.length === 0 || filtersHideAllResults) ? (
+                <div className="nb-empty">
+                  <p className="nb-hand nb-empty-title">{noResultsMessage}</p>
+                  {noResultsGuidance?.type === "nearby" && !filtersHideAllResults ? (
+                    <button
+                      type="button"
+                      className="nb-btn nb-btn-small"
+                      onClick={() => expandSearchTo(noResultsGuidance.suggestedRadiusKm, "no_results")}
+                      disabled={isLoading}
+                    >
+                      {expandSearchButtonLabel}
+                    </button>
+                  ) : null}
+                  {filtersHideAllResults ? (
+                    <button
+                      type="button"
+                      className="nb-btn nb-btn-small"
+                      onClick={() => {
+                        setOpenNowOnly(false);
+                        setSavedOnly(false);
+                        setIndependentOnly(false);
+                        pulse(7);
+                      }}
+                    >
+                      {dictionary.clearFiltersAction}
+                    </button>
+                  ) : null}
+                  {relatedTerms.length > 0 ? (
+                    <p className="nb-try">
+                      <span className="nb-hand">{dictionary.tryLabel}:</span>{" "}
+                      {relatedTerms.map((term, index) => (
+                        <span key={`related-${term}`}>
                           <button
                             type="button"
-                            className={`btn-ghost inline-flex text-[0.72rem] px-2.5 py-1.5 ${isSavedStore ? "is-active" : ""}`}
+                            className="nb-link"
                             onClick={() => {
-                              toggleSavedStore(selectedResultEntry.result.store.id);
+                              setQuery(term);
+                              setActiveQuickIntent(null);
+                              void runSearch({ overrideQuery: term, category: null });
                             }}
+                            disabled={isLoading}
                           >
-                            {isSavedStore ? dictionary.unsaveStoreAction : dictionary.saveStoreAction}
+                            {term}
                           </button>
-                        </>
-                      );
-                    })()}
-                  </div>
+                          {index < relatedTerms.length - 1 ? <span aria-hidden="true"> · </span> : null}
+                        </span>
+                      ))}
+                    </p>
+                  ) : null}
                 </div>
-              </article>
-            ) : null}
-
-            <div className="results-toolbar mb-1.5 md:mb-2">
-              <h3 className="note-subtitle note-mark">{dictionary.resultsTitle}</h3>
-              <div className="results-toolbar-actions">
-                {openNowOnly || savedOnly || independentOnly ? (
-                  <button
-                    type="button"
-                    className="btn-ghost text-[0.72rem] px-2.5 py-1.5"
-                    onClick={() => {
-                      setOpenNowOnly(false);
-                      setSavedOnly(false);
-                      setIndependentOnly(false);
-                      pulse(7);
-                    }}
-                    disabled={isLoading}
-                  >
-                    {dictionary.clearFiltersAction}
-                  </button>
-                ) : null}
-                {quickExpandRadiusKm !== null ? (
-                  <button
-                    type="button"
-                    className="btn-ghost text-[0.72rem] px-2.5 py-1.5"
-                    onClick={() => {
-                      expandSearchTo(quickExpandRadiusKm, "results_list");
-                    }}
-                    disabled={isLoading}
-                  >
-                    {quickExpandButtonLabel}
-                  </button>
-                ) : null}
-                {hasHiddenListResults ? (
-                  <button
-                    type="button"
-                    className="btn-ghost text-[0.72rem] px-2.5 py-1.5"
-                    onClick={() => {
-                      setIsResultsExpanded((current) => !current);
-                      pulse(7);
-                    }}
-                    disabled={isLoading}
-                  >
-                    {isResultsExpanded ? dictionary.viewLessResultsLabel : dictionary.viewMoreResultsLabel}
-                  </button>
-                ) : null}
-              </div>
+              ) : null}
             </div>
-            {compactListSummary ? (
-              <p className="status-text results-toolbar-summary mb-1.5">{compactListSummary}</p>
-            ) : null}
-            <div
-              className="space-y-1"
-              role="listbox"
-              aria-label={dictionary.resultsTitle}
-              aria-activedescendant={selectedOfferId ? `result-row-${selectedOfferId}` : undefined}
+
+            <section
+              id="map"
+              ref={mapSectionRef}
+              className={`nb-map-col ${isMapVisible ? "is-visible" : ""}`}
+              aria-label={dictionary.mapTitle}
             >
-              {visibleListResults.map(({ result, openingStatus, openingInfo }, index) => {
-                const isSelected = selectedOfferId === result.offer.id;
-                const rowWalkRouteKey = `${result.offer.id}:walk`;
-                const rowBikeRouteKey = `${result.offer.id}:bike`;
-                const rowWalkRouteActive =
-                  activeRoute?.offerId === result.offer.id && activeRoute.mode === "walk";
-                const rowBikeRouteActive =
-                  activeRoute?.offerId === result.offer.id && activeRoute.mode === "bike";
-                const rowWalkRouteLoading = routeLoadingKey === rowWalkRouteKey;
-                const rowBikeRouteLoading = routeLoadingKey === rowBikeRouteKey;
-
-                return (
-                  <div
-                    key={result.offer.id}
-                    className={`store-item result-enter ${openingStatusToneClass(openingStatus)} ${
-                      isSelected ? "is-selected" : ""
-                    } ${flashedOfferId === result.offer.id ? "is-flashing" : ""}`}
-                    style={{ animationDelay: `${Math.min(index, 10) * 26}ms` }}
-                  >
-                    <div className="store-summary-row">
-                      <button
-                        id={`result-row-${result.offer.id}`}
-                        type="button"
-                        className="store-summary store-summary-button w-full text-left"
-                        role="option"
-                        aria-selected={isSelected}
-                        aria-current={isSelected ? "true" : undefined}
-                        aria-describedby={isSelected ? "selected-store-card" : undefined}
-                        onClick={() => {
-                          pulse(6);
-                          setSelectedOfferId(result.offer.id);
-                        }}
-                      >
-                        <span className="store-summary-name-wrap">
-                          <span
-                            aria-hidden="true"
-                            className={`map-pin store-summary-leading-pin map-pin-${openingStatus}`}
-                          />
-                          <span className="store-summary-name">{result.store.name}</span>
-                        </span>
-                        <span className="store-summary-meta">
-                          <span className="mono store-summary-distance">
-                            <UiIcon kind="distance" className="store-summary-icon" />
-                            {formatDistance(result.distanceMeters)}
-                          </span>
-                          <span className={`store-summary-badge ${openingStatusToneClass(openingStatus)}`}>
-                            {formatOpeningStatusWithDetails(dictionary, openingInfo)}
-                          </span>
-                        </span>
-                      </button>
-                      <div className="store-row-actions">
-                        <button
-                          type="button"
-                          className={`btn-ghost px-2 py-1 text-[0.66rem] ${rowWalkRouteActive ? "is-active" : ""}`}
-                          disabled={rowWalkRouteLoading}
-                          onClick={() => {
-                            void drawRouteOnMap(result, "walk");
-                          }}
-                        >
-                          {rowWalkRouteLoading
-                            ? dictionary.routeLoadingLabel
-                            : rowWalkRouteActive
-                              ? dictionary.clearRouteAction
-                              : dictionary.walkTimeLabel}
-                        </button>
-                        <button
-                          type="button"
-                          className={`btn-ghost px-2 py-1 text-[0.66rem] ${rowBikeRouteActive ? "is-active" : ""}`}
-                          disabled={rowBikeRouteLoading}
-                          onClick={() => {
-                            void drawRouteOnMap(result, "bike");
-                          }}
-                        >
-                          {rowBikeRouteLoading
-                            ? dictionary.routeLoadingLabel
-                            : rowBikeRouteActive
-                              ? dictionary.clearRouteAction
-                              : dictionary.bikeTimeLabel}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        ) : null}
-      </section>
+              {routeLoadingKey || activeRouteLabel || routeErrorMessage ? (
+                <div className="nb-route-status mono" role="status" aria-live="polite" aria-atomic="true">
+                  {routeLoadingKey ? <span>{dictionary.routeLoadingLabel}</span> : null}
+                  {!routeLoadingKey && activeRouteLabel ? <mark className="nb-mark">{activeRouteLabel}</mark> : null}
+                  {!routeLoadingKey && routeErrorMessage ? <span className="nb-status-error">{routeErrorMessage}</span> : null}
+                  {activeRoute ? (
+                    <button
+                      type="button"
+                      className="nb-link"
+                      onClick={() => {
+                        setActiveRoute(null);
+                        setRouteErrorMessage(null);
+                        pulse(8);
+                      }}
+                    >
+                      {dictionary.clearRouteAction}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+              <LocalMap
+                center={safeCenter}
+                results={mapResults}
+                themeMode={themeMode}
+                berlinOnlyHint={dictionary.berlinOnlyHint}
+                geolocationPermission={geolocationPermission}
+                isLocating={isLocating}
+                geolocationLabel={dictionary.useMyLocation}
+                geolocationDeniedLabel={dictionary.geolocationDenied}
+                onRequestGeolocation={() => {
+                  requestBrowserLocation();
+                }}
+                manualCenterEnabled={manualCenterEnabled}
+                onManualCenterChange={onMapManualCenterChange}
+                radiusMeters={Math.round(radiusKm * 1000)}
+                activeRouteGeometry={activeRoute?.geometry ?? null}
+                activeRouteFitKey={
+                  activeRoute ? `${activeRoute.offerId}:${activeRoute.mode}:${Math.round(activeRoute.distanceMeters)}` : null
+                }
+                selectedOfferId={selectedOfferId}
+                onMarkerSelect={onMapMarkerSelect}
+                isLoading={isLoading}
+                loadingLabel={dictionary.searchingLabel}
+                cacheIndicatorLabel={null}
+                className="nb-map-frame"
+              />
+            </section>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

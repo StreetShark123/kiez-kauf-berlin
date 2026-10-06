@@ -93,23 +93,23 @@ function storeFromRecord(record: PresenceStoreRecord): Store {
 
 const WHY_TEXT: Record<Locale, Record<PresenceTier, string>> = {
   en: {
-    confirmed: "Confirmed by neighbours",
-    likely: "Likely: shops of this type usually carry it",
-    possible: "Possible: some shops of this type carry it",
+    confirmed: "a neighbour saw it here",
+    likely: "shops like this usually carry it",
+    possible: "some shops like this carry it",
     reported_missing: "Recently reported as not available",
     unlikely: "Unlikely"
   },
   de: {
-    confirmed: "Von Nachbarn bestätigt",
-    likely: "Wahrscheinlich: Läden dieser Art führen es meistens",
-    possible: "Möglich: manche Läden dieser Art führen es",
+    confirmed: "ein Nachbar hat es hier gesehen",
+    likely: "solche Läden führen es meistens",
+    possible: "manche Läden dieser Art führen es",
     reported_missing: "Kürzlich als nicht vorrätig gemeldet",
     unlikely: "Unwahrscheinlich"
   },
   es: {
-    confirmed: "Confirmado por vecinos",
-    likely: "Probable: las tiendas de este tipo suelen tenerlo",
-    possible: "Posible: algunas tiendas de este tipo lo tienen",
+    confirmed: "un vecino lo vio aquí",
+    likely: "las tiendas así suelen tenerlo",
+    possible: "algunas tiendas así lo tienen",
     reported_missing: "Reportado recientemente como no disponible",
     unlikely: "Poco probable"
   }

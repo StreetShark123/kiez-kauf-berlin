@@ -64,50 +64,54 @@ export default async function StoreDetailPage({
     unlikely: dictionary.validationRejected
   } as const;
 
+  const tierClass = {
+    confirmed: "is-confirmed",
+    likely: "is-likely",
+    possible: "is-possible",
+    reported_missing: "is-possible",
+    unlikely: "is-possible"
+  } as const;
+
   return (
-    <main className="space-y-4">
-      <Link href={`/${locale}`} className="mono back-link text-sm">
-        {"<-"} {dictionary.backToSearch}
+    <main className="nb space-y-5 pt-2">
+      <Link href={`/${locale}`} className="nb-link mono text-sm">
+        ← {dictionary.backToSearch}
       </Link>
 
-      <section className="tool-block">
-        <div className="tool-row p-4">
-          <h2 className="text-xl font-medium tracking-tight">{store.name}</h2>
-          <p className="detail-address mt-1 text-sm">{store.address}</p>
-          {store.openingHours ? (
-            <p className="status-text mt-1">
-              {dictionary.openingHoursLabel}: {store.openingHours}
-            </p>
-          ) : null}
-        </div>
-        <div className="p-4">
-          <a
-            href={buildDirectionsUrl({
-              destinationLat: store.lat,
-              destinationLng: store.lng
-            })}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-primary inline-flex"
-          >
-            {dictionary.routeAction}
-          </a>
-        </div>
-      </section>
+      <header className="space-y-2">
+        <h1 className="nb-store-title">{store.name}</h1>
+        <p className="nb-why">{store.address}</p>
+        {store.openingHours ? (
+          <p className="nb-card-foot mono">
+            {dictionary.openingHoursLabel}: {store.openingHours}
+          </p>
+        ) : null}
+        <a
+          href={buildDirectionsUrl({
+            destinationLat: store.lat,
+            destinationLng: store.lng
+          })}
+          target="_blank"
+          rel="noreferrer"
+          className="nb-btn nb-btn-primary nb-btn-small"
+        >
+          {dictionary.directionsAction} ↗
+        </a>
+      </header>
 
       {presence ? (
-        <section className="space-y-3">
-          <h3 className="text-base font-medium">{dictionary.storeProductsTitle}</h3>
-          <p className="status-text text-[0.72rem]">{dictionary.presenceHint}</p>
+        <section>
+          <h2 className="nb-results-heading">{dictionary.storeProductsTitle}</h2>
+          <p className="nb-feedback-hint">{dictionary.presenceHint}</p>
           {groupItems(presence.items).map((group) => (
             <div key={group.name}>
-              <h4 className="mb-1 text-sm font-medium">{group.name}</h4>
-              <ul className="detail-list border-y">
+              <h3 className="nb-store-group mono">{group.name}</h3>
+              <ul className="m-0 list-none p-0">
                 {group.items.map((item) => (
-                  <li key={item.typeId} className="result-row flex items-center justify-between gap-2">
-                    <span className="text-sm">{item.name}</span>
-                    <span className="inline-flex items-center gap-2">
-                      <span className="status-text text-[0.68rem]">{tierLabel[item.estimate.tier]}</span>
+                  <li key={item.typeId} className="nb-store-row">
+                    <span className="nb-store-row-name">{item.name}</span>
+                    <span className="nb-store-row-side">
+                      <span className={`nb-tier ${tierClass[item.estimate.tier]}`}>{tierLabel[item.estimate.tier]}</span>
                       <PresenceFeedback
                         compact
                         dictionary={dictionary}
@@ -124,15 +128,12 @@ export default async function StoreDetailPage({
         </section>
       ) : (
         <section>
-          <h3 className="mb-2 text-base font-medium">{dictionary.storeProductsTitle}</h3>
-          <ul className="detail-list border-y">
-            {detail!.offers.map((item, index) => (
-              <li key={item.offer.id} className="result-row">
-                <p className="status-text mb-1">
-                  {dictionary.itemLabel} {String(index + 1).padStart(2, "0")}
-                </p>
-                <p className="text-sm">{displayProductName(item.product)}</p>
-                <p className="status-text mt-1">{dictionary.storeCategoryLabel}: {item.product.category}</p>
+          <h2 className="nb-results-heading">{dictionary.storeProductsTitle}</h2>
+          <ul className="m-0 list-none p-0">
+            {detail!.offers.map((item) => (
+              <li key={item.offer.id} className="nb-store-row">
+                <span className="nb-store-row-name">{displayProductName(item.product)}</span>
+                <span className="nb-store-row-side nb-muted">{item.product.category}</span>
               </li>
             ))}
           </ul>

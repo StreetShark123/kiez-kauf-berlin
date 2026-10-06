@@ -51,6 +51,19 @@ export type Dictionary = {
   validationLabel: string;
   whyMatchLabel: string;
   presenceQuestionTemplate: string;
+  heroTitle: string;
+  tryLabel: string;
+  nearLabel: string;
+  nearYourLocation: string;
+  nearDefaultArea: string;
+  resultsHeadingTemplate: string;
+  directionsAction: string;
+  walkMinutesTemplate: string;
+  bikeMinutesTemplate: string;
+  storePageAction: string;
+  moreResultsTemplate: string;
+  showMapAction: string;
+  hideMapAction: string;
   presenceYesAction: string;
   presenceNoAction: string;
   presenceThanks: string;
@@ -130,7 +143,7 @@ const dictionaries: Record<Locale, Dictionary> = {
   de: {
     appTitle: "KiezKauf Berlin",
     appSubtitle: "Produkte schnell im Kiez finden.",
-    searchPlaceholder: "Produkt suchen (z. B. Hafermilch 1L)",
+    searchPlaceholder: "Batterien, Knoblauch, Pflaster…",
     searchHint: "Kurz und konkret suchen. Wir finden passende Laeden in der Naehe.",
     radiusLabel: "Radius",
     searchButton: "Suchen",
@@ -179,6 +192,19 @@ const dictionaries: Record<Locale, Dictionary> = {
     validationLabel: "Datenstatus",
     whyMatchLabel: "Warum dieser Treffer",
     presenceQuestionTemplate: "Gibt es hier {product}?",
+    heroTitle: "Was brauchst du heute?",
+    tryLabel: "z. B.",
+    nearLabel: "In der Nähe von",
+    nearYourLocation: "deinem Standort",
+    nearDefaultArea: "Berlin-Mitte",
+    resultsHeadingTemplate: "{count} Läden für {product}",
+    directionsAction: "Weg zeigen",
+    walkMinutesTemplate: "{min} Min. zu Fuß",
+    bikeMinutesTemplate: "{min} Min. mit dem Rad",
+    storePageAction: "Zum Laden",
+    moreResultsTemplate: "{count} weitere anzeigen",
+    showMapAction: "Karte zeigen",
+    hideMapAction: "Karte ausblenden",
     presenceYesAction: "Ja, gesehen",
     presenceNoAction: "Nein, nicht da",
     presenceThanks: "Danke! Das macht die Treffer fuer deine Nachbarn genauer.",
@@ -256,7 +282,7 @@ const dictionaries: Record<Locale, Dictionary> = {
   en: {
     appTitle: "KiezKauf Berlin",
     appSubtitle: "Find products in nearby local shops.",
-    searchPlaceholder: "Search a product (e.g. oat milk 1L)",
+    searchPlaceholder: "Batteries, garlic, plasters…",
     searchHint: "Keep it short and direct. We will map nearby shops fast.",
     radiusLabel: "Radius",
     searchButton: "Search",
@@ -305,6 +331,19 @@ const dictionaries: Record<Locale, Dictionary> = {
     validationLabel: "Reliability",
     whyMatchLabel: "Why it matched",
     presenceQuestionTemplate: "Do they have {product} here?",
+    heroTitle: "What do you need today?",
+    tryLabel: "try",
+    nearLabel: "Near",
+    nearYourLocation: "your location",
+    nearDefaultArea: "Berlin Mitte",
+    resultsHeadingTemplate: "{count} shops for {product}",
+    directionsAction: "Show the way",
+    walkMinutesTemplate: "{min} min walk",
+    bikeMinutesTemplate: "{min} min by bike",
+    storePageAction: "Shop page",
+    moreResultsTemplate: "Show {count} more",
+    showMapAction: "Show map",
+    hideMapAction: "Hide map",
     presenceYesAction: "Yes, I saw it",
     presenceNoAction: "No, not there",
     presenceThanks: "Thanks! This makes results more accurate for your neighbours.",
@@ -382,7 +421,7 @@ const dictionaries: Record<Locale, Dictionary> = {
   es: {
     appTitle: "KiezKauf Berlin",
     appSubtitle: "Encuentra productos en tiendas cercanas.",
-    searchPlaceholder: "Busca un producto (ej. leche de avena 1L)",
+    searchPlaceholder: "Pilas, ajo, tiritas…",
     searchHint: "Busca en corto y directo. Te mostramos tiendas cercanas rapido.",
     radiusLabel: "Radio",
     searchButton: "Buscar",
@@ -431,6 +470,19 @@ const dictionaries: Record<Locale, Dictionary> = {
     validationLabel: "Fiabilidad",
     whyMatchLabel: "Por que sale",
     presenceQuestionTemplate: "¿Tienen {product} aquí?",
+    heroTitle: "¿Qué necesitas hoy?",
+    tryLabel: "prueba",
+    nearLabel: "Cerca de",
+    nearYourLocation: "tu ubicación",
+    nearDefaultArea: "Berlín Mitte",
+    resultsHeadingTemplate: "{count} tiendas para {product}",
+    directionsAction: "Cómo llegar",
+    walkMinutesTemplate: "{min} min a pie",
+    bikeMinutesTemplate: "{min} min en bici",
+    storePageAction: "Ver tienda",
+    moreResultsTemplate: "Ver {count} más",
+    showMapAction: "Ver mapa",
+    hideMapAction: "Ocultar mapa",
     presenceYesAction: "Sí, lo vi",
     presenceNoAction: "No lo tenían",
     presenceThanks: "¡Gracias! Así los resultados son más precisos para tus vecinos.",
