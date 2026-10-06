@@ -25,32 +25,35 @@ const monoFont = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://kiez-kauf-berlin.vercel.app"),
-  title: "KiezKauf Berlin — Find it in your Kiez",
+  title: "Kiez Kiez — find it in your Kiez",
   description: "Search for any product and find the nearest local store in Berlin.",
   manifest: "/manifest.json",
   icons: {
-    icon: [{ url: "/favicon.ico", sizes: "any" }],
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" }
+    ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }]
   },
   openGraph: {
-    title: "KiezKauf Berlin — Find it in your Kiez",
+    title: "Kiez Kiez — find it in your Kiez",
     description: "Search for any product and find the nearest local store in Berlin.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "KiezKauf Berlin"
+        alt: "Kiez Kiez Berlin"
       }
     ],
     url: "https://kiez-kauf-berlin.vercel.app",
-    siteName: "KiezKauf Berlin",
+    siteName: "Kiez Kiez",
     locale: "en_US",
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: "KiezKauf Berlin — Find it in your Kiez",
+    title: "Kiez Kiez — find it in your Kiez",
     description: "Search for any product and find the nearest local store in Berlin.",
     images: ["/og-image.png"]
   }

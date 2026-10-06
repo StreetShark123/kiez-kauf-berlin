@@ -875,3 +875,47 @@ body {
     stroke-dashoffset: 0;
   }
 }
+
+/* ---------- logo ---------- */
+
+.nb-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink);
+}
+
+.nb-logo-mark {
+  width: 2.4rem;
+  height: auto;
+  flex: none;
+  overflow: visible;
+}
+
+.nb-logo-text {
+  display: grid;
+  line-height: 1;
+}
+
+.nb-logo-word {
+  font-family: var(--font-hand), cursive;
+  font-size: 1.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.nb-logo-tagline {
+  margin-top: 0.15rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.nb-has-results .nb-logo-mark {
+  width: 2rem;
+}
+
+.nb-has-results .nb-logo-word {
+  font-size: 1.4rem;
+}

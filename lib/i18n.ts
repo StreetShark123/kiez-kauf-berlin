@@ -141,7 +141,7 @@ export type Dictionary = {
 
 const dictionaries: Record<Locale, Dictionary> = {
   de: {
-    appTitle: "KiezKauf Berlin",
+    appTitle: "Kiez Kiez",
     appSubtitle: "Produkte schnell im Kiez finden.",
     searchPlaceholder: "Batterien, Knoblauch, Pflaster…",
     searchHint: "Kurz und konkret suchen. Wir finden passende Laeden in der Naehe.",
@@ -280,7 +280,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     cachedResultLabel: "Cache"
   },
   en: {
-    appTitle: "KiezKauf Berlin",
+    appTitle: "Kiez Kiez",
     appSubtitle: "Find products in nearby local shops.",
     searchPlaceholder: "Batteries, garlic, plasters…",
     searchHint: "Keep it short and direct. We will map nearby shops fast.",
@@ -419,7 +419,7 @@ const dictionaries: Record<Locale, Dictionary> = {
     cachedResultLabel: "Cached result"
   },
   es: {
-    appTitle: "KiezKauf Berlin",
+    appTitle: "Kiez Kiez",
     appSubtitle: "Encuentra productos en tiendas cercanas.",
     searchPlaceholder: "Pilas, ajo, tiritas…",
     searchHint: "Busca en corto y directo. Te mostramos tiendas cercanas rapido.",

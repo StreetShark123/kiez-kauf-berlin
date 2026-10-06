@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { Doodle } from "@/components/Doodle";
 import { LocalMap } from "@/components/LocalMap";
+import { Logo } from "@/components/Logo";
 import { PresenceFeedback } from "@/components/PresenceFeedback";
 import { track } from "@vercel/analytics";
 import type { Dictionary } from "@/lib/i18n";
@@ -1915,12 +1916,9 @@ export function SearchExperience({
       </p>
 
       <header className="nb-hero">
-        <p className="nb-kicker mono">{dictionary.appTitle}</p>
+        <Logo name={dictionary.appTitle} tagline="Berlin" />
         {!showResultsArea ? (
-          <>
-            <Doodle kind="kiez" />
-            <h1 className="nb-title">{dictionary.heroTitle}</h1>
-          </>
+          <h1 className="nb-title">{dictionary.heroTitle}</h1>
         ) : null}
 
         <form
