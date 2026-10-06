@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
+import { Doodle } from "@/components/Doodle";
 import { LocalMap } from "@/components/LocalMap";
 import { PresenceFeedback } from "@/components/PresenceFeedback";
 import { track } from "@vercel/analytics";
@@ -1915,7 +1916,12 @@ export function SearchExperience({
 
       <header className="nb-hero">
         <p className="nb-kicker mono">{dictionary.appTitle}</p>
-        {!showResultsArea ? <h1 className="nb-title">{dictionary.heroTitle}</h1> : null}
+        {!showResultsArea ? (
+          <>
+            <Doodle kind="kiez" />
+            <h1 className="nb-title">{dictionary.heroTitle}</h1>
+          </>
+        ) : null}
 
         <form
           className="nb-search"
@@ -2141,7 +2147,10 @@ export function SearchExperience({
           <div className="nb-columns">
             <div className="nb-list-col">
               {isLoading && filteredListResults.length === 0 ? (
-                <p className="nb-loading nb-hand">{dictionary.searchingLabel}</p>
+                <div className="nb-loading-wrap">
+                  <Doodle kind="searching" />
+                  <p className="nb-loading nb-hand">{dictionary.searchingLabel}</p>
+                </div>
               ) : null}
 
               {filteredListResults.length > 0 ? (
@@ -2323,6 +2332,7 @@ export function SearchExperience({
 
               {!isLoading && hasSearched && (results.length === 0 || filtersHideAllResults) ? (
                 <div className="nb-empty">
+                  <Doodle kind="empty" />
                   <p className="nb-hand nb-empty-title">{noResultsMessage}</p>
                   {noResultsGuidance?.type === "nearby" && !filtersHideAllResults ? (
                     <button

@@ -776,3 +776,102 @@ body {
   gap: 0.6rem;
   font-size: 0.84rem;
 }
+
+/* ---------- doodles ---------- */
+
+.nb-doodle {
+  display: block;
+  color: var(--ink);
+  overflow: visible;
+}
+
+.nb-doodle-marker {
+  fill: var(--marker);
+  stroke: none;
+  opacity: 0.9;
+}
+
+.nb-doodle-empty {
+  width: min(240px, 70vw);
+}
+
+.nb-doodle-searching {
+  width: 180px;
+}
+
+.nb-doodle-thanks {
+  width: 96px;
+}
+
+.nb-doodle-kiez {
+  width: 120px;
+  margin-bottom: -0.4rem;
+}
+
+.nb-doodle-sweep {
+  transform-box: fill-box;
+  transform-origin: 50% 80%;
+  animation: nb-sweep 1.6s ease-in-out infinite alternate;
+}
+
+.nb-doodle-wiggle {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: nb-wiggle 2.4s ease-in-out infinite;
+}
+
+.nb-doodle-draw path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: nb-draw 0.6s 0.15s ease-out forwards;
+}
+
+.nb-loading-wrap {
+  display: grid;
+  justify-items: start;
+  gap: 0.2rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.nb-feedback-thanks-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+@keyframes nb-sweep {
+  from {
+    transform: translateX(-46px) rotate(-6deg);
+  }
+  to {
+    transform: translateX(46px) rotate(6deg);
+  }
+}
+
+@keyframes nb-wiggle {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes nb-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb-doodle-sweep,
+  .nb-doodle-wiggle {
+    animation: none;
+  }
+
+  .nb-doodle-draw path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { track } from "@vercel/analytics";
+import { Doodle } from "@/components/Doodle";
 import type { Dictionary } from "@/lib/i18n";
 
 type FeedbackState = "idle" | "sending" | "thanks" | "error";
@@ -94,9 +95,10 @@ export function PresenceFeedback({
 
   if (state === "thanks") {
     return (
-      <p className="nb-feedback-thanks" role="status">
-        {dictionary.presenceThanks}
-      </p>
+      <div className="nb-feedback-thanks-wrap" role="status">
+        <Doodle kind="thanks" />
+        <p className="nb-feedback-thanks">{dictionary.presenceThanks}</p>
+      </div>
     );
   }
 
