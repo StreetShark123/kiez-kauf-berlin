@@ -89,7 +89,7 @@ export function boundedLevenshtein(a: string, b: string, maxDistance: number): n
   return distance <= maxDistance ? distance : Number.POSITIVE_INFINITY;
 }
 
-// Typos are only tolerated on longer words: "mjlk" is handled by an explicit alias,
+// Typos are only tolerated on words of 6+ letters: "mjlk" is handled by an explicit alias,
 // while "batterien" vs "baterien" is caught here. Returns the edit distance, or null.
 export function fuzzyTokenDistance(queryToken: string, aliasToken: string): number | null {
   if (queryToken === aliasToken) {
@@ -98,8 +98,9 @@ export function fuzzyTokenDistance(queryToken: string, aliasToken: string): numb
   if (/\d/.test(queryToken) || /\d/.test(aliasToken)) {
     return null;
   }
+  // 5-letter words are too close to each other ("paste" vs "pastel") to guess safely.
   const shorter = Math.min(queryToken.length, aliasToken.length);
-  if (shorter < 5) {
+  if (shorter < 6) {
     return null;
   }
   const allowed = shorter >= 9 ? 2 : 1;

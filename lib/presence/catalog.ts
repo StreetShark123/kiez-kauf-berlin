@@ -1,5 +1,5 @@
 import rawCatalog from "@/data/presence/product-types.v1.json";
-import { boundedLevenshtein, foldGermanDigraphs, fuzzyTokenDistance, stemmedTokens, tokenize } from "@/lib/presence/normalize";
+import { boundedLevenshtein, foldGermanDigraphs, fuzzyTokenDistance, stemToken, stemmedTokens, tokenize } from "@/lib/presence/normalize";
 import type { Locale } from "@/lib/types";
 
 export type ProductTypeKind = "product" | "store_type";
@@ -123,6 +123,28 @@ function buildAliasIndex(): AliasEntry[] {
 
 const ALIAS_INDEX = buildAliasIndex();
 
+// Single-word aliases, so "tooth paste" / "Zahn bürste" can be glued back into one word.
+const SINGLE_TOKEN_ALIASES = new Set(
+  ALIAS_INDEX.filter((entry) => entry.tokens.length === 1).map((entry) => entry.tokens[0])
+);
+
+function joinSplitCompounds(rawTokens: string[]): string[] {
+  const output: string[] = [];
+  for (let index = 0; index < rawTokens.length; index += 1) {
+    const next = rawTokens[index + 1];
+    if (next !== undefined) {
+      const joined = rawTokens[index] + next;
+      if (SINGLE_TOKEN_ALIASES.has(stemToken(joined))) {
+        output.push(joined);
+        index += 1;
+        continue;
+      }
+    }
+    output.push(rawTokens[index]);
+  }
+  return output;
+}
+
 // Words that carry no product meaning ("where can I buy", "near me"...).
 const STOPWORDS = new Set(
   [
@@ -198,8 +220,9 @@ function matchAlias(queryTokens: string[], rawQueryTokens: string[], entry: Alia
  * Several types can be returned when the query names several things or an alias is shared.
  */
 export function resolveQuery(query: string): QueryResolution {
-  const tokens = stemmedTokens(query);
-  const rawTokens = tokenize(query).map(foldGermanDigraphs);
+  const words = joinSplitCompounds(tokenize(query));
+  const tokens = words.map(stemToken);
+  const rawTokens = words.map(foldGermanDigraphs);
   const candidates: CandidateMatch[] = [];
   for (const entry of ALIAS_INDEX) {
     const match = matchAlias(tokens, rawTokens, entry);
@@ -271,7 +294,24 @@ export function resolveQuery(query: string): QueryResolution {
     }
   }
 
-  const unmatchedTokens = tokens.filter((token, index) => !claims.has(index) && !STOPWORDS.has(token));
+  let unmatchedTokens = tokens.filter((token, index) => !claims.has(index) && !STOPWORDS.has(token));
+
+  // A typo guess is only trusted when it explains the whole query: in "tooth paste" the unknown
+  // "tooth" means we misunderstood, so "paste≈pastel" must not turn into cake.
+  if (unmatchedTokens.length > 0) {
+    for (const [typeId, match] of typeMatches) {
+      if (match.fuzzy) {
+        typeMatches.delete(typeId);
+      }
+    }
+    unmatchedTokens = tokens.filter((token, index) => {
+      if (STOPWORDS.has(token)) {
+        return false;
+      }
+      const claim = claims.get(index);
+      return !claim || claim.fuzzy;
+    });
+  }
 
   return {
     query,

@@ -75,6 +75,18 @@ describe("query resolution", () => {
     expect(typeIds("Brötchen")).toEqual(["bread_rolls"]);
   });
 
+  it("glues compounds typed as two words", () => {
+    expect(typeIds("tooth paste")).toEqual(["toothpaste"]);
+    expect(typeIds("tooth brush")).toEqual(["toothbrush"]);
+  });
+
+  it("does not guess on short words or when the rest of the query is unknown", () => {
+    // "paste" is one letter from "pastel" (cake in Spanish): must not become cake.
+    expect(typeIds("paste")).toEqual([]);
+    expect(typeIds("tooth paste")).not.toContain("cake");
+    expect(resolveQuery("hair dryer").resolved).toBe(false);
+  });
+
   it("tolerates typos on long words only", () => {
     expect(typeIds("bateries")).toEqual(["batteries"]);
     expect(typeIds("Waschmitel")).toEqual(["laundry_detergent"]);
