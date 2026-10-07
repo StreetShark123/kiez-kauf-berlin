@@ -108,3 +108,17 @@ describe("searchPresence with evidence", () => {
     expect(output.results).toEqual([]);
   });
 });
+
+describe("evidence storage failures", () => {
+  it("reports storage_error instead of throwing when persistence fails", async () => {
+    class ReadOnlyRepository extends MemoryEvidenceRepository {
+      protected async persist(): Promise<void> {
+        throw new Error("EROFS: read-only file system");
+      }
+    }
+    const repository = new ReadOnlyRepository();
+    const result = await repository.add({ storeId: "s1", productTypeId: "milk", signal: 1, source: "user", deviceHash: null });
+    expect(result).toEqual({ ok: false, reason: "storage_error" });
+    expect(await repository.listForStore("s1")).toEqual([]);
+  });
+});

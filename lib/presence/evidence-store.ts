@@ -58,6 +58,7 @@ export class MemoryEvidenceRepository implements EvidenceRepository {
 
   async add(evidence: NewEvidence): Promise<AddEvidenceResult> {
     await this.load();
+    const snapshot = [...this.rows];
     if (evidence.deviceHash) {
       const since = dayAgoIso(1);
       const recent = this.rows.filter((row) => row.deviceHash === evidence.deviceHash && row.createdAt >= since);
@@ -87,7 +88,14 @@ export class MemoryEvidenceRepository implements EvidenceRepository {
       query: evidence.query ?? null,
       interactionId: evidence.interactionId ?? null
     });
-    await this.persist();
+    try {
+      await this.persist();
+    } catch (error) {
+      // e.g. read-only filesystem on serverless hosts without the Supabase table yet
+      console.warn("[presence] could not persist evidence:", error instanceof Error ? error.message : error);
+      this.rows = snapshot;
+      return { ok: false, reason: "storage_error" };
+    }
     return { ok: true };
   }
 
