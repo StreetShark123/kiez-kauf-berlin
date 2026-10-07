@@ -37,7 +37,8 @@ function buildForwardArgs(args) {
     "offset",
     "resume",
     "close-candidate-grace-days",
-    "batch-id"
+    "batch-id",
+    "snapshot-only"
   ];
 
   for (const key of safePassThrough) {

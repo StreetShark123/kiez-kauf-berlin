@@ -11,6 +11,19 @@ MVP web responsive para buscar productos concretos y encontrar tiendas de barrio
 - i18n: Aleman e Ingles
 - Vercel Web Analytics + Speed Insights
 
+## Motor de búsqueda: modelo de presencia
+
+Desde 2026-10 la búsqueda usa el **modelo de presencia** (`lib/presence`, datos en `data/presence`):
+cada consulta se resuelve a un tipo de producto y cada tienda recibe una probabilidad
+(prior por categoría/marca + evidencia de usuarios). Guía completa: [`docs/presence-model.md`](docs/presence-model.md).
+
+- `SEARCH_ENGINE=legacy` (o `?engine=legacy`) vuelve al motor anterior.
+- Calidad: `npm test` incluye el gold suite (`data/eval/gold-queries.v1.json`); `npm run eval:gold` lo
+  corre contra una app en marcha.
+- Nota macOS/iCloud: si el repo está en `~/Documents` con iCloud activo, `node_modules` y `.next`
+  deben ser enlaces a `node_modules.nosync` / `.next.nosync` (iCloud no sincroniza `*.nosync`);
+  si no, macOS los vacía y los tests/compilaciones se cuelgan.
+
 ## Flujo MVP
 
 1. Usuario busca producto exacto.

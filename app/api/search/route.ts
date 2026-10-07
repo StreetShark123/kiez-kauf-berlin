@@ -5,6 +5,12 @@ import {
   persistQueryResolutionLog,
   resolveQueryWithLlm
 } from "@/lib/query-intelligence";
+import { runPresenceSearch, selectedEngine } from "@/lib/presence/server";
+import type { Locale } from "@/lib/types";
+
+function parseLocale(value: string | null): Locale {
+  return value === "en" || value === "es" || value === "de" ? value : "de";
+}
 
 const DEFAULT_RADIUS_METERS = 2000;
 const MIN_RADIUS_METERS = 300;
@@ -72,6 +78,53 @@ export async function GET(request: NextRequest) {
       radiusMeters: radius
     });
     const effectiveQuery = chooseEffectiveQuery(resolution);
+
+    if (selectedEngine(searchParams.get("engine")) === "presence") {
+      const locale = parseLocale(searchParams.get("locale"));
+      const presence = await runPresenceSearch({
+        query: q,
+        alternateQuery: effectiveQuery,
+        lat,
+        lng,
+        radiusMeters: radius,
+        locale
+      });
+      const resultMode =
+        presence.results.length > 0
+          ? presence.serviceResults.length > 0
+            ? "products_plus_services"
+            : "products_only"
+          : "services_fallback_only";
+      const endpoint = `${fallbackRequested ? "search_api_fallback" : "search_api_primary"}:presence_${presence.storeSource}`;
+      await persistQueryResolutionLog({
+        resolution,
+        lat,
+        lng,
+        radiusMeters: radius,
+        resultMode,
+        resultsCount: presence.results.length,
+        serviceFallbackCount: presence.serviceResults.length,
+        endpoint
+      });
+      return NextResponse.json({
+        query: q,
+        effective_query: effectiveQuery,
+        query_intent: resolution.intentType,
+        query_resolution_confidence: Number(resolution.confidence.toFixed(4)),
+        query_resolution_used_llm: resolution.usedLlm,
+        engine: "presence",
+        product_types: presence.resolution.types.map((match) => match.typeId),
+        modifiers: presence.resolution.modifiers,
+        unmatched_terms: presence.resolution.unmatchedTokens,
+        origin: { lat, lng },
+        radius,
+        results: presence.results,
+        service_fallback: presence.serviceResults,
+        result_mode: resultMode,
+        endpoint
+      });
+    }
+
     let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutHandle = setTimeout(() => {
@@ -115,6 +168,7 @@ export async function GET(request: NextRequest) {
       query_intent: resolution.intentType,
       query_resolution_confidence: Number(resolution.confidence.toFixed(4)),
       query_resolution_used_llm: resolution.usedLlm,
+      engine: "legacy",
       origin: { lat, lng },
       radius,
       results,

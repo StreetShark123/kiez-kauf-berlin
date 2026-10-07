@@ -12,3 +12,8 @@ coverage
 skills-lock.json
 data/berlin/.pipeline-state.json
 data/berlin/osm_berlin_establishments.normalized.json
+
+# iCloud: keep build/deps out of sync (see README)
+node_modules.nosync
+.next.nosync
+.data
